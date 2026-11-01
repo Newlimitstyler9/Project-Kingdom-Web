@@ -6,12 +6,12 @@ const jobs=Object.freeze([
   {id:"fieldwork",title:"Tending fields",place:"farm",capacity:2,season:"growing"},
   {id:"winter-farm",title:"Repairing farm tools",place:"farm",capacity:2,season:"winter"},
   {id:"milling",title:"Milling grain",place:"mill",capacity:1},
-  {id:"baking",title:"Baking bread",place:"inn",capacity:1},
+  {id:"baking",title:"Baking bread",place:"bakery",capacity:1},
   {id:"hospitality",title:"Serving travelers",place:"inn",capacity:1},
   {id:"trade",title:"Running market stalls",place:"market",capacity:2},
-  {id:"healing",title:"Treating villagers",place:"market",capacity:1},
-  {id:"guard",title:"Keeping watch",place:"market",capacity:1},
-  {id:"weaving",title:"Making cloth",place:"market",capacity:1},
+  {id:"healing",title:"Treating villagers",place:"healer",capacity:1},
+  {id:"guard",title:"Keeping watch",place:"guard",capacity:1},
+  {id:"weaving",title:"Making cloth",place:"weaver",capacity:1},
   {id:"maintenance",title:"Repairing village paths",place:"green",capacity:1},
   {id:"gathering",title:"Collecting supplies",place:"farm",capacity:1}
 ]);

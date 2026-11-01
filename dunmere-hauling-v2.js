@@ -1,6 +1,6 @@
 (function(root){"use strict";
 function create(world,food){
- const locations={farm:"farm",mill:"mill",bakery:"inn",market:"market"};
+ const locations={farm:"farm",mill:"mill",bakery:"bakery",market:"market"};
  const stock={farm:{grain:24},mill:{grain:0,flour:0},bakery:{flour:0,bread:0}};
  const carriers=[
  {worker:9,source:"farm",target:"mill",item:"grain",capacity:6},

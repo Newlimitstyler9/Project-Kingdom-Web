@@ -8,6 +8,6 @@ This is a standalone HTML prototype, not a compiled app. The ChatGPT in-app file
 
 The Character tab has a **Preview underwear base** button. Close the menu to view the body sheet; reopen Character to switch back to the starter outfit. The base sheet is ready for future clothing overlays.
 
-Dunmere's twelve residents each have their own appearance, with different colors and job details. Their complete four-direction walking poses share the player's ground anchor. The roster and source workflow are documented in `docs/architecture/npc-appearances.md`.
+Dunmere's twelve residents each have their own appearance, with different colors and job details. Their complete four-direction walking poses share the player's ground anchor. Residents now have distinct homes, work sites, and gathering spots in the village. The roster and source workflow are documented in `docs/architecture/npc-appearances.md`; the village plan and research are in `docs/architecture/dunmere-village-plan.md`.
 
 After a game change is merged into `main`, run `python3 scripts/publish-web.py` from the repository root to mirror the static prototype to the public Pages repository. The live check is `bash scripts/check-live.sh`.
