@@ -15,6 +15,13 @@ function create(places,residents=[]){
     solid[yy][xx]=(xx===x||xx===x+w-1||yy===y||yy===y+h-1)&&!(xx===doorX&&yy===doorY);
   }
  }
+ const inn=buildings.find(b=>b.id==='inn');
+ const innYard=inn?[
+  {sprite:'yardTrough',x:inn.x+inn.w+.15,y:inn.y+.78,w:1.52,h:.76,blocked:[[inn.x+inn.w,inn.y+1]]},
+  {sprite:'yardCart',x:inn.x+inn.w+.08,y:inn.y+2.25,w:1.82,h:1.42,blocked:[[inn.x+inn.w,inn.y+3],[inn.x+inn.w+1,inn.y+3]]},
+  {sprite:'yardLogs',x:inn.x-1.53,y:inn.y+2.42,w:1.08,h:1.16,blocked:[[inn.x-2,inn.y+3]]}
+ ]:[];
+ for(const prop of innYard)for(const [px,py] of prop.blocked)if(px>=0&&py>=0&&px<WIDTH&&py<HEIGHT)solid[py][px]=true;
  solid[24][20]=true; // Stone well on the green.
  for(let y=25;y<HEIGHT;y++)for(let x=0;x<3;x++)solid[y][x]=true; // Brook and mill race.
  function goal(place,id=0){
@@ -58,7 +65,8 @@ function create(places,residents=[]){
    return x===b.doorX&&y>b.doorY&&y<=lane;
   });
  }
- return {width:WIDTH,height:HEIGHT,solid,buildings,goal,porch,road};
+ function innYardGround(x,y){return !!inn&&((y===inn.y+inn.h&&x>=inn.x-2&&x<inn.x+inn.w+2)||((x===inn.x-2||x===inn.x-1||x===inn.x+inn.w||x===inn.x+inn.w+1)&&y>=inn.y+1&&y<inn.y+inn.h))&&!road(x,y)}
+ return {width:WIDTH,height:HEIGHT,solid,buildings,innYard,innYardGround,goal,porch,road};
 }
 root.DunmereVillageLayout={create};
 })(window);

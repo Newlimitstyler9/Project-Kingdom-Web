@@ -1,0 +1,3 @@
+"LPC Thatched-roof Cottage" by bluecarrot16. License: CC-BY-SA 3.0 / GPL 3.0+. Source: https://opengameart.org/content/lpc-thatched-roof-cottage
+Based on "LPC Base Assets" by Lanea Zimmerman (Sharm) and Daniel Armstrong (HughSpectrum), CC-BY-SA 3.0 / GPL 3.0+, and "LPC art entry" by Casper Nilsson, CC-BY-SA 3.0 / GPL 3.0+.
+The game uses the CC-BY-SA 3.0 option. Original source sheets are preserved as inn-thatch-roof.png and inn-cottage-wall.png. Cropping and scaling occur in dunmere-inn-sprites.js and dunmere-art.js.

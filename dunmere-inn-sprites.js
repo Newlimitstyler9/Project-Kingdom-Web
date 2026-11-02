@@ -1,6 +1,6 @@
 // LPC Tavern sprite crops used by the Hearth & Hound. See assets/inn-tavern-CREDITS.txt.
 (function(root){"use strict";
-const sheets={furniture:'assets/inn-tavern-furniture.png',cooking:'assets/inn-tavern-cooking.png',deco:'assets/inn-tavern-deco.png',exterior:'assets/inn-medieval-exterior.png',interior:'assets/inn-medieval-interior.png',guestBed:'assets/inn-guest-bed.png'};
+const sheets={furniture:'assets/inn-tavern-furniture.png',cooking:'assets/inn-tavern-cooking.png',deco:'assets/inn-tavern-deco.png',exterior:'assets/inn-medieval-exterior.png',interior:'assets/inn-medieval-interior.png',guestBed:'assets/inn-guest-bed.png',thatch:'assets/inn-thatch-roof.png',cottage:'assets/inn-cottage-wall.png',yard:'assets/inn-yard-decorations.png'};
 const crops={
  counter:['furniture',191,320,96,54],table:['furniture',320,190,64,54],stool:['furniture',578,198,32,32],
  cupboard:['furniture',423,0,80,64],
@@ -11,6 +11,8 @@ const crops={
  innRoof:['exterior',128,0,128,64],innWall:['exterior',128,128,128,80],
  innShingle:['exterior',128,0,32,48],innChimney:['exterior',160,0,16,64],
  innDoor:['exterior',172,71,26,41],innWindow:['exterior',210,70,31,32],
+ innThatch:['thatch',80,224,132,104],innTimber:['cottage',0,0,96,128],
+ yardCart:['yard',192,510,92,74],yardTrough:['yard',422,530,90,48],yardLogs:['yard',455,640,57,60],innSign:['yard',254,36,34,30],
  floorA:['interior',0,192,32,32],floorB:['interior',32,192,32,32],
  wallA:['interior',0,128,32,32],wallB:['interior',32,128,32,32],wallWindows:['interior',96,128,64,64]
 };

@@ -46,14 +46,10 @@ function plant(g,kind,x,y,size,seed=0){const baseX=Math.round((x+.5)*size),baseY
 function crop(g,x,y,size,growth){for(let i=0;i<3;i++){const bx=(x+.18+i*.29)*size,by=(y+.83)*size,h=Math.max(4,growth/100*size*.6);r(g,bx,by-h,size*.07,h,growth>=90?"#c4a65a":"#4e783b");r(g,bx-size*.07,by-h*.65,size*.12,size*.07,"#81944c")}}
 function building(g,b,size,open=false){const x=b.x*size,y=b.y*size,w=b.w*size,h=b.h*size;
  if(b.kind==='tavern'&&root.KingdomInnSprites?.ready){const sprites=root.KingdomInnSprites;
-  const left=x-size*.12,roofY=y-size*.42,roofW=w+size*.24;
-  sprites.draw(g,'innWall',x,y+size*1.45,w,size*2.55);
-  r(g,x,y+size*2.52,w,size*.13,'#593c2b');r(g,x,y+size*2.58,w,size*.04,'#bb8c58');
-  for(let i=0;i<10;i++)sprites.draw(g,'innShingle',left+i*roofW/10,roofY,roofW/10+1,size*1.94);
-  sprites.draw(g,'innChimney',x+size*3.72,y-size*.53,size*.34,size*1.33);
-  for(const px of [1.05,3.42])sprites.draw(g,'innWindow',x+size*px,y+size*1.71,size*.58,size*.57);
-  for(const px of [.55,3.82])sprites.draw(g,'innWindow',x+size*px,y+size*2.84,size*.62,size*.65);
-  sprites.draw(g,'innDoor',b.doorX*size+size*.07,b.doorY*size-size*.13,size*.86,size*1.13);
+  for(let i=0;i<2;i++)sprites.draw(g,'innTimber',x+i*w/2,y+size*1.24,w/2,size*2.76);
+  r(g,x,y+size*2.54,w,size*.1,'#503323');
+  for(const px of [.62,3.8])sprites.draw(g,'innWindow',x+size*px,y+size*2.07,size*.6,size*.58);
+  sprites.draw(g,'innDoor',b.doorX*size+size*.03,b.doorY*size-size*.17,size*.94,size*1.17);
   return;
  }
  const stone=['mill','smithy','guard'].includes(b.kind),wall=stone?'#9b9888':'#b4976d',beam=stone?'#626b68':'#76543a';
@@ -85,19 +81,19 @@ function roof(g,b,size){const x=b.x*size,y=b.y*size,w=b.w*size,h=(b.h-1)*size;
  if(['smithy','bakery','tavern'].includes(b.kind)){r(g,x+size*3.7,y-size*.14,size*.33,size*.55,'#776a5c');r(g,x+size*3.6,y-size*.2,size*.53,size*.12,'#4c4843')}
  }
  if(b.kind==='tavern'){
-  // A hanging sign leaves both storeys and all four windows visible.
-  r(g,x+size*.38,y+size*2.62,size*.08,size*.42,'#3d2e25');
-  r(g,x+size*.3,y+size*2.62,size*1.86,size*.53,'#3d2e25');
-  r(g,x+size*.36,y+size*2.68,size*1.74,size*.41,'#9d7846');
-  g.textAlign='center';g.font='bold 9px system-ui';g.lineWidth=2;g.strokeStyle='#4a3325';g.fillStyle='#f6e6be';
-  g.strokeText('HEARTH & HOUND',x+size*1.23,y+size*2.96);g.fillText('HEARTH & HOUND',x+size*1.23,y+size*2.96);
-  for(const tx of [2.05,3.08]){const px=x+size*tx,py=y+size*3.22;if(!root.KingdomInnSprites?.draw(g,'sconce',px-size*.18,py-size*.43,size*.36,size*.43)){r(g,px-7,py+1,14,4,'#4d3c2e');r(g,px-2,py-14,4,7,'#e2a455')}}
+  const sprites=root.KingdomInnSprites;
+  if(sprites?.ready)sprites.draw(g,'innThatch',x-size*.27,y-size*.33,w+size*.54,size*2.5);
+  sprites?.draw(g,'innChimney',x+size*3.45,y-size*.48,size*.33,size*.7);
+  // An actual hanging inn sign replaces the painted rectangle on the facade.
+  sprites?.draw(g,'innSign',x+size*.23,y+size*2.57,size*.95,size*.83);
+  for(const tx of [2.05,3.08]){const px=x+size*tx,py=y+size*3.22;if(!sprites?.draw(g,'sconce',px-size*.18,py-size*.43,size*.36,size*.43)){r(g,px-7,py+1,14,4,'#4d3c2e');r(g,px-2,py-14,4,7,'#e2a455')}}
   return;
  }
  g.textAlign='center';g.font='bold 10px system-ui';g.lineWidth=3;g.strokeStyle='#263027';g.fillStyle='#f3dfaf';
  const label=b.kind==='home'?b.name:b.name.replace("Dunmere ",'');
  g.strokeText(label,x+w/2,y+size*3.45);g.fillText(label,x+w/2,y+size*3.45);
 }
+function innYard(g,props,size){const sprites=root.KingdomInnSprites;if(!sprites?.ready)return;for(const prop of props)sprites.draw(g,prop.sprite,prop.x*size,prop.y*size,prop.w*size,prop.h*size)}
 function villageSite(g,p,size,road){
  const x=p.x*size,y=p.y*size;
  if(p.kind==='farm'){
@@ -169,5 +165,5 @@ function person(g,x,y,size,color,dir,walk,tool){const art=sprite("person:"+color
  g.drawImage(art,Math.round(px-w/2),Math.round(py+size*.12-44*scale),Math.round(w),Math.round(h));
 }
 function resource(g,name,x,y,size){const px=x*size,py=y*size;g.fillStyle=P.shadow;g.beginPath();g.ellipse(px,py+size*.13,size*.2,size*.07,0,0,Math.PI*2);g.fill();if(name==="charcoal"){r(g,px-10,py-6,20,12,P.black);r(g,px-7,py-10,10,7,"#34393b");r(g,px+3,py-4,5,3,"#596062")}else if(name==="wood"){r(g,px-13,py-5,26,9,P.wood);r(g,px-10,py-3,7,5,P.woodLight)}else if(name==="stone"){r(g,px-10,py-8,20,13,P.rock);r(g,px-7,py-8,9,3,P.rockHi)}}
-root.KingdomArt={terrain,plant,crop,building,roof,villageSite,water,shelter,person,resource,palette:P};
+root.KingdomArt={terrain,plant,crop,building,roof,innYard,villageSite,water,shelter,person,resource,palette:P};
 })(window);
