@@ -3,6 +3,7 @@
 const defs={
  charcoal:{name:"Charcoal",type:"material",stack:20,weight:.4,art:["................","......111.......","....112211......","...12222211.....","..1223332211....","..1233333221....","..1233233221....","..1223333221....","...122332211....","....112221......","......111.......","................"],palette:["#00000000","#101415","#252a2b","#454b4c"]},
  bread:{name:"Bread",type:"food",stack:10,weight:.3,nutrition:20,art:["................","......111.......","....122221......","...12222221.....","..1223223221....","..1232223221....","..1222222221....","...12222221.....","....111111......","................"],palette:["#00000000","#4a3327","#b07a42","#e8bd78"]},
+ ale:{name:"Ale cup",type:"drink",stack:10,weight:.5,art:["................","...11111111.....","...12222221.11..","...12333321.121.","...12333321.121.","...12333321.11..","...12333321.....","....122221......",".....1111.......","................"],palette:["#00000000","#493522","#9d6a35","#ddad59"]},
  axe:{name:"Stone axe",type:"tool",stack:1,weight:1.6,slot:"hand",art:["....111.........","...122211.......","..12222211......","..12332221......","...122221.......","....1112........",".......2........",".......2........",".......2........",".......2........",".......2........",".......2........","................"],palette:["#00000000","#2c3535","#8e9690","#d3d3bf"]},
  stick:{name:"Stick",type:"material",stack:20,weight:.2,art:["................","............1...","...........12...","..........12....",".........12.....","........12......",".......12.......","......12........",".....12.........","....12..........","...12...........","..11............"],palette:["#00000000","#453528","#99734a","#d1aa73"]}
 };
@@ -29,6 +30,7 @@ function create(actions,options={}){
  function act(slot,action){const item=slots[slot];if(!item)return {ok:false,message:"Empty slot."};const def=defs[item.id];
  if(action==="drop"){if(!take(slot,1))return {ok:false};ground.push({id:item.id,count:1});return {ok:true,message:"Dropped one "+def.name.toLowerCase()+"."}}
  if(action==="eat"){if(def.type!=="food")return {ok:false,message:"This item isn't edible."};take(slot,1);return {ok:true,nutrition:def.nutrition,message:"You ate "+def.name.toLowerCase()+"."}}
+ if(action==="drink"){if(def.type!=="drink")return {ok:false,message:"This item isn't a drink."};take(slot,1);return {ok:true,message:"You drank a cup of ale."}}
  if(action==="equip"){if(!def.slot)return {ok:false,message:"This item cannot be equipped."};if(equipped!==null){if(!add(equipped,1))return {ok:false,message:"No room to unequip your current tool."}}equipped=item.id;take(slot,1);return {ok:true,message:"Equipped "+def.name+"."}}
  return {ok:false,message:"Unknown action."}}
  function reconcile(){const amount=actions.charcoal;const actual=slots.reduce((n,s)=>n+(s?.id==="charcoal"?s.count:0),0);if(amount>actual)add("charcoal",amount-actual);else if(amount<actual){let remaining=actual-amount;for(let i=SLOTS-1;i>=0&&remaining;i--)if(slots[i]?.id==="charcoal"){let n=Math.min(remaining,slots[i].count);take(i,n);remaining-=n}}}

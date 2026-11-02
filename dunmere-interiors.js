@@ -3,7 +3,7 @@
 const W=12,H=9;
 const FURNITURE={
  home:[['bed',2,2,2,2],['bed',8,2,2,2],['hearth',2,5,2,1],['table',6,4,2,1]],
- tavern:[['counter',2,2,7,1],['table',2,5,2,1],['table',8,5,2,1],['hearth',9,2,1,2]],
+ tavern:[['cupboard',1.15,1.2,2.25,1],['hearth',8.0,1.35,1.8,1.9],['counter',2,3,6,1],['barrel',8.9,6.4,1,1],['table',2,5,2,1],['table',7,5,2,1],['bench',2,6,2,.35],['bench',7,6,2,.35]],
  smithy:[['forge',2,2,2,2],['anvil',7,3,2,1],['rack',2,6,2,1]],
  mill:[['millstone',2,2,2,2],['sacks',8,2,2,1],['sacks',8,5,2,1]],
  bakery:[['oven',2,2,2,2],['counter',6,3,3,1],['sacks',8,6,2,1]],
@@ -18,6 +18,8 @@ function furniture(ctx,f,size){
  const box=(dx,dy,bw,bh,color)=>{ctx.fillStyle=color;ctx.fillRect(x+dx,y+dy,bw,bh)};
  if(f.type==='bed'){box(0,0,w,h,'#4b392b');box(4,4,w-8,h-8,'#738779');box(6,6,w-12,h*.28,'#ded4b5');box(6,h*.4,w-12,h*.48,'#856a6a');return}
  if(f.type==='table'||f.type==='counter'){box(0,0,w,h,'#4a3426');box(4,4,w-8,h-8,'#886541');box(7,6,w-14,3,'#b59162');if(f.type==='table'){box(w*.45,h*.3,10,8,'#d4be91');box(w*.48,h*.35,5,4,'#6b7659')}return}
+ if(f.type==='bench'){box(0,0,w,h,'#4b3325');box(4,2,w-8,h-4,'#8b6643');box(7,h-3,4,7,'#62442d');box(w-11,h-3,4,7,'#62442d');return}
+ if(f.type==='barrel'){ctx.fillStyle='#533a2a';ctx.beginPath();ctx.ellipse(x+w/2,y+h/2,w*.44,h*.46,0,0,7);ctx.fill();box(w*.12,h*.27,w*.76,4,'#a78d67');box(w*.12,h*.7,w*.76,4,'#a78d67');box(w*.35,h*.2,w*.3,h*.1,'#b28b57');return}
  if(f.type==='hearth'||f.type==='forge'||f.type==='oven'){box(0,0,w,h,'#55564e');box(5,5,w-10,h-10,'#282d2c');box(w*.23,h*.42,w*.54,h*.4,f.type==='oven'?'#a1663e':'#af4d30');box(w*.42,h*.26,w*.18,h*.34,'#e6a751');return}
  if(f.type==='anvil'){box(0,h*.4,w,h*.34,'#414b4d');box(w*.2,h*.24,w*.6,h*.23,'#a4ada7');box(w*.4,h*.7,w*.2,h*.3,'#5c5046');return}
  if(f.type==='rack'||f.type==='shelf'){box(0,0,w,h,'#624932');for(let i=0;i<3;i++){box(4+i*w*.28,5,8,h-10,f.type==='rack'?'#9ba6a4':['#79915c','#a67c62','#b5a06a'][i])}return}
@@ -27,21 +29,51 @@ function furniture(ctx,f,size){
  if(f.type==='boulder'||f.type==='stone'){ctx.fillStyle=f.type==='stone'?'#aab8ad':'#505b54';ctx.beginPath();ctx.moveTo(x,y+h);ctx.lineTo(x+w*.15,y+h*.22);ctx.lineTo(x+w*.7,y);ctx.lineTo(x+w,y+h*.55);ctx.lineTo(x+w*.8,y+h);ctx.fill();box(w*.3,h*.25,w*.2,3,'#c2cbbf')}
 }
 function create(buildings){
- const rooms=Object.fromEntries([...buildings.map(b=>[b.id,{id:b.id,name:b.name,kind:b.kind,portal:{x:b.doorX+.5,y:b.doorY+.5}}]),[CAVE.id,CAVE]].map(([id,room])=>[id,{...room,width:W,height:H,furniture:(FURNITURE[room.kind]||FURNITURE.home).map(([type,x,y,w,h])=>({type,x,y,w,h}))}]));
+ const rooms=Object.fromEntries([...buildings.map(b=>[b.id,{id:b.id,name:b.name,kind:b.kind,portal:{x:b.doorX+.5,y:b.doorY+.5}}]),[CAVE.id,CAVE]].map(([id,room])=>[id,{...room,width:W,height:H,furniture:(FURNITURE[room.kind]||FURNITURE.home).map(([type,x,y,w,h])=>({type,x,y,w,h})),lights:room.kind==='tavern'?[{x:3.7,y:1.7,type:'wall-candle'},{x:7.4,y:1.7,type:'wall-candle'},{x:8.9,y:2.45,type:'hearth'}]:[]}]));
  function get(id){return rooms[id]||null}
- function pass(room,x,y){if(!room||x<1.2||x>W-1.2||y<1.2||y>H-1.05)return false;return !room.furniture.some(f=>x>=f.x-.2&&x<f.x+f.w+.2&&y>=f.y-.2&&y<f.y+f.h+.2)}
- function slot(room,index){const candidates=[];for(const y of [3.5,4.5,5.5,6.5,2.5])for(const x of [3.5,5.5,7.5,9.5,4.5,6.5,8.5])if(pass(room,x,y)&&Math.hypot(x-5.5,y-7.3)>1.4)candidates.push({x,y});return candidates[index%candidates.length]||{x:5.5,y:5.5}}
+ function pass(room,x,y){if(!room||x<1.2||x>W-1.2||y<(room.kind==='tavern'?2.25:1.2)||y>H-1.05)return false;return !room.furniture.some(f=>x>=f.x-.2&&x<f.x+f.w+.2&&y>=f.y-.2&&y<f.y+f.h+.2)}
+ function slot(room,index){if(room.kind==='tavern'&&index===0)return {x:4.5,y:2.55};const candidates=[];for(const y of [4.5,5.5,6.5,3.5,2.5])for(const x of [3.5,5.5,7.5,9.5,4.5,6.5,8.5])if(pass(room,x,y)&&Math.hypot(x-5.5,y-7.3)>1.4)candidates.push({x,y});return candidates[(room.kind==='tavern'?index-1:index)%candidates.length]||{x:5.5,y:5.5}}
  function nearPortal(x,y){return Object.values(rooms).find(r=>Math.hypot(x-r.portal.x,y-r.portal.y)<1.45)||null}
- function draw(ctx,room,size){
+ function draw(ctx,room,size,details={}){
   const cave=room.kind==='cave',wall=cave?'#343c3a':'#514236',floor=cave?'#676b60':'#a5845e';
   ctx.fillStyle=wall;ctx.fillRect(0,0,W*size,H*size);
   ctx.fillStyle=floor;ctx.fillRect(size,size,(W-2)*size,(H-2)*size);
-  ctx.fillStyle=cave?'#767b6d':'#b6956a';
-  for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++)if((x*11+y*17)%7===0)ctx.fillRect(x*size+size*.2,y*size+size*.35,size*.22,size*.07);
-  ctx.fillStyle=cave?'#252d2c':'#34291f';ctx.fillRect(5*size,8*size,size,12);
+  const sprites=root.KingdomInnSprites;
+  if(room.kind==='tavern'&&sprites?.ready){
+   // Complete floor and back-wall tiles. All furnishings share these source pixels.
+   for(let y=1;y<8;y++)for(let x=1;x<11;x++)sprites.draw(ctx,(x+y)%3?'floorA':'floorB',x*size,y*size,size,size);
+   for(let x=1;x<11;x++)sprites.draw(ctx,x%3?'wallA':'wallB',x*size,size,size,size);
+   sprites.draw(ctx,'wallWindows',4.8*size,1.05*size,2.2*size,1.35*size);
+   for(let y=6;y<8;y++)for(let x=5;x<7;x++)sprites.draw(ctx,'floorB',x*size,y*size,size,size);
+  }
+  for(const light of room.lights){const x=light.x*size,y=light.y*size,radius=light.type==='hearth'?size*2.6:size*1.7;const glow=ctx.createRadialGradient(x,y,0,x,y,radius);glow.addColorStop(0,'#f5ad5140');glow.addColorStop(1,'#f5ad5100');ctx.fillStyle=glow;ctx.fillRect(x-radius,y-radius,radius*2,radius*2)}
+  if(room.kind!=='tavern'){ctx.fillStyle=cave?'#767b6d':'#b6956a';for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++)if((x*11+y*17)%7===0)ctx.fillRect(x*size+size*.2,y*size+size*.35,size*.22,size*.07)}
+  if(room.kind==='tavern'&&sprites?.ready)sprites.draw(ctx,'innDoor',5.1*size,7.72*size,.8*size,1.06*size);
+  else{ctx.fillStyle=cave?'#252d2c':'#34291f';ctx.fillRect(5*size,8*size,size,12)}
   ctx.fillStyle='#e6ce9f';ctx.font=`bold ${Math.round(size*.25)}px system-ui`;ctx.textAlign='center';ctx.fillText(room.name,W*size/2,size*.6);
-  for(const f of room.furniture)furniture(ctx,f,size);
-  ctx.fillStyle='#e8d3a7';ctx.font=`${Math.round(size*.22)}px system-ui`;ctx.fillText('EXIT',5.5*size,7.8*size);
+  for(const f of room.furniture){
+   if(room.kind==='tavern'&&sprites?.ready){
+    if(f.type==='cupboard'){sprites.draw(ctx,'cupboard',1.2*size,1.42*size,2.3*size,.92*size);continue}
+    if(f.type==='counter'){for(let i=0;i<3;i++)sprites.draw(ctx,'counter',(2+i*2)*size,2.96*size,2*size,1.12*size);continue}
+    if(f.type==='hearth'){sprites.draw(ctx,'hearth',8.03*size,1.43*size,1.78*size,1.8*size);sprites.draw(ctx,'fire',8.47*size,2.34*size,.88*size,.45*size);continue}
+    if(f.type==='barrel'){sprites.draw(ctx,'barrel',8.9*size,6.28*size,.88*size,1.1*size);continue}
+    if(f.type==='table'){sprites.draw(ctx,'table',f.x*size,4.89*size,2*size,1.22*size);continue}
+    if(f.type==='bench'){for(let i=0;i<2;i++)sprites.draw(ctx,'stool',(f.x+.18+i*.94)*size,6.05*size,.72*size,.72*size);continue}
+   }
+   furniture(ctx,f,size);
+  }
+  if(room.kind==='tavern'){
+   const stock=details.shop?.stock||{bread:0,ale:0};
+   // Sprite goods are tied to the saved stock ledger; a sold loaf disappears from view.
+   if(sprites?.ready){
+    for(let i=0;i<Math.min(stock.bread,5);i++)sprites.draw(ctx,'bread',(2.24+i*.96)*size,3.28*size,.52*size,.45*size);
+    for(let i=0;i<Math.min(stock.ale,3);i++)sprites.draw(ctx,'ale',(7.14+i*.25)*size,3.23*size,.34*size,.45*size);
+    sprites.draw(ctx,'ale',3.12*size,5.11*size,.35*size,.4*size);
+    sprites.draw(ctx,'ale',8.05*size,5.11*size,.35*size,.4*size);
+   }
+  }
+  for(const light of room.lights)if(light.type==='wall-candle'){const x=light.x*size,y=light.y*size;if(!(room.kind==='tavern'&&sprites?.draw(ctx,'candle',x-size*.2,y-size*.43,size*.4,size*.58))){ctx.fillStyle='#4c3928';ctx.fillRect(x-7,y-2,14,5);ctx.fillStyle='#d8c696';ctx.fillRect(x-2,y-12,4,11);ctx.fillStyle='#efa74d';ctx.fillRect(x-2,y-18,4,6);ctx.fillStyle='#fff0a7';ctx.fillRect(x-1,y-16,2,3)}}
+  if(room.kind!=='tavern'){ctx.fillStyle='#e8d3a7';ctx.font=`${Math.round(size*.22)}px system-ui`;ctx.fillText('EXIT',5.5*size,7.8*size)}
  }
  return {rooms,get,pass,slot,nearPortal,draw,cave:CAVE};
 }
