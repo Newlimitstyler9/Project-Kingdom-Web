@@ -1,11 +1,11 @@
-// Twelve resident rows with profession-specific clothing and repaired poses.
+// Twelve resident rows with distinct resident silhouettes, clothing, and repaired poses.
 (function(root){"use strict";
 const image=new Image();
 let ready=false;
 let failed=false;
 image.onload=()=>{ready=image.naturalWidth===384&&image.naturalHeight===576;failed=!ready};
 image.onerror=()=>{failed=true};
-image.src="assets/dunmere-npcs-v4.png?v=4";
+image.src="assets/dunmere-npcs-v5.png?v=5";
 if(image.complete&&image.naturalWidth===384&&image.naturalHeight===576)ready=true;
 function render(ctx,id,x,y,size,direction,moving,walkTimeMs){
  if(!ready||!Number.isInteger(id)||id<0||id>=12)return false;
