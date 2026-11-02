@@ -11,7 +11,7 @@ const crops={
  innRoof:['exterior',128,0,128,64],innWall:['exterior',128,128,128,80],
  innShingle:['exterior',128,0,32,48],innChimney:['exterior',160,0,16,64],
  innDoor:['doors',208,512,32,48],innWindow:['exterior',210,70,31,32],
- innThatchLeft:['thatch',84,224,52,107],innThatchMiddle:['thatch',136,224,26,107],innThatchRight:['thatch',162,224,46,107],innTimber:['cottage',0,0,96,128],
+ innGableRoof:['thatch',310,240,120,110],innTimber:['cottage',0,0,96,128],
  yardCart:['yard',192,510,92,74],yardTrough:['yard',422,530,90,48],yardLogs:['yard',455,640,57,60],innSign:['yard',254,36,34,30],
  floorA:['interior',0,192,32,32],floorB:['interior',32,192,32,32],
  wallA:['interior',0,128,32,32],wallB:['interior',32,128,32,32],wallWindows:['interior',96,128,64,64]
