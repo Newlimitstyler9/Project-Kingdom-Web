@@ -65,8 +65,7 @@ function create(places,residents=[]){
    return x===b.doorX&&y>b.doorY&&y<=lane;
   });
  }
- function innYardGround(x,y){return !!inn&&((y===inn.y+inn.h&&x>=inn.x-2&&x<inn.x+inn.w+2)||((x===inn.x-2||x===inn.x-1||x===inn.x+inn.w||x===inn.x+inn.w+1)&&y>=inn.y+1&&y<inn.y+inn.h))&&!road(x,y)}
- return {width:WIDTH,height:HEIGHT,solid,buildings,innYard,innYardGround,goal,porch,road};
+ return {width:WIDTH,height:HEIGHT,solid,buildings,innYard,goal,porch,road};
 }
 root.DunmereVillageLayout={create};
 })(window);

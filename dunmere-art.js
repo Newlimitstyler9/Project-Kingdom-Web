@@ -49,7 +49,7 @@ function building(g,b,size,open=false){const x=b.x*size,y=b.y*size,w=b.w*size,h=
   for(let i=0;i<2;i++)sprites.draw(g,'innTimber',x+i*w/2,y+size*1.24,w/2,size*2.76);
   r(g,x,y+size*2.54,w,size*.1,'#503323');
   for(const px of [.62,3.8])sprites.draw(g,'innWindow',x+size*px,y+size*2.07,size*.6,size*.58);
-  sprites.draw(g,'innDoor',b.doorX*size+size*.03,b.doorY*size-size*.17,size*.94,size*1.17);
+  sprites.draw(g,'innDoor',b.doorX*size+size*.12,b.doorY*size-size*.16,size*.76,size*1.16);
   return;
  }
  const stone=['mill','smithy','guard'].includes(b.kind),wall=stone?'#9b9888':'#b4976d',beam=stone?'#626b68':'#76543a';
@@ -82,7 +82,12 @@ function roof(g,b,size){const x=b.x*size,y=b.y*size,w=b.w*size,h=(b.h-1)*size;
  }
  if(b.kind==='tavern'){
   const sprites=root.KingdomInnSprites;
-  if(sprites?.ready)sprites.draw(g,'innThatch',x-size*.27,y-size*.33,w+size*.54,size*2.5);
+  if(sprites?.ready){const left=x-size*.18,top=y-size*.33,roofW=w+size*.36,roofH=size*2.48;
+   const leftW=size*1.25,rightW=size*1.1;
+   sprites.draw(g,'innThatchLeft',left,top,leftW,roofH);
+   sprites.draw(g,'innThatchMiddle',left+leftW,top,roofW-leftW-rightW,roofH);
+   sprites.draw(g,'innThatchRight',left+roofW-rightW,top,rightW,roofH);
+  }
   sprites?.draw(g,'innChimney',x+size*3.45,y-size*.48,size*.33,size*.7);
   // An actual hanging inn sign replaces the painted rectangle on the facade.
   sprites?.draw(g,'innSign',x+size*.23,y+size*2.57,size*.95,size*.83);
