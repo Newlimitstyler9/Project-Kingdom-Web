@@ -1,7 +1,7 @@
 // One pose index and ground anchor for every character part. Each sheet has
 // thirteen rows: twelve named residents followed by the player.
 (function(root){"use strict";
-const PARTS=Object.freeze(["base-male","base-female","head","hair","beard","headwear","torso","legs"]);
+const PARTS=Object.freeze(["base-male","base-female","head","hair","headwear","torso","legs","hands"]);
 const PEOPLE=Object.freeze([
  ["Aldric","smith"],["Marta","farmer"],["Oswin","merchant"],
  ["Edda","healer"],["Borin","miller"],["Nell","innkeeper"],
@@ -15,7 +15,7 @@ for(const part of PARTS){
  images[part]=img;
  img.onload=()=>{if(img.naturalWidth!==384||img.naturalHeight!==624)failed=true};
  img.onerror=()=>{failed=true};
- img.src="assets/character-"+part+"-v1.png?v=1";
+ img.src="assets/character-"+part+"-v1.png?v=2";
 }
 function ready(){return !failed&&PARTS.every(part=>images[part].complete&&images[part].naturalWidth===384&&images[part].naturalHeight===624)}
 function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
@@ -37,8 +37,8 @@ function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
  if(underwear)return true;
  if(!bareLegs)draw("legs",id);
  if(!bareTorso)draw("torso",id);
+ if(!bareTorso)draw("hands",id);
  if(!bald)draw("head",id);
- if(appearance.beard!==false)draw("beard",id);
  if(appearance.hair!==false)draw("hair",id);
  if(appearance.headwear!==false)draw("headwear",id);
  return true;
