@@ -1,6 +1,6 @@
-// LPC Tavern sprite crops used by the Hearth & Hound. See assets/inn-tavern-CREDITS.txt.
+// LPC building and furniture sprite crops. Source credits are linked from character-art-credits.html.
 (function(root){"use strict";
-const sheets={furniture:'assets/inn-tavern-furniture.png',cooking:'assets/inn-tavern-cooking.png',deco:'assets/inn-tavern-deco.png',exterior:'assets/inn-medieval-exterior.png',interior:'assets/inn-medieval-interior.png',guestBed:'assets/inn-guest-bed.png',thatch:'assets/inn-thatch-roof.png',cottage:'assets/inn-cottage-wall.png',yard:'assets/inn-yard-decorations.png',doors:'assets/inn-windows-doors.png'};
+const sheets={furniture:'assets/inn-tavern-furniture.png',cooking:'assets/inn-tavern-cooking.png',deco:'assets/inn-tavern-deco.png',exterior:'assets/inn-medieval-exterior.png',interior:'assets/inn-medieval-interior.png',guestBed:'assets/inn-guest-bed.png',thatch:'assets/inn-thatch-roof.png',cottage:'assets/inn-cottage-wall.png',yard:'assets/inn-yard-decorations.png',doors:'assets/inn-windows-doors.png',containers:'assets/bakery-containers.png'};
 const crops={
  counter:['furniture',191,320,96,54],table:['furniture',320,190,64,54],stool:['furniture',578,198,32,32],
  cupboard:['furniture',423,0,80,64],
@@ -12,6 +12,7 @@ const crops={
  innShingle:['exterior',128,0,32,48],innChimney:['exterior',160,0,16,64],
  innDoor:['doors',208,512,32,48],innWindow:['exterior',210,70,31,32],
  innGableRoof:['thatch',310,240,120,110],innTimber:['cottage',0,0,96,128],
+ bakeryRoof:['thatch',310,16,120,110],bakeryDoor:['doors',16,512,32,48],bakeryOvenMain:['cooking',240,64,55,96],bakeryOvenRight:['cooking',295,96,9,64],bakeryBench:['furniture',192,263,96,58],bakerySack:['containers',48,800,32,32],bakerySackPile:['containers',96,800,64,48],
  yardCart:['yard',192,510,92,74],yardTrough:['yard',422,530,90,48],yardLogs:['yard',455,640,57,60],innSign:['yard',254,36,34,30],
  floorA:['interior',0,192,32,32],floorB:['interior',32,192,32,32],
  wallA:['interior',0,128,32,32],wallB:['interior',32,128,32,32],wallWindows:['interior',96,128,64,64]

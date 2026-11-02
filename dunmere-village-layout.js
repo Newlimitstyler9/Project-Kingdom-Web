@@ -22,6 +22,12 @@ function create(places,residents=[]){
   {sprite:'yardLogs',x:inn.x-1.53,y:inn.y+2.42,w:1.08,h:1.16,blocked:[[inn.x-2,inn.y+3]]}
  ]:[];
  for(const prop of innYard)for(const [px,py] of prop.blocked)if(px>=0&&py>=0&&px<WIDTH&&py<HEIGHT)solid[py][px]=true;
+ const bakery=buildings.find(b=>b.id==='bakery');
+ const bakeryYard=bakery?[
+  {sprite:'yardLogs',x:bakery.x+bakery.w+.12,y:bakery.y+1.45,w:1.08,h:1.15,blocked:[[bakery.x+bakery.w,bakery.y+2]]},
+  {sprite:'bakerySackPile',x:bakery.x+bakery.w+.8,y:bakery.y+2.4,w:1.0,h:1.05,blocked:[[bakery.x+bakery.w+1,bakery.y+3]]}
+ ]:[];
+ for(const prop of bakeryYard)for(const [px,py] of prop.blocked)if(px>=0&&py>=0&&px<WIDTH&&py<HEIGHT)solid[py][px]=true;
  solid[24][20]=true; // Stone well on the green.
  for(let y=25;y<HEIGHT;y++)for(let x=0;x<3;x++)solid[y][x]=true; // Brook and mill race.
  function goal(place,id=0){
@@ -65,7 +71,7 @@ function create(places,residents=[]){
    return x===b.doorX&&y>b.doorY&&y<=lane;
   });
  }
- return {width:WIDTH,height:HEIGHT,solid,buildings,innYard,goal,porch,road};
+ return {width:WIDTH,height:HEIGHT,solid,buildings,innYard,bakeryYard,goal,porch,road};
 }
 root.DunmereVillageLayout={create};
 })(window);

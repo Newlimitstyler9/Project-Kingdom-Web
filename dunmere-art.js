@@ -52,6 +52,14 @@ function building(g,b,size,open=false){const x=b.x*size,y=b.y*size,w=b.w*size,h=
   sprites.draw(g,'innDoor',b.doorX*size+size*.12,b.doorY*size-size*.16,size*.76,size*1.16);
   return;
  }
+ if(b.kind==='bakery'&&root.KingdomInnSprites?.ready){const sprites=root.KingdomInnSprites;
+  for(let i=0;i<2;i++)sprites.draw(g,'innTimber',x+i*w/2,y+size*1.24,w/2,size*2.76);
+  for(const px of [.58,3.83])sprites.draw(g,'innWindow',x+size*px,y+size*2.08,size*.58,size*.58);
+  sprites.draw(g,'bakeryDoor',b.doorX*size+size*.11,b.doorY*size-size*.16,size*.78,size*1.16);
+  sprites.draw(g,'counter',x+size*3.28,y+size*3.12,size*1.5,size*.76);
+  for(const px of [3.47,3.89,4.3])sprites.draw(g,'bread',x+size*px,y+size*3.07,size*.36,size*.34);
+  return;
+ }
  const stone=['mill','smithy','guard'].includes(b.kind),wall=stone?'#9b9888':'#b4976d',beam=stone?'#626b68':'#76543a';
  r(g,x,y,w,h,beam);r(g,x+size*.12,y+size*.12,w-size*.24,h-size*.24,wall);
  for(let row=1;row<b.h;row++)r(g,x+4,y+row*size-2,w-8,3,"#876848");
@@ -65,8 +73,8 @@ function building(g,b,size,open=false){const x=b.x*size,y=b.y*size,w=b.w*size,h=
  // Roof drawn separately after exterior characters, preventing roof bleed-through.
 }
 function roof(g,b,size){const x=b.x*size,y=b.y*size,w=b.w*size,h=(b.h-1)*size;
- const spriteInn=b.kind==='tavern'&&root.KingdomInnSprites?.ready;
- if(!spriteInn){
+ const spriteBuilding=['tavern','bakery'].includes(b.kind)&&root.KingdomInnSprites?.ready;
+ if(!spriteBuilding){
  const dark=['mill','smithy','guard'].includes(b.kind),roof=dark?'#535b5b':b.kind==='tavern'?'#75493c':'#806546',ridge=dark?'#89908b':'#b59a69';
  const left=x+size*.08,top=y+size*.12,width=w-size*.16,height=h-size*.05,mid=top+height*.48;
  r(g,left,top,width,height,roof);
@@ -87,6 +95,11 @@ function roof(g,b,size){const x=b.x*size,y=b.y*size,w=b.w*size,h=(b.h-1)*size;
   // An actual hanging inn sign replaces the painted rectangle on the facade.
   sprites?.draw(g,'innSign',x+size*.23,y+size*2.57,size*.95,size*.83);
   for(const tx of [2.05,3.08]){const px=x+size*tx,py=y+size*3.22;if(!sprites?.draw(g,'sconce',px-size*.18,py-size*.43,size*.36,size*.43)){r(g,px-7,py+1,14,4,'#4d3c2e');r(g,px-2,py-14,4,7,'#e2a455')}}
+  return;
+ }
+ if(b.kind==='bakery'&&root.KingdomInnSprites?.ready){const sprites=root.KingdomInnSprites;
+  sprites.draw(g,'bakeryRoof',x-size*.18,y-size*.33,w+size*.36,size*2.48);
+  sprites.draw(g,'innChimney',x+size*3.42,y-size*.22,size*.33,size*.7);
   return;
  }
  g.textAlign='center';g.font='bold 10px system-ui';g.lineWidth=3;g.strokeStyle='#263027';g.fillStyle='#f3dfaf';
@@ -134,9 +147,6 @@ function villageSite(g,p,size,road){
  }else if(p.kind==='guard'){
   r(g,x+size*2.8,y+size*.4,size*.13,size*.95,'#604735');
   r(g,x+size*2.93,y+size*.4,size*.47,size*.57,'#6b7792');
- }else if(p.kind==='bakery'){
-  r(g,x+size*3,y+size*.8,size*.7,size*.3,'#6e5036');
-  for(let i=0;i<3;i++)r(g,x+size*(3.05+i*.18),y+size*.73,size*.14,size*.12,'#d5b37a');
  }else if(p.kind==='tavern'){
   for(const dx of [-2.9,3]){r(g,x+dx*size,y+size*.9,size*.6,size*.17,'#76583e');r(g,x+(dx+.1)*size,y+size*1.07,size*.08,size*.19,'#5a4636')}
  }else if(p.kind==='home'){
