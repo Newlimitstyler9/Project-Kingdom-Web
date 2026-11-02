@@ -5,7 +5,7 @@ let ready=false;
 let failed=false;
 image.onload=()=>{ready=image.naturalWidth===384&&image.naturalHeight===576;failed=!ready};
 image.onerror=()=>{failed=true};
-image.src="assets/dunmere-npcs-v2.png?v=2";
+image.src="assets/dunmere-npcs-v3.png?v=3";
 if(image.complete&&image.naturalWidth===384&&image.naturalHeight===576)ready=true;
 function render(ctx,id,x,y,size,direction,moving,walkTimeMs){
  if(!ready||!Number.isInteger(id)||id<0||id>=12)return false;
