@@ -46,11 +46,14 @@ function plant(g,kind,x,y,size,seed=0){const baseX=Math.round((x+.5)*size),baseY
 function crop(g,x,y,size,growth){for(let i=0;i<3;i++){const bx=(x+.18+i*.29)*size,by=(y+.83)*size,h=Math.max(4,growth/100*size*.6);r(g,bx,by-h,size*.07,h,growth>=90?"#c4a65a":"#4e783b");r(g,bx-size*.07,by-h*.65,size*.12,size*.07,"#81944c")}}
 function building(g,b,size,open=false){const x=b.x*size,y=b.y*size,w=b.w*size,h=b.h*size;
  if(b.kind==='tavern'&&root.KingdomInnSprites?.ready){const sprites=root.KingdomInnSprites;
-  sprites.draw(g,'innRoof',x,y,w,2*size);
-  sprites.draw(g,'innWall',x,y+2*size,w,2*size);
-  sprites.draw(g,'innWindow',x+size*.38,y+size*2.5,size*.62,size*.56);
-  sprites.draw(g,'innWindow',x+size*3.02,y+size*2.5,size*.62,size*.56);
-  sprites.draw(g,'innDoor',b.doorX*size+size*.12,b.doorY*size,size*.76,size);
+  const left=x-size*.12,roofY=y-size*.42,roofW=w+size*.24;
+  sprites.draw(g,'innWall',x,y+size*1.45,w,size*2.55);
+  r(g,x,y+size*2.52,w,size*.13,'#593c2b');r(g,x,y+size*2.58,w,size*.04,'#bb8c58');
+  for(let i=0;i<10;i++)sprites.draw(g,'innShingle',left+i*roofW/10,roofY,roofW/10+1,size*1.94);
+  sprites.draw(g,'innChimney',x+size*3.72,y-size*.53,size*.34,size*1.33);
+  for(const px of [1.05,3.42])sprites.draw(g,'innWindow',x+size*px,y+size*1.71,size*.58,size*.57);
+  for(const px of [.55,3.82])sprites.draw(g,'innWindow',x+size*px,y+size*2.84,size*.62,size*.65);
+  sprites.draw(g,'innDoor',b.doorX*size+size*.07,b.doorY*size-size*.13,size*.86,size*1.13);
   return;
  }
  const stone=['mill','smithy','guard'].includes(b.kind),wall=stone?'#9b9888':'#b4976d',beam=stone?'#626b68':'#76543a';
@@ -82,15 +85,13 @@ function roof(g,b,size){const x=b.x*size,y=b.y*size,w=b.w*size,h=(b.h-1)*size;
  if(['smithy','bakery','tavern'].includes(b.kind)){r(g,x+size*3.7,y-size*.14,size*.33,size*.55,'#776a5c');r(g,x+size*3.6,y-size*.2,size*.53,size*.12,'#4c4843')}
  }
  if(b.kind==='tavern'){
-  // Broad painted inn sign above the entrance, an ale cask, and two lit brackets.
-  r(g,x+size*.39,y+size*2.42,size*3.22,size*.57,'#3d2e25');
-  r(g,x+size*.46,y+size*2.49,size*3.08,size*.42,'#9d7846');
-  r(g,x+size*.59,y+size*2.56,size*.2,size*.23,'#e7d3a4');
-  r(g,x+size*.78,y+size*2.61,size*.1,size*.13,'#e7d3a4');
+  // A hanging sign leaves both storeys and all four windows visible.
+  r(g,x+size*.38,y+size*2.62,size*.08,size*.42,'#3d2e25');
+  r(g,x+size*.3,y+size*2.62,size*1.86,size*.53,'#3d2e25');
+  r(g,x+size*.36,y+size*2.68,size*1.74,size*.41,'#9d7846');
   g.textAlign='center';g.font='bold 9px system-ui';g.lineWidth=2;g.strokeStyle='#4a3325';g.fillStyle='#f6e6be';
-  g.strokeText('HEARTH & HOUND',x+size*2.2,y+size*2.76);g.fillText('HEARTH & HOUND',x+size*2.2,y+size*2.76);
-  if(!root.KingdomInnSprites?.draw(g,'barrel',x+size*.63,y+size*3.04,size*.47,size*.58)){r(g,x+size*.64,y+size*3.18,size*.45,size*.42,'#674832')}
-  for(const tx of [1.45,3.55]){const px=x+size*tx,py=y+size*3.22;if(!root.KingdomInnSprites?.draw(g,'sconce',px-size*.18,py-size*.43,size*.36,size*.43)){r(g,px-7,py+1,14,4,'#4d3c2e');r(g,px-2,py-14,4,7,'#e2a455')}}
+  g.strokeText('HEARTH & HOUND',x+size*1.23,y+size*2.96);g.fillText('HEARTH & HOUND',x+size*1.23,y+size*2.96);
+  for(const tx of [2.05,3.08]){const px=x+size*tx,py=y+size*3.22;if(!root.KingdomInnSprites?.draw(g,'sconce',px-size*.18,py-size*.43,size*.36,size*.43)){r(g,px-7,py+1,14,4,'#4d3c2e');r(g,px-2,py-14,4,7,'#e2a455')}}
   return;
  }
  g.textAlign='center';g.font='bold 10px system-ui';g.lineWidth=3;g.strokeStyle='#263027';g.fillStyle='#f3dfaf';
