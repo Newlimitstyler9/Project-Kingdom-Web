@@ -8,19 +8,25 @@ function r(g,x,y,w,h,color){g.fillStyle=color;g.fillRect(x,y,w,h)}
 function terrain(g,x,y,size,road,roadAt){
  const px=x*size,py=y*size;
  let seed=(Math.imul(x,73856093)^Math.imul(y,19349663))>>>0;seed^=seed>>>16;seed=Math.imul(seed,2246822519)>>>0;seed^=seed>>>13;
- g.fillStyle=road?P.path:P.grass;g.fillRect(px,py,size+1,size+1);
+ g.fillStyle=P.grass;g.fillRect(px,py,size+1,size+1);
+ if(road){
+  const edge=Math.max(2,Math.round(size*.15)),span=size-edge*2;
+  const north=!roadAt||roadAt(x,y-1),east=!roadAt||roadAt(x+1,y),south=!roadAt||roadAt(x,y+1),west=!roadAt||roadAt(x-1,y);
+  g.fillStyle=P.path;
+  if(Number(north)+Number(east)+Number(south)+Number(west)>=3)g.fillRect(px,py,size+1,size+1);
+  else{
+   g.fillRect(px+edge,py+edge,span,span);
+   if(north)g.fillRect(px+edge,py,span,edge+1);
+   if(south)g.fillRect(px+edge,py+size-edge,span,edge+1);
+   if(west)g.fillRect(px,py+edge,edge+1,span);
+   if(east)g.fillRect(px+size-edge,py+edge,edge+1,span);
+  }
+ }
  for(let i=0;i<8;i++){
   let n=(seed+Math.imul(i+1,2654435761))>>>0;n^=n>>>15;n=Math.imul(n,2246822519)>>>0;
   const u=(n%29)/32,v=((n>>>12)%29)/32;
   g.fillStyle=road?(i%3===0?'#baa078':i%2?'#957d5c':'#8b7557'):(i%2?P.grass2:P.grass3);
   g.fillRect(px+Math.floor(u*size),py+Math.floor(v*size),Math.max(2,size/14|0),Math.max(1,size/19|0));
- }
- if(road&&roadAt){
-  g.fillStyle='#647e4d';const a=(seed%17)/32*size,b=((seed>>>8)%17)/32*size;
-  if(!roadAt(x,y-1))g.fillRect(px+a,py,Math.max(2,size*.12),Math.max(1,size*.04));
-  if(!roadAt(x,y+1))g.fillRect(px+b,py+size-Math.max(1,size*.04),Math.max(2,size*.12),Math.max(1,size*.04));
-  if(!roadAt(x-1,y))g.fillRect(px,py+a,Math.max(1,size*.04),Math.max(2,size*.12));
-  if(!roadAt(x+1,y))g.fillRect(px+size-Math.max(1,size*.04),py+b,Math.max(1,size*.04),Math.max(2,size*.12));
  }
 }
 function plant(g,kind,x,y,size,seed=0){const baseX=Math.round((x+.5)*size),baseY=Math.round((y+1)*size),scale=size/32;
