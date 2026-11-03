@@ -2,7 +2,7 @@
 (function(root){"use strict";
 const sheets={furniture:'assets/inn-tavern-furniture.png',cooking:'assets/inn-tavern-cooking.png',deco:'assets/inn-tavern-deco.png',exterior:'assets/inn-medieval-exterior.png',interior:'assets/inn-medieval-interior.png',guestBed:'assets/inn-guest-bed.png?v=2',thatch:'assets/inn-thatch-roof.png',cottage:'assets/inn-cottage-wall.png',yard:'assets/inn-yard-decorations.png',doors:'assets/inn-windows-doors.png',containers:'assets/bakery-containers.png'};
 const crops={
- counter:['furniture',191,320,96,54],table:['furniture',318,190,70,54],stool:['furniture',578,198,32,32],
+ counter:['furniture',191,320,96,54],table:['furniture',320,192,64,43],stool:['furniture',578,198,32,32],
  cupboard:['furniture',423,0,80,64],
  bakeryWallShelf:['furniture',326,0,84,31],bakeryWindow:['interior',128,128,32,32],guestWindow:['interior',128,128,32,32],guestChest:['containers',0,256,32,32],
  stairStep:['furniture',896,192,96,32],guestBed:['guestBed',0,0,54,86],
