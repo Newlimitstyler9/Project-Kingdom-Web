@@ -13,3 +13,9 @@ The Character tab has a **Preview underwear base** button. Close the menu to vie
 Dunmere's twelve residents each have their own appearance, with different colors and job details. Their complete four-direction walking poses share the player's ground anchor. Residents now have distinct homes, work sites, and gathering spots in the village. The roster and source workflow are documented in `docs/architecture/npc-appearances.md`; the village plan and research are in `docs/architecture/dunmere-village-plan.md`.
 
 After a game change is merged into `main`, run `python3 scripts/publish-web.py` from the repository root to mirror the static prototype to the public Pages repository. The live check is `bash scripts/check-live.sh`.
+
+## Modular exteriors and wilderness camp
+
+Dunmere houses, the inn, bakery, smithy, and Brook Mill now render from layered Kenney tiles instead of one full-building image. See `docs/architecture/modular-buildings.md` for the template, atlas spacing, door anchor, and visual validation workflow. Brook Mill keeps its animated waterwheel as a separate prop. The timber yard and north ridge cave remain distinct site art.
+
+At the wilderness trail, interact with fallen branches, loose stones, and dry grasses to gather starting supplies. Open the bag and choose **Craft** to make a campfire kit, travel tent, and bedroll. Select the kit or tent in the bag and choose **Place** while facing open ground away from paths and trees. Interact with the pitched tent to sleep and save. New travelers carry salvaged cloth for their first shelter.

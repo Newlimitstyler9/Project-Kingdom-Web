@@ -3,13 +3,13 @@
 const recipes={
  pick:{name:"Stone pick",category:"tool",ingredients:{stone:2,stick:2},output:{pick:1}},
  hoe:{name:"Wooden hoe",category:"tool",ingredients:{wood:1,stick:2},output:{hoe:1}},
- axe:{name:"Stone axe",category:"tool",ingredients:{stone:2,stick:2},output:{axe:1}}
+ axe:{name:"Stone axe",category:"tool",ingredients:{stone:2,stick:2},output:{axe:1}},
+ campfire:{name:"Campfire kit",category:"camp",ingredients:{stone:4,stick:2},output:{campfire:1}},
+ tent:{name:"Travel tent",category:"camp",ingredients:{stick:4,cloth:4,fiber:2},output:{tent:1}},
+ bedroll:{name:"Bedroll",category:"camp",ingredients:{cloth:3,fiber:2},output:{bedroll:1}}
 };
 const planned={
  tinder:{name:"Tinder bundle",category:"survival",ingredients:{fiber:2,stick:1},output:{tinder:1}},
- campfire:{name:"Campfire kit",category:"camp",ingredients:{stone:4,wood:2},output:{campfire:1}},
- tent:{name:"Travel tent",category:"camp",ingredients:{wood:3,cloth:4,fiber:2},output:{tent:1}},
- bedroll:{name:"Bedroll",category:"camp",ingredients:{cloth:3,fiber:2},output:{bedroll:1}},
  torch:{name:"Torch",category:"tool",ingredients:{stick:1,fiber:2,tinder:1},output:{torch:1}},
  knife:{name:"Stone knife",category:"weapon",ingredients:{stone:2,stick:1,fiber:1},output:{knife:1}},
  spear:{name:"Wooden spear",category:"weapon",ingredients:{stick:2,stone:1,fiber:1},output:{spear:1}},

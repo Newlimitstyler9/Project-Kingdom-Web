@@ -49,6 +49,17 @@ const planned={
  cookedFish:{name:"Cooked fish",type:"food",stack:10,weight:.4,nutrition:35,shelfLife:2}
 };
 for(const [id,definition] of Object.entries(planned))defs[id]={...definition,portable:false,phase:"planned"};
+// The first wilderness camp uses materials from the starting grove and salvaged canvas.
+const campArt={
+ fiber:["................","...2.....2......","....2...2.......","....2..2........",".....22.........","......2.........",".....122........","....11122.......",".....111........","......1.........","................"],
+ cloth:["................","...11111111.....","...12222221.....","...12332221.....","...12232221.....","...12222221.....","...11111111.....","................"],
+ campfire:["................","......33........",".....3333.......","......23........","....111111......","...12222221.....","....111111......","................"],
+ tent:["................",".......1........","......121.......",".....12221......","....1222221.....","...122332221....","..11111111111...","................"],
+ bedroll:["................","...11111111.....","..1222222221....","..1233333321....","..1222222221....","...11111111.....","................"]
+};
+for(const [id,art] of Object.entries(campArt)){
+ defs[id]={...defs[id],portable:true,phase:"playable",art,palette:id==='campfire'?["#00000000","#54463a","#d6813b","#f6d070"]:id==='fiber'?["#00000000","#5b7540","#9eb66a","#d1c783"]:["#00000000","#473f33","#b19b71","#ded0a8"]};
+}
 for(const definition of Object.values(defs))if(!definition.phase)definition.phase="playable";
 function validate(){for(const [id,definition] of Object.entries(defs)){if(!/^[a-z][A-Za-z0-9]*$/.test(id)||!definition.name||!definition.type||!Number.isInteger(definition.stack)||definition.stack<1||!Number.isFinite(definition.weight)||definition.weight<0)return false;if(definition.phase==="playable"&&(!Array.isArray(definition.art)||!Array.isArray(definition.palette)))return false}return true}
 const worldStockStart={grain:350,flour:40,wellWater:80,bread:45,vegetables:120,beans:200,eggs:18,fish:8,preserves:180,seed:20,wood:60};

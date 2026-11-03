@@ -104,6 +104,7 @@ function buildingSpriteId(b){
  return null;
 }
 function building(g,b,size,open=false){const x=b.x*size,y=b.y*size,w=b.w*size,h=b.h*size;
+ if(root.KingdomModularBuildings?.drawWalls(g,b,size))return;
  const spriteId=buildingSpriteId(b);
  if(spriteId&&regionSite(g,spriteId,b.x+b.w/2,b.y+b.h-1,size))return;
  if(b.kind==='tavern'&&root.KingdomInnSprites?.ready){const sprites=root.KingdomInnSprites;
@@ -136,6 +137,7 @@ function building(g,b,size,open=false){const x=b.x*size,y=b.y*size,w=b.w*size,h=
  // Roof drawn separately after exterior characters, preventing roof bleed-through.
 }
 function roof(g,b,size){const x=b.x*size,y=b.y*size,w=b.w*size,h=(b.h-1)*size;
+ if(root.KingdomModularBuildings?.drawRoof(g,b,size))return;
  const spriteId=buildingSpriteId(b);
  if(spriteId&&regionImages[spriteId]?.complete&&regionImages[spriteId].naturalWidth)return;
  const spriteBuilding=['tavern','bakery','home','cottage'].includes(b.kind)&&root.KingdomInnSprites?.ready;

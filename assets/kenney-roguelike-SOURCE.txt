@@ -1,0 +1,5 @@
+Kenney Roguelike/RPG Pack
+https://kenney.nl/assets/roguelike-rpg-pack
+Original file: Spritesheet/roguelikeSheet_transparent.png
+License: CC0 (see kenney-roguelike-LICENSE.txt)
+Imported intact for the Brooklands tent and campfire. Source tiles are 16 x 16 with 1 px spacing.
