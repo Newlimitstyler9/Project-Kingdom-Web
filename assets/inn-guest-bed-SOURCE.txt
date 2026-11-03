@@ -1,0 +1,7 @@
+inn-guest-bed.png is a crop from "LPC House Insides" by Lanea Zimmerman (Sharm).
+Source: https://opengameart.org/content/lpc-house-insides
+License: Creative Commons Attribution-ShareAlike 3.0 (CC BY-SA 3.0).
+The complete bed silhouette is preserved. Project Kingdom recolors the five
+violet blanket shades to muted sage greens; the pillow and wooden frame are
+unchanged. The editable copy is
+docs/art-source/pixelorama/inn-guest-bed-source.png.
