@@ -2,7 +2,7 @@
 (function(root){"use strict";
 const W=40,H=32;
 const definitions={brush:{tool:"axe",work:2,yield:{stick:2}},forest:{tool:"axe",work:4,yield:{wood:3,stick:1}},stones:{tool:"pick",work:3,yield:{stone:2}}};
-function create(bag=null){
+function create(bag=null,isRoad=()=>false){
  const tiles=Array.from({length:H},(_,y)=>Array.from({length:W},(_,x)=>{
   const hash=(x*73856093^y*19349663)>>>0;
   const water=x<3&&y>24,rock=hash%53===0,forest=hash%13===0,brush=hash%7===0;
@@ -20,6 +20,7 @@ function create(bag=null){
  function valid(t){return t&&t.terrain==="soil"}
  function change(x,y,action){
   const t=at(x,y);if(!t)return {ok:false,message:"Outside the world."};if(action!=="gather"&&!valid(t))return {ok:false,message:"This terrain cannot be cultivated."};
+  if(action!=="gather"&&isRoad(x,y))return {ok:false,message:"The village path must stay clear."};
   if(t.owner!==null&&t.owner!=="player")return {ok:false,message:"This land belongs to someone else."};
   if(action==="claim"){if(x>=5&&x<=34&&y>=5&&y<=27)return {ok:false,message:"Dunmere village land is not yours to claim."};if(t.owner)return {ok:false,message:"Already claimed."};t.owner="player";return {ok:true,message:"Claimed a plot of unoccupied land."}}
   if(action==="gather"&&t.owner===null){if(t.cover==="brush"){if(!gain("stick",1))return {ok:false,message:"Your bag is full."};t.cover=null;return {ok:true,message:"Picked up a loose stick."}}if(t.cover==="stones"){if(!gain("stone",1))return {ok:false,message:"Your bag is full."};t.cover=null;return {ok:true,message:"Collected a loose stone."}}return {ok:false,message:"Nothing loose to gather here."}}
@@ -33,7 +34,7 @@ function create(bag=null){
  }
  function advanceDay(){day++;for(const row of tiles)for(const t of row){if(t.crop){const gain=t.moisture<20?0:Math.max(1,Math.floor(t.fertility/16));t.growth=Math.min(100,t.growth+gain);t.moisture=Math.max(0,t.moisture-2)}else if(day%10===0)t.fertility=Math.min(95,t.fertility+1);if(day%6===0)t.moisture=Math.min(90,t.moisture+12)}}
  function save(){return {version:1,day,harvests,inventory:available(),tools:{...tools},tiles:tiles.map(row=>row.map(t=>({...t})))}}
- function restore(data){if(!data||data.version!==1||!Array.isArray(data.tiles)||data.tiles.length!==H||!data.tiles.every(row=>Array.isArray(row)&&row.length===W)||!Number.isInteger(data.day)||data.day<1)return false;for(let y=0;y<H;y++)for(let x=0;x<W;x++){const t=data.tiles[y][x];if(!t||!["soil","water","rock"].includes(t.terrain)||!Number.isFinite(t.fertility)||!Number.isFinite(t.moisture))return false}for(let y=0;y<H;y++)for(let x=0;x<W;x++)Object.assign(tiles[y][x],data.tiles[y][x]);day=data.day;harvests=data.harvests;if(!bag)Object.assign(inventory,data.inventory);Object.assign(tools,data.tools);return true}
+ function restore(data){if(!data||data.version!==1||!Array.isArray(data.tiles)||data.tiles.length!==H||!data.tiles.every(row=>Array.isArray(row)&&row.length===W)||!Number.isInteger(data.day)||data.day<1)return false;for(let y=0;y<H;y++)for(let x=0;x<W;x++){const t=data.tiles[y][x];if(!t||!["soil","water","rock"].includes(t.terrain)||!Number.isFinite(t.fertility)||!Number.isFinite(t.moisture))return false}for(let y=0;y<H;y++)for(let x=0;x<W;x++){Object.assign(tiles[y][x],data.tiles[y][x]);if(isRoad(x,y)){tiles[y][x].owner=null;tiles[y][x].structure=null;tiles[y][x].prepared=false;tiles[y][x].crop=null;tiles[y][x].growth=0}}day=data.day;harvests=data.harvests;if(!bag)Object.assign(inventory,data.inventory);Object.assign(tools,data.tools);return true}
  return {at,change,advanceDay,save,restore,get inventory(){return available()},tools,get day(){return day},get harvests(){return harvests}};
 }
 root.KingdomLand={create};

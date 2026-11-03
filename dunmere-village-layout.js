@@ -28,6 +28,12 @@ function create(places,residents=[]){
   {sprite:'bakerySackPile',x:bakery.x+bakery.w+.8,y:bakery.y+2.4,w:1.0,h:1.05,blocked:[[bakery.x+bakery.w+1,bakery.y+3]]}
  ]:[];
  for(const prop of bakeryYard)for(const [px,py] of prop.blocked)if(px>=0&&py>=0&&px<WIDTH&&py<HEIGHT)solid[py][px]=true;
+ const market=byId.market;
+ const marketStalls=market?[
+  {sprite:'marketStallBlue',x:market.x-3.05,y:market.y-.9,w:1.6,h:2.15,blocked:[15,16].flatMap(x=>[16,17,18].map(y=>[x,y]))},
+  {sprite:'marketStallGold',x:market.x+2.05,y:market.y-.9,w:1.6,h:2.15,blocked:[20,21].flatMap(x=>[16,17,18].map(y=>[x,y]))}
+ ]:[];
+ for(const prop of marketStalls)for(const [px,py] of prop.blocked)solid[py][px]=true;
  solid[24][20]=true; // Stone well on the green.
  for(let y=25;y<HEIGHT;y++)for(let x=0;x<3;x++)solid[y][x]=true; // Brook and mill race.
  function goal(place,id=0){
@@ -35,15 +41,15 @@ function create(places,residents=[]){
   if(!p)return [19.5,21.5];
   if(place==='farm')return [4.5+(id%4)*1.4,17.5+(Math.floor(id/4)%3)*1.4];
   if(place==='market'){
-   const spots=[[16.5,16.5],[18.5,16.5],[20.5,16.5],[22.5,16.5],
-    [16.5,18.3],[18.5,18.3],[22.5,18.3],[24.5,18.3],
-    [16.5,20.1],[18.5,20.1],[20.5,20.1],[22.5,20.1]];
+   const spots=[[17.5,16.5],[18.5,16.5],[22.5,16.5],[23.5,16.5],
+    [22.5,17.5],[18.5,17.5],[17.5,17.5],[23.5,17.5],
+    [17.5,18.3],[18.5,18.3],[22.5,18.3],[23.5,18.3]];
    return spots[id%spots.length];
   }
   if(place==='green'){
-   const spots=[[17.5,22.5],[18.5,22.5],[20.5,22.5],[21.5,22.5],
-    [17.5,24.5],[18.5,24.5],[21.5,24.5],[22.5,24.5],
-    [17.5,25.5],[18.5,25.5],[21.5,25.5],[22.5,25.5]];
+   const spots=[[18.5,22.5],[17.5,22.5],[20.5,22.5],[21.5,22.5],
+    [17.5,24.5],[22.5,24.5],[21.5,24.5],[18.5,24.5],
+    [17.5,25.5],[21.5,25.5],[18.5,25.5],[22.5,25.5]];
    return spots[id%spots.length];
   }
   if(b){
@@ -71,7 +77,7 @@ function create(places,residents=[]){
    return x===b.doorX&&y>b.doorY&&y<=lane;
   });
  }
- return {width:WIDTH,height:HEIGHT,solid,buildings,innYard,bakeryYard,goal,porch,road};
+ return {width:WIDTH,height:HEIGHT,solid,buildings,innYard,bakeryYard,marketStalls,goal,porch,road};
 }
 root.DunmereVillageLayout={create};
 })(window);

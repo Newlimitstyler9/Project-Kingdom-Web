@@ -147,12 +147,7 @@ function villageSite(g,p,size,road){
   }
   g.fillStyle='#e9d49e';g.font='bold 11px system-ui';g.fillText('WESTFIELD',x-size*2,y-size*2.8);
  }else if(p.kind==='market'){
-  for(const [dx,awning] of [[-2.3,'#9f654e'],[2.3,'#bd9a5d']]){
-   const bx=x+dx*size,by=y-size*.6;
-   r(g,bx-size*.65,by,size*1.3,size*.55,'#72513a');
-   r(g,bx-size*.76,by-size*.23,size*1.52,size*.23,awning);
-   for(const side of [-.55,.5])r(g,bx+side*size,by-size*.16,size*.06,size*.79,'#664b36');
-  }
+  return; // Authored sprite props are placed with the village collision plan.
  }else if(p.kind==='public'){
   // A well and two benches make the green a visible shared place to rest.
   const wx=20*size,wy=24*size;

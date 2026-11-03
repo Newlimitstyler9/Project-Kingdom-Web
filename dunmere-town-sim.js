@@ -54,7 +54,8 @@ if(agenda.mode==="work"&&r.currentTask){
   if(r.social>=70||(destination==="inn"&&r.coins<2)){destination=r.home;activity="At home";if(hasArrived(r,destination))r.energy=Math.min(100,r.energy+4)}
   else if(!hasArrived(r,destination))activity=destination==="green"?"Walking to village green":"Traveling to tavern";
   else if(destination==="green")r.social=Math.min(100,r.social+12);
-  else {r.social=Math.min(100,r.social+25);r.coins-=2;coins+=2;transactions++;if(random()<.16)log(r.name+" visited the Hearth & Hound.")}
+  else if(destination==="inn"){r.social=Math.min(100,r.social+25);r.coins-=2;coins+=2;transactions++;if(random()<.16)log(r.name+" visited the Hearth & Hound.")}
+  else r.energy=Math.min(100,r.energy+4);
 }else if(agenda.mode==="walk"){
   if(hasArrived(r,destination))r.social=Math.min(100,r.social+9);
   else activity="Walking to village green";
