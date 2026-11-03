@@ -72,8 +72,19 @@ function brickChimney(g,x,y,size,darkRoof){
  },20,40);
  g.drawImage(art,x,y,size*.62,size*1.14);
 }
+function buildingSpriteId(b){
+ if(b.kind==='tavern')return 'inn';
+ if(b.kind==='bakery')return 'bakery';
+ if(b.kind==='smithy')return 'forge';
+ if(b.kind==='mill')return 'mill';
+ if(b.kind==='healer')return 'cottage';
+ if(b.id==='cottage5')return 'farmhouse';
+ if(b.kind==='guard'||['cottage2','cottage4','eastern-cottage'].includes(b.id))return 'cottageLong';
+ if(['home','cottage','weaver'].includes(b.kind))return 'cottageModest';
+ return null;
+}
 function building(g,b,size,open=false){const x=b.x*size,y=b.y*size,w=b.w*size,h=b.h*size;
- const spriteId=b.kind==='tavern'?'inn':b.kind==='bakery'?'bakery':b.kind==='smithy'?'forge':['home','cottage','healer','weaver','guard'].includes(b.kind)?'cottage':b.kind==='mill'?'mill':null;
+ const spriteId=buildingSpriteId(b);
  if(spriteId&&regionSite(g,spriteId,b.x+b.w/2,b.y+b.h-1,size))return;
  if(b.kind==='tavern'&&root.KingdomInnSprites?.ready){const sprites=root.KingdomInnSprites;
   gableInfill(g,x,y,w,size);
@@ -105,7 +116,7 @@ function building(g,b,size,open=false){const x=b.x*size,y=b.y*size,w=b.w*size,h=
  // Roof drawn separately after exterior characters, preventing roof bleed-through.
 }
 function roof(g,b,size){const x=b.x*size,y=b.y*size,w=b.w*size,h=(b.h-1)*size;
- const spriteId=b.kind==='tavern'?'inn':b.kind==='bakery'?'bakery':b.kind==='smithy'?'forge':['home','cottage','healer','weaver','guard'].includes(b.kind)?'cottage':b.kind==='mill'?'mill':null;
+ const spriteId=buildingSpriteId(b);
  if(spriteId&&regionImages[spriteId]?.complete&&regionImages[spriteId].naturalWidth)return;
  const spriteBuilding=['tavern','bakery','home','cottage'].includes(b.kind)&&root.KingdomInnSprites?.ready;
  if(!spriteBuilding){
@@ -153,7 +164,7 @@ function landmarkOak(g,x,y,size,canopy=false,fade=false,scale=1){
 }
 const regionImages={};
 function regionSite(g,id,x,y,size){
- const config={inn:['brooklands-inn-v1.png',6.3,5.2],cottage:['brooklands-cottage-v1.png',5.5,4.3],bakery:['brooklands-bakehouse-v1.png',6.1,4.8],forge:['brooklands-forge-v1.png',6.2,5],mill:['brooklands-watermill-v1.png',8.5,6.4],timber:['brooklands-timber-yard-v1.png',9.5,6.4],mine:['brooklands-mine-v1.png',10.5,7]};
+ const config={inn:['brooklands-inn-v1.png',6.3,5.2],cottage:['brooklands-cottage-v1.png',5.5,4.3],cottageModest:['brooklands-cottage-modest-v1.png',4.9,3.8],cottageLong:['brooklands-cottage-long-v1.png',5.4,3.7],farmhouse:['brooklands-farmhouse-v1.png',5.6,3.7],bakery:['brooklands-bakehouse-v1.png',6.1,4.8],forge:['brooklands-forge-v1.png',6.2,5],mill:['brooklands-watermill-v1.png',8.5,6.4],timber:['brooklands-timber-yard-v1.png',9.5,6.4],mine:['brooklands-mine-v1.png',10.5,7]};
  const entry=config[id];if(!entry)return false;
  if(!regionImages[id]&&typeof Image!=='undefined'){const img=new Image();img.src='assets/'+entry[0];regionImages[id]=img}
  const img=regionImages[id];if(!img?.complete||!img.naturalWidth)return false;
