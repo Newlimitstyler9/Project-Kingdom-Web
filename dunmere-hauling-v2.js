@@ -31,7 +31,10 @@ function create(world,food){
   stock.mill.grain-=mill.ingredients.grain*millBatches;stock.mill.flour+=mill.output.flour*millBatches;milled+=mill.output.flour*millBatches;
   const target=Math.max(0,36-food.snapshot().stocks.bread-stock.bakery.bread);
   const batches=Math.min(8,Math.floor(stock.bakery.flour/bake.ingredients.flour),Math.ceil(target/bake.output.bread));
-  if(batches&&food.withdraw("wood",batches*bake.ingredients.wood)){
+  const neededWater=batches*bake.ingredients.wellWater,neededWood=batches*bake.fuel.wood;
+  const villageStock=food.snapshot().stocks;
+  if(batches&&villageStock.wellWater>=neededWater&&villageStock.wood>=neededWood){
+   food.withdraw("wellWater",neededWater);food.withdraw("wood",neededWood);
    stock.bakery.flour-=bake.ingredients.flour*batches;stock.bakery.bread+=bake.output.bread*batches;baked+=bake.output.bread*batches;
   }
  }

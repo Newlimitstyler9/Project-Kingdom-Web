@@ -3,7 +3,7 @@
 const defs={
  charcoal:{name:"Charcoal",type:"material",stack:20,weight:.4,art:["................","......111.......","....112211......","...12222211.....","..1223332211....","..1233333221....","..1233233221....","..1223333221....","...122332211....","....112221......","......111.......","................"],palette:["#00000000","#101415","#252a2b","#454b4c"]},
  bread:{name:"Bread",type:"food",stack:10,weight:.3,nutrition:32,shelfLife:5,art:["................","......111.......","....122221......","...12222221.....","..1223223221....","..1232223221....","..1222222221....","...12222221.....","....111111......","................"],palette:["#00000000","#4a3327","#b07a42","#e8bd78"]},
- ale:{name:"Ale cup",type:"drink",stack:10,weight:.5,art:["................","...11111111.....","...12222221.11..","...12333321.121.","...12333321.121.","...12333321.11..","...12333321.....","....122221......",".....1111.......","................"],palette:["#00000000","#493522","#9d6a35","#ddad59"]},
+ ale:{name:"Ale serving",type:"drink",stack:10,weight:.5,art:["................","...11111111.....","...12222221.11..","...12333321.121.","...12333321.121.","...12333321.11..","...12333321.....","....122221......",".....1111.......","................"],palette:["#00000000","#493522","#9d6a35","#ddad59"]},
  axe:{name:"Stone axe",type:"tool",stack:1,weight:1.6,slot:"hand",art:["....111.........","...122211.......","..12222211......","..12332221......","...122221.......","....1112........",".......2........",".......2........",".......2........",".......2........",".......2........",".......2........","................"],palette:["#00000000","#2c3535","#8e9690","#d3d3bf"]},
  stick:{name:"Stick",type:"material",stack:20,weight:.2,art:["................","............1...","...........12...","..........12....",".........12.....","........12......",".......12.......","......12........",".....12.........","....12..........","...12...........","..11............"],palette:["#00000000","#453528","#99734a","#d1aa73"]}
 };
@@ -22,11 +22,12 @@ for(const id of ["stone","pick"])defs[id].palette=["#00000000","#30383a","#838b8
 
 const worldGoods={
  flour:{name:"Flour",type:"material",stack:20,weight:.25},
+ wellWater:{name:"Well water",type:"material",stack:20,weight:1},
  vegetables:{name:"Vegetables",type:"food",stack:20,weight:.4,nutrition:18,shelfLife:9},
  beans:{name:"Beans",type:"food",stack:20,weight:.2,nutrition:28,shelfLife:30},
  eggs:{name:"Eggs",type:"food",stack:12,weight:.1,nutrition:20,shelfLife:5},
- fish:{name:"Fish",type:"food",stack:10,weight:.5,nutrition:30,shelfLife:3},
- preserves:{name:"Preserves",type:"food",stack:10,weight:.4,nutrition:25,shelfLife:90}
+ fish:{name:"Fresh fish",type:"food",stack:10,weight:.5,nutrition:30,shelfLife:3},
+ preserves:{name:"Dried vegetables",type:"food",stack:10,weight:.4,nutrition:25,shelfLife:90}
 };
 for(const [id,definition] of Object.entries(worldGoods))defs[id]={...definition,portable:false,phase:"world-stock"};
 const planned={
@@ -36,8 +37,8 @@ const planned={
  clay:{name:"Clay",type:"material",stack:20,weight:.4},
  hide:{name:"Hide",type:"material",stack:10,weight:1},
  cloth:{name:"Cloth",type:"material",stack:20,weight:.3},
- dirtyWater:{name:"Unclean water",type:"drink",stack:1,weight:1},
- cleanWater:{name:"Clean water",type:"drink",stack:1,weight:1},
+ dirtyWater:{name:"Vessel of unclean water",type:"container",stack:1,weight:1.6,vesselState:"unclean"},
+ cleanWater:{name:"Vessel of clean water",type:"container",stack:1,weight:1.6,vesselState:"clean",returnsOnDrink:"waterVessel"},
  waterVessel:{name:"Water vessel",type:"container",stack:1,weight:.6},
  campfire:{name:"Campfire kit",type:"placeable",stack:1,weight:2},
  tent:{name:"Travel tent",type:"placeable",stack:1,weight:4},
@@ -45,13 +46,12 @@ const planned={
  torch:{name:"Torch",type:"tool",stack:1,weight:.7,slot:"hand"},
  knife:{name:"Stone knife",type:"weapon",stack:1,weight:.5,slot:"hand"},
  spear:{name:"Wooden spear",type:"weapon",stack:1,weight:1.6,slot:"hand"},
- rawFish:{name:"Raw fish",type:"food",stack:10,weight:.5},
- cookedFish:{name:"Cooked fish",type:"food",stack:10,weight:.4,nutrition:25}
+ cookedFish:{name:"Cooked fish",type:"food",stack:10,weight:.4,nutrition:35,shelfLife:2}
 };
 for(const [id,definition] of Object.entries(planned))defs[id]={...definition,portable:false,phase:"planned"};
 for(const definition of Object.values(defs))if(!definition.phase)definition.phase="playable";
 function validate(){for(const [id,definition] of Object.entries(defs)){if(!/^[a-z][A-Za-z0-9]*$/.test(id)||!definition.name||!definition.type||!Number.isInteger(definition.stack)||definition.stack<1||!Number.isFinite(definition.weight)||definition.weight<0)return false;if(definition.phase==="playable"&&(!Array.isArray(definition.art)||!Array.isArray(definition.palette)))return false}return true}
-const worldStockStart={grain:350,flour:40,bread:45,vegetables:120,beans:200,eggs:18,fish:8,preserves:180,seed:20,wood:60};
+const worldStockStart={grain:350,flour:40,wellWater:80,bread:45,vegetables:120,beans:200,eggs:18,fish:8,preserves:180,seed:20,wood:60};
 if(!validate()||Object.keys(worldStockStart).some(id=>!defs[id]))throw Error("Invalid item catalog");
 root.KingdomItemCatalog={defs,worldStockStart,validate,get:id=>defs[id]||null,ids:()=>Object.keys(defs)};
 })(window);
