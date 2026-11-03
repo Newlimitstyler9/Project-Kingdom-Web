@@ -75,6 +75,7 @@ function plan(resident,day,hour,assignment){
   if(mode==="sleep")return {destination:resident.home,activity:"Sleeping",task:null,mode};
   if(mode==="morning")return {destination:resident.home,activity:"Preparing for the day",task:null,mode};
   if(mode==="meal")return {destination:resident.home,activity:"Taking a meal break",task:null,mode};
+  if(resident.job==="innkeeper"&&hour>=17&&hour<21)return {destination:"inn",activity:"Serving guests",task:"hospitality",mode:"work"};
   if(mode==="walk"){
     const destination=["green","market",resident.home,resident.home][(resident.id+day+(hour===21?1:0))%4];
     return {destination,activity:destination==="green"?"Taking a walk":destination==="market"?"Browsing the market":"Heading home",task:null,mode};

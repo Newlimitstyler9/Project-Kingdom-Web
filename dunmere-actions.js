@@ -7,7 +7,7 @@ function create(world,dialogue){
   if(Math.hypot(x-node.x,y-node.y)>1.8)return {ok:false,message:"Move closer to the charcoal sacks."};
   if(state.collected)return {ok:false,message:"The charcoal sacks have already been collected."};
   state.collected=true;state.charcoal+=node.quantity;
-  return {ok:true,message:"You gathered 3 charcoal from the abandoned supply cache. Bring them to Aldric."};
+  return {ok:true,message:"You gathered 3 charcoal from the abandoned supply cache. Aldric at the forge may need it once he knows he can rely on you."};
  }
  function deliver(id){
   if(world.residents[id]?.name!=="Aldric")return {ok:false,message:"This delivery is meant for Aldric."};
@@ -23,14 +23,18 @@ function create(world,dialogue){
  function discardCharcoal(n){if(!Number.isInteger(n)||n<=0||state.charcoal<n)return false;state.charcoal-=n;return true}
  function workFarm(x,y,food,bag){
   if(x<3||x>12||y<16||y>23)return {ok:false,message:"Work at the western fields."};
-  const promise=dialogue.get(1).promises.find(p=>p.subject==="farm labor"&&!p.fulfilled);
+  const relation=dialogue.get(1),promise=relation.promises.find(p=>p.subject==="farm labor"&&!p.fulfilled);
+  if(!promise&&relation.trialOffered&&!relation.trialDone){
+   if(!dialogue.completeTrial(1))return {ok:false,message:"Marta's trial is not available."};
+   return {ok:true,message:"You clear a section of weeds by hand. Marta can now see that you will do the work; speak with her about paid field labor."};
+  }
   if(!promise)return {ok:false,message:"Talk to Marta and agree to help with the farm first."};
   if(state.farmDone)return {ok:false,message:"Your field work for Marta is complete."};
   if(state.farmWork<2){state.farmWork++;return {ok:true,message:["You weed the grain rows. One of three field tasks complete.","You clear the irrigation furrow. Two of three field tasks complete."][state.farmWork-1]}}
   if(!food.withdraw("bread",1))return {ok:false,message:"The village pantry has no bread to pay you yet."};
   if(!bag.add("bread",1)){food.transferIn("bread",1);return {ok:false,message:"Your bag is full. Make room for a loaf."}}
   state.farmWork=3;state.farmDone=true;promise.fulfilled=true;promise.completedDay=world.snapshot().day;
-  const relation=dialogue.get(1);relation.trust+=8;relation.respect+=5;
+  relation.trust+=8;relation.respect+=5;
   relation.memories.unshift({day:world.snapshot().day,type:"fulfilled",detail:"Traveler tended the western fields for Marta."});
   return {ok:true,message:"You finish tending the grain. Marta sends you a loaf from the village pantry. Bread +1, trust +8, respect +5."};
  }
