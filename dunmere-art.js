@@ -73,6 +73,8 @@ function brickChimney(g,x,y,size,darkRoof){
  g.drawImage(art,x,y,size*.62,size*1.14);
 }
 function building(g,b,size,open=false){const x=b.x*size,y=b.y*size,w=b.w*size,h=b.h*size;
+ const spriteId=b.kind==='tavern'?'inn':b.kind==='bakery'?'bakery':b.kind==='smithy'?'forge':['home','cottage','healer','weaver','guard'].includes(b.kind)?'cottage':b.kind==='mill'?'mill':null;
+ if(spriteId&&regionSite(g,spriteId,b.x+b.w/2,b.y+b.h-1,size))return;
  if(b.kind==='tavern'&&root.KingdomInnSprites?.ready){const sprites=root.KingdomInnSprites;
   gableInfill(g,x,y,w,size);
   for(let i=0;i<2;i++)sprites.draw(g,'innTimber',x+i*w/2,y+size*1.24,w/2,size*2.76);
@@ -81,13 +83,13 @@ function building(g,b,size,open=false){const x=b.x*size,y=b.y*size,w=b.w*size,h=
   sprites.draw(g,'innDoor',b.doorX*size+size*.12,b.doorY*size-size*.16,size*.76,size*1.16);
   return;
  }
- if(b.kind==='bakery'&&root.KingdomInnSprites?.ready){const sprites=root.KingdomInnSprites;
+ if(['bakery','home','cottage'].includes(b.kind)&&root.KingdomInnSprites?.ready){const sprites=root.KingdomInnSprites;
   gableInfill(g,x,y,w,size);
   for(let i=0;i<2;i++)sprites.draw(g,'innTimber',x+i*w/2,y+size*1.24,w/2,size*2.76);
   for(const px of [.58,3.73])sprites.draw(g,'innWindow',x+size*px,y+size*2.01,size*.68,size*.72);
   sprites.draw(g,'bakeryDoor',b.doorX*size+size*.11,b.doorY*size-size*.16,size*.78,size*1.16);
-  sprites.draw(g,'counter',x+size*3.28,y+size*3.12,size*1.5,size*.76);
-  for(const px of [3.47,3.89,4.3])sprites.draw(g,'bread',x+size*px,y+size*3.07,size*.36,size*.34);
+  if(b.kind==='bakery'){sprites.draw(g,'counter',x+size*3.28,y+size*3.12,size*1.5,size*.76);
+   for(const px of [3.47,3.89,4.3])sprites.draw(g,'bread',x+size*px,y+size*3.07,size*.36,size*.34)}
   return;
  }
  const stone=['mill','smithy','guard'].includes(b.kind),wall=stone?'#9b9888':'#b4976d',beam=stone?'#626b68':'#76543a';
@@ -103,7 +105,9 @@ function building(g,b,size,open=false){const x=b.x*size,y=b.y*size,w=b.w*size,h=
  // Roof drawn separately after exterior characters, preventing roof bleed-through.
 }
 function roof(g,b,size){const x=b.x*size,y=b.y*size,w=b.w*size,h=(b.h-1)*size;
- const spriteBuilding=['tavern','bakery'].includes(b.kind)&&root.KingdomInnSprites?.ready;
+ const spriteId=b.kind==='tavern'?'inn':b.kind==='bakery'?'bakery':b.kind==='smithy'?'forge':['home','cottage','healer','weaver','guard'].includes(b.kind)?'cottage':b.kind==='mill'?'mill':null;
+ if(spriteId&&regionImages[spriteId]?.complete&&regionImages[spriteId].naturalWidth)return;
+ const spriteBuilding=['tavern','bakery','home','cottage'].includes(b.kind)&&root.KingdomInnSprites?.ready;
  if(!spriteBuilding){
  const dark=['mill','smithy','guard'].includes(b.kind),roof=dark?'#535b5b':b.kind==='tavern'?'#75493c':'#806546',ridge=dark?'#89908b':'#b59a69';
  const left=x+size*.08,top=y+size*.12,width=w-size*.16,height=h-size*.05,mid=top+height*.48;
@@ -127,8 +131,8 @@ function roof(g,b,size){const x=b.x*size,y=b.y*size,w=b.w*size,h=(b.h-1)*size;
   for(const tx of [2.05,3.08]){const px=x+size*tx,py=y+size*3.22;if(!sprites?.draw(g,'sconce',px-size*.18,py-size*.43,size*.36,size*.43)){r(g,px-7,py+1,14,4,'#4d3c2e');r(g,px-2,py-14,4,7,'#e2a455')}}
   return;
  }
- if(b.kind==='bakery'&&root.KingdomInnSprites?.ready){const sprites=root.KingdomInnSprites;
-  brickChimney(g,x+size*3.33,y-size*.6,size,false);
+ if(['bakery','home','cottage'].includes(b.kind)&&root.KingdomInnSprites?.ready){const sprites=root.KingdomInnSprites;
+  if(b.kind==='bakery')brickChimney(g,x+size*3.33,y-size*.6,size,false);
   sprites.drawGable(g,'bakeryRoof',x+w/2,y-size*.33,w+size*.36,size*2.48);
   return;
  }
@@ -138,22 +142,43 @@ function roof(g,b,size){const x=b.x*size,y=b.y*size,w=b.w*size,h=(b.h-1)*size;
 }
 function innYard(g,props,size){const sprites=root.KingdomInnSprites;if(!sprites?.ready)return;for(const prop of props)sprites.draw(g,prop.sprite,prop.x*size,prop.y*size,prop.w*size,prop.h*size)}
 let oakImage=null;
-function landmarkOak(g,x,y,size,canopy=false,fade=false){
+function landmarkOak(g,x,y,size,canopy=false,fade=false,scale=1){
  if(!oakImage&&typeof Image!=='undefined'){oakImage=new Image();oakImage.src='assets/village-oak-v1.png'}
  if(!oakImage?.complete||!oakImage.naturalWidth)return;
- const width=size*3.1,height=size*3.05,left=(x+.5)*size-width/2,top=(y+1)*size-height;
+ const width=size*9.5*scale,height=size*9*scale,left=(x+.5)*size-width/2,top=(y+1)*size-height;
  g.save();g.globalAlpha=fade?0.43:1;g.imageSmoothingEnabled=false;
  if(canopy){const crop=Math.floor(oakImage.naturalHeight*.73);g.drawImage(oakImage,0,0,oakImage.naturalWidth,crop,left,top,width,height*crop/oakImage.naturalHeight)}
  else g.drawImage(oakImage,left,top,width,height);
  g.restore();
 }
+const regionImages={};
+function regionSite(g,id,x,y,size){
+ const config={inn:['brooklands-inn-v1.png',6.3,5.2],cottage:['brooklands-cottage-v1.png',5.5,4.3],bakery:['brooklands-bakehouse-v1.png',6.1,4.8],forge:['brooklands-forge-v1.png',6.2,5],mill:['brooklands-watermill-v1.png',8.5,6.4],timber:['brooklands-timber-yard-v1.png',9.5,6.4],mine:['brooklands-mine-v1.png',10.5,7]};
+ const entry=config[id];if(!entry)return false;
+ if(!regionImages[id]&&typeof Image!=='undefined'){const img=new Image();img.src='assets/'+entry[0];regionImages[id]=img}
+ const img=regionImages[id];if(!img?.complete||!img.naturalWidth)return false;
+ const [,w,h]=entry;g.save();g.imageSmoothingEnabled=true;g.drawImage(img,(x-w/2)*size,(y+1-h)*size,w*size,h*size);g.restore();return true;
+}
+function field(g,x,y,size,kind='grain'){
+ const art=sprite('field:'+kind,c=>{
+  r(c,0,0,32,32,kind==='beans'?'#6b5a3e':'#8b7043');
+  for(let row=0;row<4;row++){
+   const y0=row*8+2;r(c,0,y0+6,32,2,kind==='beans'?'#5a4b37':'#745b39');
+   for(let col=0;col<6;col++){
+    const xx=2+col*5+(row%2),yy=y0+(col%2);
+    if(kind==='beans'){r(c,xx,yy+2,1,4,'#365f38');r(c,xx-1,yy+1,2,2,'#5a8644');r(c,xx+1,yy+2,2,2,'#71934d')}
+    else{r(c,xx,yy+1,1,6,'#5c6b39');r(c,xx-1,yy,3,3,'#b9954d');r(c,xx,yy-1,2,2,'#dfc06e');r(c,xx+1,yy+2,2,2,'#c9a35b')}
+   }
+  }
+ },32,32);
+ g.drawImage(art,x*size,y*size,size+1,size+1);
+}
 function villageSite(g,p,size,road){
  const x=p.x*size,y=p.y*size;
  if(p.kind==='farm'){
-  for(let yy=16;yy<=22;yy++)for(let xx=3;xx<=10;xx++){
+  for(let yy=16;yy<=20;yy++)for(let xx=3;xx<=10;xx++){
    if(road(xx,yy))continue;
-   r(g,xx*size+3,yy*size+size*.16,size-6,size*.66,'#66543b');
-   for(let k=0;k<3;k++)r(g,xx*size+7,yy*size+size*(.25+k*.17),size-14,2,'#9e8558');
+   field(g,xx,yy,size,xx<=5?'beans':'grain');
   }
   g.fillStyle='#e9d49e';g.font='bold 11px system-ui';g.fillText('WESTFIELD',x-size*2,y-size*2.8);
  }else if(p.kind==='market'){
@@ -165,28 +190,6 @@ function villageSite(g,p,size,road){
   r(g,wx+size*.19,wy+size*.2,size*.62,size*.3,'#263f48');
   r(g,wx+size*.07,wy+size*.1,size*.86,size*.11,'#aaa794');
   for(const bx of [17,22]){r(g,bx*size,24*size+size*.6,size*.85,size*.13,'#8e704d');r(g,bx*size+size*.1,24*size+size*.73,size*.1,size*.13,'#564536');r(g,bx*size+size*.64,24*size+size*.73,size*.1,size*.13,'#564536')}
- }else if(p.kind==='smithy'){
-  r(g,x+size*3,y+size*.8,size*.65,size*.35,'#424745');
-  r(g,x+size*3.13,y+size*.64,size*.38,size*.22,'#a4aaa2');
-  r(g,x+size*3.04,y+size*1.5,size*.56,size*.48,'#514036');
-  r(g,x+size*3.16,y+size*1.4,size*.32,size*.2,'#cd6f39');
- }else if(p.kind==='mill'){
-  const bx=(p.x-2.8)*size,by=(p.y-.1)*size;
-  g.strokeStyle='#5b4934';g.lineWidth=5;g.beginPath();g.arc(bx,by,size*.58,0,Math.PI*2);g.stroke();
-  r(g,bx-size*.5,by-2,size,4,'#79634a');r(g,bx-2,by-size*.5,4,size,'#79634a');
- }else if(p.kind==='healer'){
-  for(let i=0;i<2;i++){r(g,(p.x+2.8)*size,y+size*(.4+i*.8),size*.73,size*.38,'#66543e');r(g,(p.x+2.8)*size+size*.23,y+size*(.28+i*.8),size*.25,size*.25,'#66864c')}
- }else if(p.kind==='weaver'){
-  r(g,x+size*3,y+size*.8,size*.7,size*.3,'#644e3a');
-  r(g,x+size*3.1,y+size*.67,size*.5,size*.18,'#947da1');
- }else if(p.kind==='guard'){
-  r(g,x+size*2.8,y+size*.4,size*.13,size*.95,'#604735');
-  r(g,x+size*2.93,y+size*.4,size*.47,size*.57,'#6b7792');
- }else if(p.kind==='tavern'){
-  for(const dx of [-2.9,3]){r(g,x+dx*size,y+size*.9,size*.6,size*.17,'#76583e');r(g,x+(dx+.1)*size,y+size*1.07,size*.08,size*.19,'#5a4636')}
- }else if(p.kind==='home'){
-  // Small household gardens echo the toft-and-croft plots behind the lane.
-  for(let i=0;i<2;i++){r(g,(p.x+3)*size,y+size*(.4+i*.7),size*.68,size*.2,'#66513b');r(g,(p.x+3)*size+size*.18,y+size*(.29+i*.7),size*.17,size*.2,'#73864f')}
  }
 }
 function water(g,x,y,size){const px=x*size,py=y*size;r(g,px,py,size+1,size+1,'#4b7178');
@@ -210,5 +213,5 @@ function person(g,x,y,size,color,dir,walk,tool){const art=sprite("person:"+color
  g.drawImage(art,Math.round(px-w/2),Math.round(py+size*.12-44*scale),Math.round(w),Math.round(h));
 }
 function resource(g,name,x,y,size){const px=x*size,py=y*size;g.fillStyle=P.shadow;g.beginPath();g.ellipse(px,py+size*.13,size*.2,size*.07,0,0,Math.PI*2);g.fill();if(name==="charcoal"){r(g,px-10,py-6,20,12,P.black);r(g,px-7,py-10,10,7,"#34393b");r(g,px+3,py-4,5,3,"#596062")}else if(name==="wood"){r(g,px-13,py-5,26,9,P.wood);r(g,px-10,py-3,7,5,P.woodLight)}else if(name==="stone"){r(g,px-10,py-8,20,13,P.rock);r(g,px-7,py-8,9,3,P.rockHi)}}
-root.KingdomArt={terrain,plant,crop,building,roof,innYard,landmarkOak,villageSite,water,shelter,person,resource,palette:P};
+root.KingdomArt={terrain,plant,crop,building,roof,innYard,landmarkOak,regionSite,field,villageSite,water,shelter,person,resource,palette:P};
 })(window);
