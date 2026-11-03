@@ -6,7 +6,7 @@ const FURNITURE={
  tavern:[['wallShelf',1.2,1.14,2.3,.8],['hearth',11.8,1.35,1.8,1.9],['counter',2,3,6,1],['table',2,5,2,1],['table',7,5,2,1],['table',11,5,2,1],['bench',2,6,2,.35],['bench',7,6,2,.35],['bench',11,6,2,.35],['stairs',12.5,8,2,2]],
  upstairs:[['wallShelf',5.2,1.13,1.5,.8],['wallShelf',12.7,1.13,1.5,.8],['bed',2.4,2.7,1.7,2.65],['bed',10.4,2.7,1.7,2.65],['table',4.8,3,1.5,1],['table',12.4,3,1.5,1]],
  smithy:[['forge',2,2,2,2],['anvil',7,3,2,1],['rack',2,6,2,1]],
- mill:[['millstone',2,2,2,2],['sacks',8,2,2,1],['sacks',8,5,2,1]],
+ mill:[['millstone',2.15,2.5,2.4,2.1],['wallShelf',8.1,1.15,2.4,.72],['sacks',8,2.7,2,1.15],['sacks',8.2,5.25,1.65,1],['table',3.2,5.2,2.8,1.1]],
  bakery:[['oven',1.55,1.1,2.65,2.75],['wallShelf',8.25,1.35,2.55,.72],['counter',5,3.25,3,1.05],['sacks',8.8,2.55,1.8,1.4],['table',3.1,5.1,2.8,1.15]],
  healer:[['bed',2,2,2,2],['wallShelf',8,.18,2,.72],['table',6,5,2,1]],
  weaver:[['loom',2,2,3,2],['wallShelf',8,.18,2,.72],['table',6,5,2,1]],
@@ -14,6 +14,19 @@ const FURNITURE={
  cave:[['boulder',2,2,2,1],['boulder',8,5,2,1],['stone',8,2,1,1]]
 };
 const CAVE={id:'north-cave',name:'North Cave',kind:'cave',portal:{x:36.5,y:8.5}};
+let millstoneArt=null;
+function millstoneSprite(){
+ if(millstoneArt)return millstoneArt;
+ const c=document.createElement('canvas');c.width=48;c.height=44;const g=c.getContext('2d');g.imageSmoothingEnabled=false;
+ g.fillStyle='#4a382b';g.fillRect(8,34,32,7);g.fillRect(14,39,5,5);g.fillRect(30,39,5,5);
+ g.fillStyle='#4a4d49';g.beginPath();g.ellipse(24,21,22,17,0,0,7);g.fill();
+ g.fillStyle='#91958a';g.beginPath();g.ellipse(24,18,21,15,0,0,7);g.fill();
+ g.fillStyle='#c0bba8';g.beginPath();g.ellipse(24,17,16,11,0,0,7);g.fill();
+ g.strokeStyle='#777b73';g.lineWidth=2;g.beginPath();g.ellipse(24,17,12,8,0,0,7);g.stroke();
+ for(let i=0;i<35;i++){const px=7+(i*19%34),py=8+(i*13%21);if(((px-24)/18)**2+((py-17)/12)**2>1)continue;g.fillStyle=i%3?'#9fa194':'#d1c9b0';g.fillRect(px,py,2,1)}
+ g.fillStyle='#49392b';g.fillRect(22,2,4,16);g.fillStyle='#8a6745';g.fillRect(23,2,2,15);g.fillStyle='#4b514d';g.fillRect(20,15,8,6);
+ millstoneArt=c;return c;
+}
 function furniture(ctx,f,size){
  const x=f.x*size,y=f.y*size,w=f.w*size,h=f.h*size;
  const box=(dx,dy,bw,bh,color)=>{ctx.fillStyle=color;ctx.fillRect(x+dx,y+dy,bw,bh)};
@@ -24,7 +37,7 @@ function furniture(ctx,f,size){
  if(f.type==='hearth'||f.type==='forge'||f.type==='oven'){box(0,0,w,h,'#55564e');box(5,5,w-10,h-10,'#282d2c');box(w*.23,h*.42,w*.54,h*.4,f.type==='oven'?'#a1663e':'#af4d30');box(w*.42,h*.26,w*.18,h*.34,'#e6a751');return}
  if(f.type==='anvil'){box(0,h*.4,w,h*.34,'#414b4d');box(w*.2,h*.24,w*.6,h*.23,'#a4ada7');box(w*.4,h*.7,w*.2,h*.3,'#5c5046');return}
  if(f.type==='rack'||f.type==='wallShelf'){box(0,0,w,h,'#624932');for(let i=0;i<3;i++){box(4+i*w*.28,5,8,h-10,f.type==='rack'?'#9ba6a4':['#79915c','#a67c62','#b5a06a'][i])}return}
- if(f.type==='millstone'){ctx.fillStyle='#4a504d';ctx.beginPath();ctx.arc(x+w/2,y+h/2,w*.45,0,7);ctx.fill();ctx.fillStyle='#a9afa3';ctx.beginPath();ctx.arc(x+w/2,y+h/2,w*.34,0,7);ctx.fill();ctx.fillStyle='#555b56';ctx.beginPath();ctx.arc(x+w/2,y+h/2,w*.09,0,7);ctx.fill();return}
+ if(f.type==='millstone'){ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(millstoneSprite(),x,y,w,h);ctx.restore();return}
  if(f.type==='sacks'){for(let i=0;i<3;i++){box(i*w*.3+2,h*.2,w*.26,h*.65,'#9e8058');box(i*w*.3+4,h*.3,w*.18,3,'#d0b582')}return}
  if(f.type==='loom'){box(0,0,w,h,'#5d4738');box(6,6,w-12,h-12,'#9b8065');for(let i=0;i<6;i++)box(9+i*(w-18)/6,7,2,h-14,i%2?'#a66e65':'#776d9b');return}
  if(f.type==='boulder'||f.type==='stone'){ctx.fillStyle=f.type==='stone'?'#aab8ad':'#505b54';ctx.beginPath();ctx.moveTo(x,y+h);ctx.lineTo(x+w*.15,y+h*.22);ctx.lineTo(x+w*.7,y);ctx.lineTo(x+w,y+h*.55);ctx.lineTo(x+w*.8,y+h);ctx.fill();box(w*.3,h*.25,w*.2,3,'#c2cbbf')}
@@ -42,16 +55,17 @@ function create(buildings){
   ctx.fillStyle=wall;ctx.fillRect(0,0,rw*size,rh*size);
   ctx.fillStyle=floor;ctx.fillRect(size,size,(rw-2)*size,(rh-2)*size);
   const sprites=root.KingdomInnSprites;
-  if(['tavern','upstairs','bakery'].includes(room.kind)&&sprites?.ready){
+  if(['tavern','upstairs','bakery','mill'].includes(room.kind)&&sprites?.ready){
    // Complete floor and back-wall tiles. All furnishings share these source pixels.
    for(let y=1;y<rh-1;y++)for(let x=1;x<rw-1;x++)sprites.draw(ctx,(x+y)%3?'floorA':'floorB',x*size,y*size,size,size);
-   for(let x=1;x<rw-1;x++)for(let y=1;y<=(room.kind==='bakery'?2:1);y++)sprites.draw(ctx,x%3?'wallA':'wallB',x*size,y*size,size,size);
+   for(let x=1;x<rw-1;x++)for(let y=1;y<=(['bakery','mill'].includes(room.kind)?2:1);y++)sprites.draw(ctx,x%3?'wallA':'wallB',x*size,y*size,size,size);
    if(room.kind==='tavern')sprites.draw(ctx,'wallWindows',7*size,1.05*size,2.2*size,1.35*size);
    else if(room.kind==='bakery')sprites.draw(ctx,'bakeryWindow',5.5*size,1.22*size,1.22*size,1.16*size);
+   else if(room.kind==='mill')sprites.draw(ctx,'bakeryWindow',5.5*size,1.22*size,1.22*size,1.16*size);
    else{for(const x of [3,10.5])sprites.draw(ctx,'wallWindows',x*size,1.05*size,2*size,1.35*size);ctx.fillStyle='#674a35';ctx.fillRect(8*size,size*.98,size*.22,6.55*size);for(let x=1;x<rw-1;x++)if(Math.abs(x-4.5)>.6&&Math.abs(x-11.5)>.6)ctx.fillRect(x*size,7*size,size,size*.42)}
   }
   for(const light of room.lights){const x=light.x*size,y=light.y*size,radius=light.type==='hearth'?size*2.6:size*1.7;const glow=ctx.createRadialGradient(x,y,0,x,y,radius);glow.addColorStop(0,'#f5ad5140');glow.addColorStop(1,'#f5ad5100');ctx.fillStyle=glow;ctx.fillRect(x-radius,y-radius,radius*2,radius*2)}
-  if(!['tavern','upstairs','bakery'].includes(room.kind)){ctx.fillStyle=cave?'#767b6d':'#b6956a';for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++)if((x*11+y*17)%7===0)ctx.fillRect(x*size+size*.2,y*size+size*.35,size*.22,size*.07)}
+  if(!['tavern','upstairs','bakery','mill'].includes(room.kind)){ctx.fillStyle=cave?'#767b6d':'#b6956a';for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++)if((x*11+y*17)%7===0)ctx.fillRect(x*size+size*.2,y*size+size*.35,size*.22,size*.07)}
   if(room.kind==='tavern'&&sprites?.ready)sprites.draw(ctx,'innDoor',7.1*size,10.72*size,.8*size,1.06*size);
   else if(room.kind==='upstairs'){ctx.fillStyle='#523927';ctx.fillRect(7.1*size,10.8*size,.8*size,.18*size)}
   else if(room.kind==='bakery'&&sprites?.ready)sprites.draw(ctx,'bakeryDoor',5.1*size,7.8*size,.8*size,1.05*size);
@@ -59,6 +73,10 @@ function create(buildings){
   ctx.fillStyle='#e6ce9f';ctx.font=`bold ${Math.round(size*.25)}px system-ui`;ctx.textAlign='center';ctx.fillText(room.name,rw*size/2,size*.6);
   for(const f of room.furniture){
    if(f.type==='wallShelf'&&sprites?.ready){sprites.draw(ctx,room.kind==='bakery'?'bakeryWallShelf':'cupboard',f.x*size,f.y*size,f.w*size,f.h*size);continue}
+   if(room.kind==='mill'&&sprites?.ready){
+    if(f.type==='sacks'){sprites.draw(ctx,'bakerySackPile',f.x*size,f.y*size,f.w*size,f.h*size);continue}
+    if(f.type==='table'){sprites.draw(ctx,'bakeryBench',f.x*size,f.y*size,f.w*size,f.h*size);continue}
+   }
    if(room.kind==='bakery'&&sprites?.ready){
     if(f.type==='oven'){const x=f.x*size,y=f.y*size,w=f.w*size,h=f.h*size;sprites.draw(ctx,'bakeryOvenMain',x,y,w*55/64,h);sprites.draw(ctx,'bakeryOvenRight',x+w*55/64,y+h/3,w*9/64,h*2/3);continue}
     if(f.type==='counter'){sprites.draw(ctx,'counter',f.x*size,f.y*size,f.w*size,f.h*size);continue}

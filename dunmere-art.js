@@ -199,14 +199,6 @@ function regionSite(g,id,x,y,size,animationMs=performance.now()){
   g.fillStyle='rgba(25,34,23,.14)';g.beginPath();g.ellipse(x*size,(y+.75)*size,w*size*.32,size*.11,0,0,Math.PI*2);g.fill();
  }
  g.drawImage(img,left,top,w*size,h*size);
- if(id==='mill'){
-  const wheel=loadRegionImage('wheel','brooklands-waterwheel-v2.png');
-  if(wheel?.complete&&wheel.naturalWidth){
-   const cx=left+w*size*(235/1448),cy=top+h*size*(672/1086),diam=h*size*(520/1086);
-   g.save();g.translate(cx,cy);g.scale(.72,1);g.rotate(animationMs*.00055);
-   g.drawImage(wheel,160,0,1130,1086,-diam/2,-diam/2,diam,diam);g.restore();
-  }
- }
  g.restore();return true;
 }
 function field(g,x,y,size,kind='grain'){

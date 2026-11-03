@@ -30,6 +30,10 @@ const worldGoods={
  preserves:{name:"Dried vegetables",type:"food",stack:10,weight:.4,nutrition:25,shelfLife:90}
 };
 for(const [id,definition] of Object.entries(worldGoods))defs[id]={...definition,portable:false,phase:"world-stock"};
+// Player-milled flour uses the same item ID as the village stock ledger.
+defs.flour={...defs.flour,portable:true,phase:'playable',art:[
+ '................','.....111111.....','....12222221....','...1223333221...','...1233333321...','...1233233321...','...1233333321...','...1233333321...','....12222221....','.....111111.....','................'
+],palette:['#00000000','#54483b','#bdac8a','#eee2bd']};
 const planned={
  tinder:{name:"Tinder",type:"material",stack:20,weight:.05},
  fiber:{name:"Plant fiber",type:"material",stack:20,weight:.1},

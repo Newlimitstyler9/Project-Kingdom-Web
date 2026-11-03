@@ -2,9 +2,9 @@
 
 [Play the current public build](https://newlimitstyler9.github.io/Project-Kingdom-Web/dunmere-living.html), or open `index.html` in a browser that executes local JavaScript. For local testing, run `python3 -m http.server 8000 --directory prototype` from the repository root and visit `http://localhost:8000/`.
 
-Desktop controls: WASD or arrow keys to walk, E or left click near the character to interact, Space or right click to attack, I to open the bag, and Escape to close a panel. Use the mouse to select dialogue choices, inventory items, and menu buttons. On touch screens, the joystick and A/B buttons remain available.
+Desktop controls: WASD or arrow keys to walk, E or left click near the character to interact, Space or right click to swing the equipped tool or attack, I to open the bag, and Escape to close a panel. Use the mouse to select dialogue choices, inventory items, and menu buttons. On touch screens, the joystick and A/B buttons remain available.
 
-New games begin in the Brooklands wilderness southwest of Dunmere. Follow the trail and cross the brook to reach town; interact near the large oak to enter the detailed village map. Walk south along the village's central lane to return to Brooklands. Existing saves resume at their saved location. The regional map includes Eastwood, Westfield, Brook Mill and the north ridge cave; their local jobs and interiors are still being developed.
+New games begin in the Brooklands wilderness southwest of Dunmere. Follow the trail and cross the brook to reach town; interact near the large oak to enter the detailed village map. Walk south along the village's central lane to return to Brooklands. Existing saves resume at their saved location. The regional inn, bakery, mill, and two cottages have doors that lead to their interior maps and return to the same exterior door.
 
 This is a standalone HTML prototype, not a compiled app. The ChatGPT in-app file preview may not support interactive rendering. To host it, deploy the `prototype` directory to a static host.
 
@@ -16,6 +16,8 @@ After a game change is merged into `main`, run `python3 scripts/publish-web.py` 
 
 ## Modular exteriors and wilderness camp
 
-Dunmere houses, the inn, bakery, smithy, and Brook Mill now render from layered Kenney tiles instead of one full-building image. See `docs/architecture/modular-buildings.md` for the template, atlas spacing, door anchor, and visual validation workflow. Brook Mill keeps its animated waterwheel as a separate prop. The timber yard and north ridge cave remain distinct site art.
+Dunmere houses, the inn, bakery, smithy, and Brook Mill now render from layered Kenney tiles instead of one full-building image. See `docs/architecture/modular-buildings.md` for the template, atlas spacing, door anchor, object layering, and visual validation workflow. The timber yard and north ridge cave remain distinct site art.
 
 At the wilderness trail, interact with fallen branches, loose stones, and dry grasses to gather starting supplies. Open the bag and choose **Craft** to make a campfire kit, travel tent, and bedroll. Select the kit or tent in the bag and choose **Place** while facing open ground away from paths and trees. Interact with the pitched tent to sleep and save. New travelers carry salvaged cloth for their first shelter.
+
+Walk over loose ground resources and press E to collect them. With a stone axe equipped, swing three times at a tree to fell it for wood and a stick. The stump and cleared space persist in the saved world. Tree crowns cover the player and camp objects and become translucent while the player walks under them. Inside Brook Mill, use the millstone to grind two grain into two flour.

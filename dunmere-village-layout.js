@@ -38,7 +38,6 @@ function create(places,residents=[]){
  solid[greenOak.y][greenOak.x]=true; // The oak's trunk, clear of the paths.
  solid[24][20]=true; // Stone well on the green.
  for(let y=25;y<HEIGHT;y++)for(let x=0;x<3;x++)solid[y][x]=true; // Brook and mill race.
- for(const [x,y] of [[3,24],[3,25],[3,26],[9,25],[9,26],[10,26]])solid[y][x]=true; // Mill wheel and loaded cart outside the standard building walls.
  function goal(place,id=0){
   const p=byId[place],b=buildings.find(row=>row.id===place);
   if(!p)return [19.5,21.5];
