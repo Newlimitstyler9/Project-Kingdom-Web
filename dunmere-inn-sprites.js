@@ -4,6 +4,7 @@ const sheets={furniture:'assets/inn-tavern-furniture.png',cooking:'assets/inn-ta
 const crops={
  counter:['furniture',191,320,96,54],table:['furniture',320,190,64,54],stool:['furniture',578,198,32,32],
  cupboard:['furniture',423,0,80,64],
+ bakeryWallShelf:['furniture',326,0,84,31],bakeryWindow:['interior',128,128,32,32],
  stairStep:['furniture',896,192,96,32],guestBed:['guestBed',0,0,54,86],
  hearth:['cooking',128,80,96,80],fire:['cooking',64,160,32,30],
  barrel:['deco',0,0,32,32],candle:['deco',0,352,22,32],sconce:['deco',426,352,32,32],

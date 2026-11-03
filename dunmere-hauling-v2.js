@@ -1,5 +1,6 @@
 (function(root){"use strict";
 function create(world,food){
+ const recipes=root.KingdomCraft?.production;if(!recipes)throw Error('Recipe catalog must load before village hauling');
  const locations={farm:"farm",mill:"mill",bakery:"bakery",market:"market"};
  const stock={farm:{grain:24},mill:{grain:0,flour:0},bakery:{flour:0,bread:0}};
  const carriers=[
@@ -25,12 +26,13 @@ function create(world,food){
   }
  }
  function process(){
-  const millBatches=Math.min(8,Math.floor(stock.mill.grain/2));
-  stock.mill.grain-=2*millBatches;stock.mill.flour+=2*millBatches;milled+=2*millBatches;
+  const mill=recipes.mill,bake=recipes.bread;
+  const millBatches=Math.min(8,Math.floor(stock.mill.grain/mill.ingredients.grain));
+  stock.mill.grain-=mill.ingredients.grain*millBatches;stock.mill.flour+=mill.output.flour*millBatches;milled+=mill.output.flour*millBatches;
   const target=Math.max(0,36-food.snapshot().stocks.bread-stock.bakery.bread);
-  const batches=Math.min(8,Math.floor(stock.bakery.flour/2),Math.ceil(target/3));
-  if(batches&&food.withdraw("wood",batches)){
-   stock.bakery.flour-=2*batches;stock.bakery.bread+=3*batches;baked+=3*batches;
+  const batches=Math.min(8,Math.floor(stock.bakery.flour/bake.ingredients.flour),Math.ceil(target/bake.output.bread));
+  if(batches&&food.withdraw("wood",batches*bake.ingredients.wood)){
+   stock.bakery.flour-=bake.ingredients.flour*batches;stock.bakery.bread+=bake.output.bread*batches;baked+=bake.output.bread*batches;
   }
  }
  function snapshot(){return {stock:JSON.parse(JSON.stringify(stock)),carriers:carriers.map(c=>({...c})),harvested,milled,baked,delivered}}

@@ -1,9 +1,12 @@
 // Seasonal, household-level food model. Independent of the renderer.
 (function(global){"use strict";
-const types={bread:{nutrition:32,life:5},vegetables:{nutrition:18,life:9},beans:{nutrition:28,life:30},eggs:{nutrition:20,life:5},fish:{nutrition:30,life:3},preserves:{nutrition:25,life:90}};
+const catalog=global.KingdomItemCatalog;
+const production=global.KingdomCraft?.production;
+if(!catalog||!production)throw Error('Item and recipe catalogs must load before village food');
+const types=Object.fromEntries(Object.entries(catalog.defs).filter(([,def])=>def.type==='food'&&def.shelfLife).map(([id,def])=>[id,{nutrition:def.nutrition,life:def.shelfLife}]));
 function create(world,seed=874){
  const stores=world.residents.map(r=>({owner:r.id,food:{bread:2,vegetables:3,beans:2},hungryDays:0}));
- const publicStock={grain:350,flour:40,bread:45,vegetables:120,beans:200,eggs:18,fish:8,preserves:180,seed:20,wood:60};
+ const publicStock={...catalog.worldStockStart};
  const plots=[{id:"westfield",crop:"grain",area:18,condition:80},{id:"gardens",crop:"vegetables",area:12,condition:85},{id:"beanfield",crop:"beans",area:12,condition:80}];
  let day=1,missed=0,spoiled=0,harvested=0,consumed=0,imports=0,logistics=null;
  const events=[];
@@ -18,12 +21,13 @@ function create(world,seed=874){
   }
   // Mill and bake from physical inputs, bounded by demand and fuel.
   const need=logistics?0:Math.max(0,Math.min(45,world.residents.length*3-publicStock.bread));
-  const batches=Math.ceil(need/3);
-  for(let i=0;i<batches;i++){if(publicStock.flour<2&&publicStock.grain>=2){publicStock.grain-=2;publicStock.flour+=2}if(publicStock.flour<2||publicStock.wood<1)break;publicStock.flour-=2;publicStock.wood--;publicStock.bread+=3}
+  const mill=production.mill,bake=production.bread,batches=Math.ceil(need/bake.output.bread);
+  for(let i=0;i<batches;i++){if(publicStock.flour<bake.ingredients.flour&&publicStock.grain>=mill.ingredients.grain){publicStock.grain-=mill.ingredients.grain;publicStock.flour+=mill.output.flour}if(publicStock.flour<bake.ingredients.flour||publicStock.wood<bake.ingredients.wood)break;publicStock.flour-=bake.ingredients.flour;publicStock.wood-=bake.ingredients.wood;publicStock.bread+=bake.output.bread}
   // Seasonal household gardens and village fishing replenish non-grain foods.
   if(day%2===0)add("eggs",5);
   if(day%2===0)add("fish",4);
-  if(day%5===0&&publicStock.vegetables>=10){publicStock.vegetables-=10;add("preserves",9)}
+  const preserve=production.preserves;
+  if(day%5===0&&publicStock.vegetables>=preserve.ingredients.vegetables){publicStock.vegetables-=preserve.ingredients.vegetables;add("preserves",preserve.output.preserves)}
   // A small woodland fuel collection, dependent on the settlement's labor.
   if(world.residents.some(r=>r.job==="laborer"||r.job==="farmhand"))add("wood",8);
   // Spoilage is a real loss, not a reset.
@@ -50,7 +54,7 @@ function restore(data){if(!data||data.version!==1||!Array.isArray(data.plots)||d
 for(const key of Object.keys(publicStock))if(!Number.isInteger(data.stocks[key])||data.stocks[key]<0)return false;
 day=data.day;missed=data.missed;spoiled=data.spoiled;harvested=data.harvested;consumed=data.consumed;imports=data.imports;
 Object.assign(publicStock,data.stocks);for(let i=0;i<plots.length;i++)Object.assign(plots[i],data.plots[i]);for(let i=0;i<stores.length;i++){stores[i].hungryDays=data.households[i].hungryDays;stores[i].food={...data.households[i].food}}events.splice(0,events.length,...(Array.isArray(data.events)?data.events.slice(-100):[]));return true}
-return {update,snapshot,save,restore,attachLogistics(value){logistics=value},transferIn(item,quantity){if(!Number.isInteger(quantity)||quantity<=0)return false;add(item,quantity);return true},withdraw(item,quantity){if(!Number.isInteger(quantity)||quantity<=0||!Object.hasOwn(publicStock,item)||publicStock[item]<quantity)return false;publicStock[item]-=quantity;return true}};
+return {update,snapshot,save,restore,attachLogistics(value){logistics=value},transferIn(item,quantity){if(!Object.hasOwn(publicStock,item)||!Number.isInteger(quantity)||quantity<=0)return false;add(item,quantity);return true},withdraw(item,quantity){if(!Number.isInteger(quantity)||quantity<=0||!Object.hasOwn(publicStock,item)||publicStock[item]<quantity)return false;publicStock[item]-=quantity;return true}};
 }
 global.DunmereFood={create};
 })(window);
