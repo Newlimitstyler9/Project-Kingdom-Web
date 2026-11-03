@@ -12,16 +12,20 @@ const personality={
 function create(world,options={}){
  const states=Object.create(null),history=[],seed=options.seed||874;
  let playerName="traveler";
- for(const r of world.residents)states[r.id]={met:false,knowsName:false,familiarity:0,trust:0,affection:0,respect:0,suspicion:0,promises:[],memories:[],lastTalkDay:0};
+ for(const r of world.residents)states[r.id]={met:false,knowsName:false,familiarity:0,trust:0,affection:0,respect:0,suspicion:0,promises:[],memories:[],lastTalkDay:0,lastSeenDay:0,lastSeenPlace:null};
  function get(id){if(!states[id])throw Error("Unknown resident");return states[id]}
  function remember(id,type,detail){const s=get(id),m={day:world.snapshot().day,type,detail};s.memories.unshift(m);s.memories.length=Math.min(s.memories.length,20);history.unshift({id,...m});history.length=Math.min(history.length,100)}
+ function observe(id,place){const s=get(id),day=world.snapshot().day;if(s.lastSeenDay===day)return false;s.lastSeenDay=day;s.lastSeenPlace=place;remember(id,"sighting","Saw the traveler in "+place+".");return true}
+ function witness(id,type,detail){if(!["assault","theft"].includes(type))return false;const s=get(id);remember(id,type,detail);s.trust=Math.max(-100,s.trust-(type==="assault"?8:4));s.suspicion=Math.min(100,s.suspicion+(type==="assault"?12:6));return true}
  function context(r){const snap=world.snapshot(),bits=[];if(r.hunger>60)bits.push("I'm hungry and thinking about my next meal.");if(r.energy<28)bits.push("I'm worn out and would rather be resting.");if(r.activity==="Working"||r.activity==="Traveling to work")bits.push("I've got work to attend to.");if(r.activity==="At the tavern")bits.push("I came here for a bit of company.");if(snap.bread<10)bits.push("Bread is running short in Dunmere.");if(snap.grain<18)bits.push("The village grain stores are low.");return bits[0]||personality[r.name]?.concern||"It's been an ordinary day so far."}
  function response(id,topic){
  const r=world.residents[id],s=get(id),p=personality[r.name]||{tone:"neutral",offer:"I'm occupied with my own work."};
  const known=s.knowsName,display=known?r.name:"Stranger",line=(text,choices)=>({speaker:display,text,choices});
  const opt=(id,label)=>({id,label});
  if(topic==="open"){
- if(!s.met)return line(r.activity==="Sleeping"?"You're waking me? What is it?":r.activity==="Working"?"Can this wait? I'm in the middle of something.":"Don't think we've met. Are you new around here?",[opt("introduce","Introduce yourself"),opt("askName","Ask their name"),opt("work","Ask about work"),opt("leave","Leave")]);
+ const offense=s.memories.find(m=>(m.type==="assault"||m.type==="theft")&&world.snapshot().day-m.day<=3);
+ if(offense)return line("I saw what you did. "+offense.detail+" I need some distance from you.",[opt("leave","Leave")]);
+ if(!s.met)return line(r.activity==="Sleeping"?"You're waking me? What is it?":r.activity==="Working"?"Can this wait? I'm in the middle of something.":s.lastSeenDay?"I saw you around "+s.lastSeenPlace+". Are you new here?":"Don't think we've met. Are you new around here?",[opt("introduce","Introduce yourself"),opt("askName","Ask their name"),opt("work","Ask about work"),opt("leave","Leave")]);
  const overdue=s.promises.find(p=>!p.fulfilled&&world.snapshot().day>p.day+2);
  if(overdue)return line("You said you'd help with "+overdue.subject+". I haven't forgotten.",[opt("promise","Talk about your promise"),opt("work","Ask about their work"),opt("smalltalk","Make conversation"),opt("leave","Leave")]);
  return line(s.trust>=12?"Good to see you again.":s.suspicion>10?"You again. What do you want?":"Hello again. What's on your mind?",[opt("smalltalk","Ask how their day is going"),opt("work","Ask about work"),opt("help","Offer help"),opt("promise","Discuss commitments"),opt("leave","Leave")]);
@@ -40,8 +44,8 @@ function create(world,options={}){
  }
  function choose(id,topic){const s=get(id);s.lastTalkDay=world.snapshot().day;const result=response(id,topic);if(s.met&&topic==="introduce")s.knowsName=true;return result}
  function snapshot(){return {version,playerName,states:JSON.parse(JSON.stringify(states)),history:history.slice(0,50)}}
- function restore(data){if(!data||data.version!==version||!data.states)return false;for(const r of world.residents){const saved=data.states[r.id];if(!saved)continue;const s=get(r.id);for(const key of ["met","knowsName","familiarity","trust","affection","respect","suspicion","lastTalkDay"])if(typeof saved[key]===typeof s[key])s[key]=saved[key];s.promises=Array.isArray(saved.promises)?saved.promises.slice(0,20).filter(p=>typeof p.subject==="string"&&typeof p.day==="number"):[];s.memories=Array.isArray(saved.memories)?saved.memories.slice(0,20):[]}return true}
- return {get,choose,snapshot,restore,displayName(id){const r=world.residents[id];return get(id).knowsName?r.name:"Stranger"},context};
+ function restore(data){if(!data||data.version!==version||!data.states)return false;for(const r of world.residents){const saved=data.states[r.id];if(!saved)continue;const s=get(r.id);for(const key of ["met","knowsName","familiarity","trust","affection","respect","suspicion","lastTalkDay","lastSeenDay"])if(typeof saved[key]===typeof s[key])s[key]=saved[key];if(typeof saved.lastSeenPlace==="string")s.lastSeenPlace=saved.lastSeenPlace;s.promises=Array.isArray(saved.promises)?saved.promises.slice(0,20).filter(p=>typeof p.subject==="string"&&typeof p.day==="number"):[];s.memories=Array.isArray(saved.memories)?saved.memories.slice(0,20):[]}return true}
+ return {get,choose,observe,witness,snapshot,restore,displayName(id){const r=world.residents[id];return get(id).knowsName?r.name:"Stranger"},context};
 }
 global.KingdomDialogue={create};
 })(window);
