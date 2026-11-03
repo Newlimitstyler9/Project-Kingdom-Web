@@ -2,7 +2,7 @@
 
 [Play the current public build](https://newlimitstyler9.github.io/Project-Kingdom-Web/dunmere-living.html), or open `index.html` in a browser that executes local JavaScript. For local testing, run `python3 -m http.server 8000 --directory prototype` from the repository root and visit `http://localhost:8000/`.
 
-Desktop controls: WASD or arrow keys to walk, E or left click near the character to interact, Space or right click to swing the equipped tool or attack, I to open the bag, and Escape to close a panel. Use the mouse to select dialogue choices, inventory items, and menu buttons. On touch screens, the joystick and A/B buttons remain available.
+Desktop controls: WASD or arrow keys to walk, E or left click near the character to interact, Space or right click to swing the equipped tool or attack, C to toggle sneaking, I to open the bag, and Escape to close a panel. Use the mouse to select dialogue choices, inventory items, and menu buttons. On touch screens, the joystick, A/B buttons, and Sneak button remain available.
 
 New games begin in the Brooklands wilderness southwest of Dunmere. Follow the trail and cross the brook to reach town; interact near the large oak to enter the detailed village map. Walk south along the village's central lane to return to Brooklands. Existing saves resume at their saved location. The regional inn, bakery, mill, and two cottages have doors that lead to their interior maps and return to the same exterior door.
 
