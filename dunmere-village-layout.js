@@ -34,6 +34,8 @@ function create(places,residents=[]){
   {sprite:'marketStallGold',x:market.x+2.05,y:market.y-.9,w:1.6,h:2.15,blocked:[20,21].flatMap(x=>[16,17,18].map(y=>[x,y]))}
  ]:[];
  for(const prop of marketStalls)for(const [px,py] of prop.blocked)solid[py][px]=true;
+ const greenOak={x:21,y:23};
+ solid[greenOak.y][greenOak.x]=true; // The oak's trunk, clear of the paths.
  solid[24][20]=true; // Stone well on the green.
  for(let y=25;y<HEIGHT;y++)for(let x=0;x<3;x++)solid[y][x]=true; // Brook and mill race.
  function goal(place,id=0){
@@ -77,7 +79,7 @@ function create(places,residents=[]){
    return x===b.doorX&&y>b.doorY&&y<=lane;
   });
  }
- return {width:WIDTH,height:HEIGHT,solid,buildings,innYard,bakeryYard,marketStalls,goal,porch,road};
+ return {width:WIDTH,height:HEIGHT,solid,buildings,innYard,bakeryYard,marketStalls,greenOak,goal,porch,road};
 }
 root.DunmereVillageLayout={create};
 })(window);

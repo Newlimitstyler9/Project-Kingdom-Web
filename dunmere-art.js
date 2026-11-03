@@ -137,6 +137,16 @@ function roof(g,b,size){const x=b.x*size,y=b.y*size,w=b.w*size,h=(b.h-1)*size;
  g.strokeText(label,x+w/2,y+size*3.45);g.fillText(label,x+w/2,y+size*3.45);
 }
 function innYard(g,props,size){const sprites=root.KingdomInnSprites;if(!sprites?.ready)return;for(const prop of props)sprites.draw(g,prop.sprite,prop.x*size,prop.y*size,prop.w*size,prop.h*size)}
+let oakImage=null;
+function landmarkOak(g,x,y,size,canopy=false,fade=false){
+ if(!oakImage&&typeof Image!=='undefined'){oakImage=new Image();oakImage.src='assets/village-oak-v1.png'}
+ if(!oakImage?.complete||!oakImage.naturalWidth)return;
+ const width=size*3.1,height=size*3.05,left=(x+.5)*size-width/2,top=(y+1)*size-height;
+ g.save();g.globalAlpha=fade?0.43:1;g.imageSmoothingEnabled=false;
+ if(canopy){const crop=Math.floor(oakImage.naturalHeight*.73);g.drawImage(oakImage,0,0,oakImage.naturalWidth,crop,left,top,width,height*crop/oakImage.naturalHeight)}
+ else g.drawImage(oakImage,left,top,width,height);
+ g.restore();
+}
 function villageSite(g,p,size,road){
  const x=p.x*size,y=p.y*size;
  if(p.kind==='farm'){
@@ -200,5 +210,5 @@ function person(g,x,y,size,color,dir,walk,tool){const art=sprite("person:"+color
  g.drawImage(art,Math.round(px-w/2),Math.round(py+size*.12-44*scale),Math.round(w),Math.round(h));
 }
 function resource(g,name,x,y,size){const px=x*size,py=y*size;g.fillStyle=P.shadow;g.beginPath();g.ellipse(px,py+size*.13,size*.2,size*.07,0,0,Math.PI*2);g.fill();if(name==="charcoal"){r(g,px-10,py-6,20,12,P.black);r(g,px-7,py-10,10,7,"#34393b");r(g,px+3,py-4,5,3,"#596062")}else if(name==="wood"){r(g,px-13,py-5,26,9,P.wood);r(g,px-10,py-3,7,5,P.woodLight)}else if(name==="stone"){r(g,px-10,py-8,20,13,P.rock);r(g,px-7,py-8,9,3,P.rockHi)}}
-root.KingdomArt={terrain,plant,crop,building,roof,innYard,villageSite,water,shelter,person,resource,palette:P};
+root.KingdomArt={terrain,plant,crop,building,roof,innYard,landmarkOak,villageSite,water,shelter,person,resource,palette:P};
 })(window);
