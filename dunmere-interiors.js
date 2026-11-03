@@ -2,7 +2,7 @@
 (function(root){"use strict";
 const W=12,H=9,INN_W=16,INN_H=12;
 const FURNITURE={
- home:[['bed',2,2,2,2],['bed',8,2,2,2],['hearth',2,5,2,1],['table',6,4,2,1]],
+ home:[['bed',2,2,2,2],['bed',8,2,2,2],['hearth',5,1.3,2,1.5],['table',6,4,2,1]],
  tavern:[['wallShelf',1.2,1.14,2.3,.8],['hearth',11.8,1.35,1.8,1.9],['counter',2,3,6,1],['table',2,5,2,1],['table',7,5,2,1],['table',11,5,2,1],['bench',2,6,2,.35],['bench',7,6,2,.35],['bench',11,6,2,.35],['stairs',12.5,8,2,2]],
  upstairs:[['bed',1.12,1.76,1.7,2.65],['bed',9.12,1.76,1.7,2.65],['table',4.8,3.1,1.5,.85],['table',12.4,3.1,1.5,.85],['chest',1.25,4.08,1.3,1],['chest',9.25,4.08,1.3,1]],
  smithy:[['forge',2,2,2,2],['anvil',7,3,2,1],['rack',2,6,2,1]],
@@ -55,17 +55,18 @@ function create(buildings){
   ctx.fillStyle=wall;ctx.fillRect(0,0,rw*size,rh*size);
   ctx.fillStyle=floor;ctx.fillRect(size,size,(rw-2)*size,(rh-2)*size);
   const sprites=root.KingdomInnSprites;
-  if(['tavern','upstairs','bakery','mill'].includes(room.kind)&&sprites?.ready){
+  if(['tavern','upstairs','bakery','mill','home'].includes(room.kind)&&sprites?.ready){
    // Complete floor and back-wall tiles. All furnishings share these source pixels.
    for(let y=1;y<rh-1;y++)for(let x=1;x<rw-1;x++)sprites.draw(ctx,(x+y)%3?'floorA':'floorB',x*size,y*size,size,size);
-   for(let x=1;x<rw-1;x++)for(let y=1;y<=(['bakery','mill'].includes(room.kind)?2:1);y++)sprites.draw(ctx,x%3?'wallA':'wallB',x*size,y*size,size,size);
+   for(let x=1;x<rw-1;x++)for(let y=1;y<=(['bakery','mill','home'].includes(room.kind)?2:1);y++)sprites.draw(ctx,x%3?'wallA':'wallB',x*size,y*size,size,size);
    if(room.kind==='tavern')sprites.draw(ctx,'wallWindows',7*size,1.05*size,2.2*size,1.35*size);
+   else if(room.kind==='home')sprites.draw(ctx,'guestWindow',8.2*size,1.06*size,1.05*size,.96*size);
    else if(room.kind==='bakery')sprites.draw(ctx,'bakeryWindow',5.5*size,1.22*size,1.22*size,1.16*size);
    else if(room.kind==='mill')sprites.draw(ctx,'bakeryWindow',5.5*size,1.22*size,1.22*size,1.16*size);
    else{for(const x of [3.5,11.5])sprites.draw(ctx,'guestWindow',x*size,1.02*size,1.05*size,.96*size);ctx.fillStyle='#674a35';ctx.fillRect(8*size,size*.98,size*.22,6.55*size);for(let x=1;x<rw-1;x++)if(Math.abs(x-4.5)>.6&&Math.abs(x-11.5)>.6)ctx.fillRect(x*size,7*size,size,size*.42)}
   }
   for(const light of room.lights){const x=light.x*size,y=light.y*size,radius=light.type==='hearth'?size*2.6:size*1.7;const glow=ctx.createRadialGradient(x,y,0,x,y,radius);glow.addColorStop(0,'#f5ad5140');glow.addColorStop(1,'#f5ad5100');ctx.fillStyle=glow;ctx.fillRect(x-radius,y-radius,radius*2,radius*2)}
-  if(!['tavern','upstairs','bakery','mill'].includes(room.kind)){ctx.fillStyle=cave?'#767b6d':'#b6956a';for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++)if((x*11+y*17)%7===0)ctx.fillRect(x*size+size*.2,y*size+size*.35,size*.22,size*.07)}
+  if(!['tavern','upstairs','bakery','mill','home'].includes(room.kind)){ctx.fillStyle=cave?'#767b6d':'#b6956a';for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++)if((x*11+y*17)%7===0)ctx.fillRect(x*size+size*.2,y*size+size*.35,size*.22,size*.07)}
   if(room.kind==='tavern'&&sprites?.ready)sprites.draw(ctx,'innDoor',7.1*size,10.72*size,.8*size,1.06*size);
   else if(room.kind==='upstairs'){ctx.fillStyle='#523927';ctx.fillRect(7.1*size,10.8*size,.8*size,.18*size)}
   else if(room.kind==='bakery'&&sprites?.ready)sprites.draw(ctx,'bakeryDoor',5.1*size,7.8*size,.8*size,1.05*size);
@@ -82,6 +83,11 @@ function create(buildings){
     if(f.type==='counter'){sprites.draw(ctx,'counter',f.x*size,f.y*size,f.w*size,f.h*size);continue}
     if(f.type==='sacks'){sprites.draw(ctx,'bakerySackPile',f.x*size,f.y*size,f.w*size,f.h*size);continue}
     if(f.type==='table'){sprites.draw(ctx,'bakeryBench',f.x*size,f.y*size,f.w*size,f.h*size);continue}
+   }
+   if(room.kind==='home'&&sprites?.ready){
+    if(f.type==='bed'){sprites.draw(ctx,'guestBed',f.x*size,(f.y-.25)*size,f.w*size,2.45*size);continue}
+    if(f.type==='hearth'){sprites.draw(ctx,'hearth',f.x*size,f.y*size,f.w*size,f.h*size);sprites.draw(ctx,'fire',(f.x+.48)*size,(f.y+.77)*size,.95*size,.45*size);continue}
+    if(f.type==='table'){sprites.draw(ctx,'table',f.x*size,f.y*size,f.w*size,1.13*size);continue}
    }
    if(room.kind==='tavern'&&sprites?.ready){
     if(f.type==='counter'){for(let i=0;i<3;i++)sprites.draw(ctx,'counter',(2+i*2)*size,2.96*size,2*size,1.12*size);continue}
