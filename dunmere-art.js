@@ -44,8 +44,18 @@ function plant(g,kind,x,y,size,seed=0){const baseX=Math.round((x+.5)*size),baseY
  g.drawImage(art,Math.round(baseX-width/2),Math.round(groundY-visibleBottom*scale),width,height);
 }
 function crop(g,x,y,size,growth){for(let i=0;i<3;i++){const bx=(x+.18+i*.29)*size,by=(y+.83)*size,h=Math.max(4,growth/100*size*.6);r(g,bx,by-h,size*.07,h,growth>=90?"#c4a65a":"#4e783b");r(g,bx-size*.07,by-h*.65,size*.12,size*.07,"#81944c")}}
+function gableInfill(g,x,y,w,size){
+ // The thatch sprite leaves an open triangle beneath its inner ridge.
+ // Close it with daub before the timber wall and roof are layered on top.
+ g.fillStyle='#aca06e';g.beginPath();
+ g.moveTo(x+w/2,y+size*.88);
+ g.lineTo(x+w/2-size*.75,y+size*1.55);
+ g.lineTo(x+w/2+size*.75,y+size*1.55);
+ g.closePath();g.fill();
+}
 function building(g,b,size,open=false){const x=b.x*size,y=b.y*size,w=b.w*size,h=b.h*size;
  if(b.kind==='tavern'&&root.KingdomInnSprites?.ready){const sprites=root.KingdomInnSprites;
+  gableInfill(g,x,y,w,size);
   for(let i=0;i<2;i++)sprites.draw(g,'innTimber',x+i*w/2,y+size*1.24,w/2,size*2.76);
   r(g,x,y+size*2.54,w,size*.1,'#503323');
   for(const px of [.62,3.8])sprites.draw(g,'innWindow',x+size*px,y+size*2.07,size*.6,size*.58);
@@ -53,6 +63,7 @@ function building(g,b,size,open=false){const x=b.x*size,y=b.y*size,w=b.w*size,h=
   return;
  }
  if(b.kind==='bakery'&&root.KingdomInnSprites?.ready){const sprites=root.KingdomInnSprites;
+  gableInfill(g,x,y,w,size);
   for(let i=0;i<2;i++)sprites.draw(g,'innTimber',x+i*w/2,y+size*1.24,w/2,size*2.76);
   for(const px of [.58,3.83])sprites.draw(g,'innWindow',x+size*px,y+size*2.08,size*.58,size*.58);
   sprites.draw(g,'bakeryDoor',b.doorX*size+size*.11,b.doorY*size-size*.16,size*.78,size*1.16);
