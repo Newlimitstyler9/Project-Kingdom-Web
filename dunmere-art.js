@@ -53,19 +53,38 @@ function gableInfill(g,x,y,w,size){
  g.lineTo(x+w/2+size*.75,y+size*1.55);
  g.closePath();g.fill();
 }
+function brickChimney(g,x,y,size,darkRoof){
+ const art=sprite('brick-chimney-'+(darkRoof?'dark':'light'),ctx=>{
+  const mortar='#8f806f',outline='#42362f',light='#ad7865',brick='#925e4f',shade='#6e493f';
+  r(ctx,3,5,14,32,outline);r(ctx,4,6,12,30,mortar);
+  for(let row=0;row<6;row++){
+   const yy=7+row*5,offset=row%2?3:0;
+   r(ctx,5,yy,10,4,brick);
+   r(ctx,5,yy,9,1,light);r(ctx,14,yy+1,1,3,shade);
+   for(let xx=5+offset;xx<15;xx+=6)r(ctx,xx,yy+1,1,3,mortar);
+   r(ctx,5,yy+4,10,1,mortar);
+  }
+  r(ctx,2,3,16,4,outline);r(ctx,3,2,14,3,light);
+  r(ctx,5,3,10,2,'#342e2b');r(ctx,6,3,8,1,'#201f1f');
+  r(ctx,3,7,2,28,shade);r(ctx,15,7,1,28,outline);
+  r(ctx,1,34,18,3,darkRoof?'#493329':'#755037');
+  r(ctx,3,33,14,2,darkRoof?'#79513a':'#9a6a42');
+ },20,40);
+ g.drawImage(art,x,y,size*.62,size*1.14);
+}
 function building(g,b,size,open=false){const x=b.x*size,y=b.y*size,w=b.w*size,h=b.h*size;
  if(b.kind==='tavern'&&root.KingdomInnSprites?.ready){const sprites=root.KingdomInnSprites;
   gableInfill(g,x,y,w,size);
   for(let i=0;i<2;i++)sprites.draw(g,'innTimber',x+i*w/2,y+size*1.24,w/2,size*2.76);
   r(g,x,y+size*2.54,w,size*.1,'#503323');
-  for(const px of [.62,3.8])sprites.draw(g,'innWindow',x+size*px,y+size*2.07,size*.6,size*.58);
+  for(const px of [.62,3.7])sprites.draw(g,'innWindow',x+size*px,y+size*2.01,size*.68,size*.72);
   sprites.draw(g,'innDoor',b.doorX*size+size*.12,b.doorY*size-size*.16,size*.76,size*1.16);
   return;
  }
  if(b.kind==='bakery'&&root.KingdomInnSprites?.ready){const sprites=root.KingdomInnSprites;
   gableInfill(g,x,y,w,size);
   for(let i=0;i<2;i++)sprites.draw(g,'innTimber',x+i*w/2,y+size*1.24,w/2,size*2.76);
-  for(const px of [.58,3.83])sprites.draw(g,'innWindow',x+size*px,y+size*2.08,size*.58,size*.58);
+  for(const px of [.58,3.73])sprites.draw(g,'innWindow',x+size*px,y+size*2.01,size*.68,size*.72);
   sprites.draw(g,'bakeryDoor',b.doorX*size+size*.11,b.doorY*size-size*.16,size*.78,size*1.16);
   sprites.draw(g,'counter',x+size*3.28,y+size*3.12,size*1.5,size*.76);
   for(const px of [3.47,3.89,4.3])sprites.draw(g,'bread',x+size*px,y+size*3.07,size*.36,size*.34);
@@ -101,16 +120,16 @@ function roof(g,b,size){const x=b.x*size,y=b.y*size,w=b.w*size,h=(b.h-1)*size;
  }
  if(b.kind==='tavern'){
   const sprites=root.KingdomInnSprites;
-  if(sprites?.ready)sprites.draw(g,'innGableRoof',x-size*.18,y-size*.33,w+size*.36,size*2.48);
-  sprites?.draw(g,'innChimney',x+size*3.45,y-size*.22,size*.33,size*.7);
+  brickChimney(g,x+size*3.33,y-size*.6,size,true);
+  if(sprites?.ready)sprites.drawGable(g,'innGableRoof',x+w/2,y-size*.33,w+size*.36,size*2.48);
   // An actual hanging inn sign replaces the painted rectangle on the facade.
   sprites?.draw(g,'innSign',x+size*.23,y+size*2.57,size*.95,size*.83);
   for(const tx of [2.05,3.08]){const px=x+size*tx,py=y+size*3.22;if(!sprites?.draw(g,'sconce',px-size*.18,py-size*.43,size*.36,size*.43)){r(g,px-7,py+1,14,4,'#4d3c2e');r(g,px-2,py-14,4,7,'#e2a455')}}
   return;
  }
  if(b.kind==='bakery'&&root.KingdomInnSprites?.ready){const sprites=root.KingdomInnSprites;
-  sprites.draw(g,'bakeryRoof',x-size*.18,y-size*.33,w+size*.36,size*2.48);
-  sprites.draw(g,'innChimney',x+size*3.42,y-size*.22,size*.33,size*.7);
+  brickChimney(g,x+size*3.33,y-size*.6,size,false);
+  sprites.drawGable(g,'bakeryRoof',x+w/2,y-size*.33,w+size*.36,size*2.48);
   return;
  }
  g.textAlign='center';g.font='bold 10px system-ui';g.lineWidth=3;g.strokeStyle='#263027';g.fillStyle='#f3dfaf';

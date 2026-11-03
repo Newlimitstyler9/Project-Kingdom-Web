@@ -9,8 +9,8 @@ const crops={
  barrel:['deco',0,0,32,32],candle:['deco',0,352,22,32],sconce:['deco',426,352,32,32],
  ale:['deco',0,540,32,34],bread:['deco',190,799,34,31],
  innRoof:['exterior',128,0,128,64],innWall:['exterior',128,128,128,80],
- innShingle:['exterior',128,0,32,48],innChimney:['exterior',160,0,16,64],
- innDoor:['doors',208,512,32,48],innWindow:['exterior',210,70,31,32],
+ innShingle:['exterior',128,0,32,48],
+ innDoor:['doors',208,512,32,48],innWindow:['doors',545,255,30,33],
  innGableRoof:['thatch',310,240,120,110],innTimber:['cottage',2,0,92,128],
  bakeryRoof:['thatch',310,16,120,110],bakeryDoor:['doors',16,512,32,48],bakeryOvenMain:['cooking',240,64,55,96],bakeryOvenRight:['cooking',295,96,9,64],bakeryBench:['furniture',192,263,96,58],bakerySack:['containers',48,800,32,32],bakerySackPile:['containers',96,800,64,48],
  yardCart:['yard',192,510,92,74],yardTrough:['yard',422,530,90,48],yardLogs:['yard',455,640,57,60],innSign:['yard',254,36,34,30],
@@ -19,5 +19,14 @@ const crops={
 };
 const images={};for(const [id,url] of Object.entries(sheets)){const image=new Image();image.src=url;images[id]=image}
 function draw(ctx,id,x,y,w,h){const crop=crops[id];if(!crop)return false;const [sheet,sx,sy,sw,sh]=crop,img=images[sheet];if(!img.complete||!img.naturalWidth)return false;ctx.drawImage(img,sx,sy,sw,sh,x,y,w,h);return true}
-root.KingdomInnSprites={draw,get ready(){return Object.values(images).every(img=>img.complete&&img.naturalWidth>0)}};
+function drawGable(ctx,id,centerX,y,width,height){
+ const crop=crops[id];if(!crop)return false;
+ const [sheet,sx,sy,sw,sh]=crop,img=images[sheet];if(!img.complete||!img.naturalWidth)return false;
+ const ridge=367,leftWidth=ridge-sx,rightWidth=sw-leftWidth;
+ const center=Math.round(centerX),half=Math.round(width/2);
+ ctx.drawImage(img,sx,sy,leftWidth,sh,center-half,y,half,height);
+ ctx.drawImage(img,ridge,sy,rightWidth,sh,center,y,half,height);
+ return true;
+}
+root.KingdomInnSprites={draw,drawGable,get ready(){return Object.values(images).every(img=>img.complete&&img.naturalWidth>0)}};
 })(window);
