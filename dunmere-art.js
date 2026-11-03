@@ -5,9 +5,23 @@ const P={grass:"#637f4b",grass2:"#779057",grass3:"#425d3d",dirt:"#796348",path:"
 const cache=new Map();
 function sprite(name,draw,w=32,h=48){const key=name;if(cache.has(key))return cache.get(key);const c=document.createElement("canvas");c.width=w;c.height=h;const g=c.getContext("2d");g.imageSmoothingEnabled=false;draw(g);cache.set(key,c);return c}
 function r(g,x,y,w,h,color){g.fillStyle=color;g.fillRect(x,y,w,h)}
-function terrain(g,x,y,size,road){const px=x*size,py=y*size,seed=(x*73856093^y*19349663)>>>0;
+function terrain(g,x,y,size,road,roadAt){
+ const px=x*size,py=y*size;
+ let seed=(Math.imul(x,73856093)^Math.imul(y,19349663))>>>0;seed^=seed>>>16;seed=Math.imul(seed,2246822519)>>>0;seed^=seed>>>13;
  g.fillStyle=road?P.path:P.grass;g.fillRect(px,py,size+1,size+1);
- for(let i=0;i<6;i++){const u=((seed+i*31)%29)/32,v=((seed>>>3+i*17)%29)/32;g.fillStyle=road?(i%2?"#b69c73":"#8b7557"):(i%2?P.grass2:P.grass3);g.fillRect(px+Math.floor(u*size),py+Math.floor(v*size),Math.max(2,size/12|0),Math.max(2,size/16|0))}
+ for(let i=0;i<8;i++){
+  let n=(seed+Math.imul(i+1,2654435761))>>>0;n^=n>>>15;n=Math.imul(n,2246822519)>>>0;
+  const u=(n%29)/32,v=((n>>>12)%29)/32;
+  g.fillStyle=road?(i%3===0?'#baa078':i%2?'#957d5c':'#8b7557'):(i%2?P.grass2:P.grass3);
+  g.fillRect(px+Math.floor(u*size),py+Math.floor(v*size),Math.max(2,size/14|0),Math.max(1,size/19|0));
+ }
+ if(road&&roadAt){
+  g.fillStyle='#647e4d';const a=(seed%17)/32*size,b=((seed>>>8)%17)/32*size;
+  if(!roadAt(x,y-1))g.fillRect(px+a,py,Math.max(2,size*.12),Math.max(1,size*.04));
+  if(!roadAt(x,y+1))g.fillRect(px+b,py+size-Math.max(1,size*.04),Math.max(2,size*.12),Math.max(1,size*.04));
+  if(!roadAt(x-1,y))g.fillRect(px,py+a,Math.max(1,size*.04),Math.max(2,size*.12));
+  if(!roadAt(x+1,y))g.fillRect(px+size-Math.max(1,size*.04),py+b,Math.max(1,size*.04),Math.max(2,size*.12));
+ }
 }
 function plant(g,kind,x,y,size,seed=0){const baseX=Math.round((x+.5)*size),baseY=Math.round((y+1)*size),scale=size/32;
  const art=sprite(kind,ctx=>{
@@ -163,12 +177,29 @@ function landmarkOak(g,x,y,size,canopy=false,fade=false,scale=1){
  g.restore();
 }
 const regionImages={};
-function regionSite(g,id,x,y,size){
- const config={inn:['brooklands-inn-v1.png',6.3,5.2],cottage:['brooklands-cottage-v1.png',5.5,4.3],cottageModest:['brooklands-cottage-modest-v1.png',4.9,3.8],cottageLong:['brooklands-cottage-long-v1.png',5.4,3.7],farmhouse:['brooklands-farmhouse-v1.png',5.6,3.7],bakery:['brooklands-bakehouse-v1.png',6.1,4.8],forge:['brooklands-forge-v1.png',6.2,5],mill:['brooklands-watermill-v1.png',8.5,6.4],timber:['brooklands-timber-yard-v1.png',9.5,6.4],mine:['brooklands-mine-v1.png',10.5,7]};
+function loadRegionImage(id,file){
+ if(!regionImages[id]&&typeof Image!=='undefined'){const img=new Image();img.src='assets/'+file;regionImages[id]=img}
+ return regionImages[id];
+}
+function regionSite(g,id,x,y,size,animationMs=performance.now()){
+ const config={inn:['brooklands-inn-v1.png',6.3,5.2],cottage:['brooklands-cottage-roof-v2.png',5.5,4.3],cottageModest:['brooklands-cottage-modest-v1.png',4.9,3.8],cottageLong:['brooklands-cottage-long-v1.png',5.4,3.7],farmhouse:['brooklands-farmhouse-v1.png',5.6,3.7],bakery:['brooklands-bakehouse-v1.png',6.1,4.8],forge:['brooklands-forge-v1.png',6.2,5],mill:['brooklands-watermill-base-v2.png',8.5,6.4],timber:['brooklands-timber-yard-v1.png',9.5,6.4],mine:['brooklands-mine-v1.png',10.5,7]};
  const entry=config[id];if(!entry)return false;
- if(!regionImages[id]&&typeof Image!=='undefined'){const img=new Image();img.src='assets/'+entry[0];regionImages[id]=img}
- const img=regionImages[id];if(!img?.complete||!img.naturalWidth)return false;
- const [,w,h]=entry;g.save();g.imageSmoothingEnabled=true;g.drawImage(img,(x-w/2)*size,(y+1-h)*size,w*size,h*size);g.restore();return true;
+ const img=loadRegionImage(id,entry[0]);if(!img?.complete||!img.naturalWidth)return false;
+ const [,w,h]=entry,left=(x-w/2)*size,top=(y+1-h)*size;
+ g.save();g.imageSmoothingEnabled=false;
+ if(id!=='mine'&&id!=='mill'){
+  g.fillStyle='rgba(25,34,23,.14)';g.beginPath();g.ellipse(x*size,(y+.75)*size,w*size*.32,size*.11,0,0,Math.PI*2);g.fill();
+ }
+ g.drawImage(img,left,top,w*size,h*size);
+ if(id==='mill'){
+  const wheel=loadRegionImage('wheel','brooklands-waterwheel-v2.png');
+  if(wheel?.complete&&wheel.naturalWidth){
+   const cx=left+w*size*(235/1448),cy=top+h*size*(672/1086),diam=h*size*(520/1086);
+   g.save();g.translate(cx,cy);g.scale(.72,1);g.rotate(animationMs*.00055);
+   g.drawImage(wheel,160,0,1130,1086,-diam/2,-diam/2,diam,diam);g.restore();
+  }
+ }
+ g.restore();return true;
 }
 function field(g,x,y,size,kind='grain'){
  const art=sprite('field:'+kind,c=>{
