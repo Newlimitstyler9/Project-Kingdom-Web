@@ -23,6 +23,24 @@ for(const name of ['chain-male','chain-female','plate-torso-male','plate-torso-f
 const heldSprites=new Map();
 function heldSprite(id){
  if(heldSprites.has(id))return heldSprites.get(id);
+ if(id==='axe'){
+  // A separate 20×25 world sprite keeps a readable stone head and a real hand grip.
+  const c=document.createElement('canvas');c.width=20;c.height=25;
+  const g=c.getContext('2d');g.imageSmoothingEnabled=false;
+  const blocks=(color,rects)=>{g.fillStyle=color;for(const [x,y,w,h] of rects)g.fillRect(x,y,w,h)};
+  blocks('#302b25',[[10,3,4,22],[4,2,8,9],[2,4,11,5],[1,5,13,3]]);
+  blocks('#775137',[[11,4,2,20]]);
+  blocks('#b47c4a',[[11,6,1,17]]);
+  // Chipped, tapered stone blade; the narrow end is lashed to the wooden haft.
+  blocks('#46504c',[[5,2,6,1],[3,3,9,1],[2,4,10,1],[1,5,11,3],[2,8,10,1],[4,9,7,1],[6,10,4,1]]);
+  blocks('#89948b',[[5,3,5,1],[4,4,7,1],[3,5,8,3],[4,8,7,1],[6,9,4,1]]);
+  blocks('#c2c9ba',[[5,3,3,1],[3,5,4,1],[2,6,3,1],[4,8,3,1]]);
+  blocks('#d5ddcb',[[1,6,1,1],[2,5,1,1]]);
+  blocks('#4b3528',[[10,7,4,1],[10,10,4,1],[10,12,4,1]]);
+  blocks('#c5ab7b',[[10,8,4,1],[10,11,4,1]]);
+  blocks('#593c29',[[10,16,4,2],[10,22,4,2]]);
+  heldSprites.set(id,c);return c;
+ }
  const def=root.KingdomItemCatalog?.defs[id];
  if(!def?.art||!def.palette||def.slot!=='hand')return null;
  const c=document.createElement('canvas');c.width=16;c.height=13;
@@ -34,6 +52,27 @@ function drawHeld(ctx,id,px,py,size,direction,appearance){
  const sprite=heldSprite(id);if(!sprite)return;
  const scale=size/32,crouch=appearance.crouch===true,guard=appearance.guard===true;
  const swing=Number.isFinite(appearance.attackPhase)?Math.max(0,Math.min(1,appearance.attackPhase)):null;
+ if(id==='axe'){
+  const left=direction==='left',mirror=left||direction==='down',up=direction==='up';
+  // In the front view the character's right hand is on the viewer's left.
+  const handX=mirror?8:up?23:24,handY=(up?27:28)+(crouch?4:0);
+  const arc=swing===null?0:Math.sin(Math.PI*swing);
+  const pivotX=px-size/2+(handX+(mirror?-2:2)*arc)*scale;
+  const pivotY=py+size*.12-47*scale+(handY-3*arc)*scale;
+  // The handle's grip pixel (12,17) stays anchored at the hand throughout the chop.
+  let angle=.9;
+  if(guard)angle=.55;
+  else if(swing!==null){const ease=t=>t*t*(3-2*t);angle=swing<.2?.9-.3*ease(swing/.2):swing<.72?.6+2.05*ease((swing-.2)/.52):2.65-1.75*ease((swing-.72)/.28)}
+  if(mirror)angle=-angle;
+  ctx.save();ctx.imageSmoothingEnabled=false;ctx.translate(Math.round(pivotX),Math.round(pivotY));ctx.rotate(angle);
+  if(mirror)ctx.scale(-1,1);
+  ctx.drawImage(sprite,Math.round(-12*scale),Math.round(-17*scale),Math.round(20*scale),Math.round(25*scale));
+  ctx.restore();
+  // The fingers overlap the haft at its grip, rather than the haft covering the hand.
+  ctx.fillStyle='#654839';ctx.fillRect(Math.round(pivotX-2*scale),Math.round(pivotY-scale),Math.max(2,Math.round(4*scale)),Math.max(2,Math.round(3*scale)));
+  ctx.fillStyle='#d9a789';ctx.fillRect(Math.round(pivotX-scale),Math.round(pivotY-scale),Math.max(1,Math.round(2*scale)),Math.max(1,Math.round(2*scale)));
+  return;
+ }
  const offsets={down:[24,26,2.25],left:[8,27,-2.25],right:[24,27,2.25],up:[24,25,2.5]};
  const [handX,handY,baseAngle]=offsets[direction]||offsets.down;
  const armReach=swing===null?0:Math.sin(swing*Math.PI)*4;
@@ -43,6 +82,15 @@ function drawHeld(ctx,id,px,py,size,direction,appearance){
  ctx.save();ctx.imageSmoothingEnabled=false;ctx.translate(Math.round(pivotX),Math.round(pivotY));ctx.rotate(angle);
  const long=id==='spear',length=long?19:16,top=long?16:11;
  ctx.drawImage(sprite,Math.round(-8*scale),Math.round(-top*scale),Math.round(length*scale),Math.round(13*scale*(long?1.34:1)));
+ ctx.restore();
+}
+function drawBack(ctx,id,px,py,size,direction,appearance){
+ const sprite=heldSprite(id);if(!sprite)return;
+ const scale=size/32,up=direction==='up',crouch=appearance.crouch===true;
+ const x=px-size/2+(up?20:direction==='down'?20:19)*scale,y=py+size*.12-47*scale+(crouch?31:28)*scale;
+ ctx.save();ctx.imageSmoothingEnabled=false;ctx.translate(Math.round(x),Math.round(y));ctx.rotate(.9);
+ if(id==='axe')ctx.drawImage(sprite,Math.round(-12*scale),Math.round(-17*scale),Math.round(20*scale),Math.round(25*scale));
+ else ctx.drawImage(sprite,Math.round(-8*scale),Math.round(-10*scale),Math.round(16*scale),Math.round(13*scale));
  ctx.restore();
 }
 function ready(){return !failed&&Object.entries(images).every(([part,img])=>img.complete&&img.naturalWidth===384&&img.naturalHeight===(part.startsWith("resident-v1-")?576:48))}
@@ -73,6 +121,7 @@ function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
   }
   if(appearance.handItem&&direction==='up')drawHeld(ctx,appearance.handItem,px,py,size,direction,appearance);
   ctx.imageSmoothingEnabled=false;ctx.drawImage(bent,0,1,32,48,destX,destY,size,drawHeight);
+  if(appearance.backItem)drawBack(ctx,appearance.backItem,px,py,size,direction,appearance);
   if(appearance.handItem&&direction!=='up')drawHeld(ctx,appearance.handItem,px,py,size,direction,appearance);
   return true;
  }
@@ -104,6 +153,7 @@ function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
   if(gear.head==='leatherHood')drawGear('leather-hood',hide);
   if(gear.head==='ironKettleHelm')drawGear('kettle');
   if(gear.head==='plateHelm'||gear.head==='steelHelm')drawGear('armet',gear.head==='steelHelm'?steel:null);
+  if(appearance.backItem)drawBack(ctx,appearance.backItem,px,py,size,direction,appearance);
   if(appearance.handItem&&direction!=='up')drawHeld(ctx,appearance.handItem,px,py,size,direction,appearance);
   if(attackLean)ctx.restore();
   return true;
