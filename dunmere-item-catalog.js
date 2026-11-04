@@ -64,6 +64,7 @@ const campArt={
 for(const [id,art] of Object.entries(campArt)){
  defs[id]={...defs[id],portable:true,phase:"playable",art,palette:id==='campfire'?["#00000000","#54463a","#d6813b","#f6d070"]:id==='fiber'?["#00000000","#5b7540","#9eb66a","#d1c783"]:["#00000000","#473f33","#b19b71","#ded0a8"]};
 }
+defs.torch={...defs.torch,portable:true,phase:'playable',art:['.......3........','......232.......','......232.......','.......1........','......111.......','.......1........','.......1........','.......1........','.......1........','.......1........','................'],palette:['#00000000','#67452c','#d88435','#ffe18b']};
 // Starter gear uses the same body-layer silhouettes for both player models.
 const gearArt={
  tunic:["................",".....111111.....","...112222211....","..11223332211...","..12222222221...","..12222222221...","...122222221....","....1111111.....","................"],
@@ -107,6 +108,8 @@ const gear={
  steelAxe:{name:'Steel axe',type:'weapon',slot:'hand',tier:5,weight:1.8,attack:7,art:gearArt.axe,palette:['#00000000','#58412d','#83a7b7','#e3f0e9']},
  steelDagger:{name:'Steel dagger',type:'weapon',slot:'hand',tier:5,weight:.6,attack:5,art:gearArt.dagger,palette:['#00000000','#425262','#83a7b7','#e3f0e9']},
  steelPick:{name:'Steel pick',type:'tool',slot:'hand',tier:5,weight:1.5,attack:3,art:itemArt.pick,palette:['#00000000','#425262','#83a7b7','#e3f0e9']},
+ woodShield:{name:'Wooden shield',type:'armor',slot:'offhand',tier:1,weight:2.3,defense:2,art:['................','.....111111.....','...1122222211...','..112222222211..','..122233322221..','..122233322221..','..122233322221..','...122222221....','....1222221.....','.....12221......','......111.......','................'],palette:['#00000000','#3b2b24','#98633b','#d0ab71']},
+ ironShield:{name:'Iron-bound shield',type:'armor',slot:'offhand',tier:3,weight:3.4,defense:4,art:['................','.....111111.....','...1122222211...','..112222222211..','..122233322221..','..122233322221..','..122233322221..','...122222221....','....1222221.....','.....12221......','......111.......','................'],palette:['#00000000','#343d40','#849394','#d7dfdb']},
  ironOre:{name:'Iron ore',type:'material',stack:20,weight:.8,art:gearArt.ore,palette:['#00000000','#414442','#717b78','#b5a38a']},
  ironIngot:{name:'Iron ingot',type:'material',stack:20,weight:.7,art:gearArt.ingot,palette:['#00000000','#3e4545','#89918b','#d1c7ab']},
  ironSword:{name:'Iron sword',type:'weapon',slot:'hand',tier:2,weight:1.5,attack:5,art:gearArt.blade,palette:['#00000000','#563b2b','#858f91','#d9e0d6']},

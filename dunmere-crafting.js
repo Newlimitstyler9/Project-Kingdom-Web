@@ -4,6 +4,8 @@ const recipes={
  pick:{name:"Stone pick",category:"tool",ingredients:{stone:2,stick:2},output:{pick:1}},
  hoe:{name:"Wooden hoe",category:"tool",ingredients:{wood:1,stick:2},output:{hoe:1}},
  axe:{name:"Stone axe",category:"tool",ingredients:{stone:2,stick:2},output:{axe:1}},
+ woodShield:{name:"Wooden shield",category:"armor",ingredients:{wood:3,fiber:2},output:{woodShield:1}},
+ torch:{name:"Torch",category:"tool",ingredients:{stick:1,fiber:1,charcoal:1},output:{torch:1}},
  campfire:{name:"Campfire kit",category:"camp",ingredients:{stone:4,stick:2},output:{campfire:1}},
  tent:{name:"Travel tent",category:"camp",ingredients:{stick:4,cloth:4,fiber:2},output:{tent:1}},
  bedroll:{name:"Bedroll",category:"camp",ingredients:{cloth:3,fiber:2},output:{bedroll:1}}
@@ -51,6 +53,7 @@ Object.assign(production,{
  ironIngot:{name:'Smelt iron',category:'material',ingredients:{ironOre:2,charcoal:1},output:{ironIngot:1},station:'forge',skill:'blacksmithing',level:0},
  ironAxe:{name:'Iron axe',category:'weapon',ingredients:{ironIngot:2,wood:1},output:{ironAxe:1},station:'anvil',skill:'blacksmithing',level:2},
  ironSword:{name:'Iron sword',category:'weapon',ingredients:{ironIngot:3,wood:1},output:{ironSword:1},station:'anvil',skill:'blacksmithing',level:3},
+ ironShield:{name:'Iron-bound shield',category:'armor',ingredients:{ironIngot:2,wood:2,leather:1},output:{ironShield:1},station:'anvil',skill:'blacksmithing',level:3},
  chainHauberk:{name:'Iron chain hauberk',category:'armor',ingredients:{ironIngot:3,cloth:2},output:{chainHauberk:1},station:'anvil',skill:'blacksmithing',level:3},
  ironKettleHelm:{name:'Iron kettle helm',category:'armor',ingredients:{ironIngot:2},output:{ironKettleHelm:1},station:'anvil',skill:'blacksmithing',level:3},
  ironGauntlets:{name:'Iron gauntlets',category:'armor',ingredients:{ironIngot:2,cloth:1},output:{ironGauntlets:1},station:'anvil',skill:'blacksmithing',level:4},

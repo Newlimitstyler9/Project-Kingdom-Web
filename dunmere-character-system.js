@@ -21,6 +21,8 @@ for(const part of [...PARTS.map(layer=>`resident-v1-${layer}`),...["male","femal
 const gearImages={};
 for(const name of ['chain-male','chain-female','plate-torso-male','plate-torso-female','plate-legs-male','plate-legs-female','plate-arms-male','plate-arms-female','gloves-male','gloves-female','plate-boots-male','plate-boots-female','kettle','armet','leather-torso-male','leather-torso-female','leather-hood','leather-boots-male','leather-boots-female']){const img=new Image();gearImages[name]=img;img.src='assets/gear/'+name+'.png?v=1'}
 const heldSprites=new Map();
+const equipmentSheet=new Image();equipmentSheet.src='assets/held-equipment.png?v=1';
+const equipmentCells={pick:0,hoe:1,ironSword:2,steelSword:3,knife:4,steelDagger:5,spear:6,torch:7,ironAxe:8,steelAxe:9,steelPick:10,woodShield:11,ironShield:12,axe:13};
 function heldSprite(id){
  if(heldSprites.has(id))return heldSprites.get(id);
  if(id==='axe'){
@@ -41,11 +43,9 @@ function heldSprite(id){
   blocks('#593c29',[[10,16,4,2],[10,22,4,2]]);
   heldSprites.set(id,c);return c;
  }
- const def=root.KingdomItemCatalog?.defs[id];
- if(!def?.art||!def.palette||def.slot!=='hand')return null;
- const c=document.createElement('canvas');c.width=16;c.height=13;
- const g=c.getContext('2d');g.imageSmoothingEnabled=false;
- def.art.forEach((row,y)=>[...row].forEach((pixel,x)=>{const color=def.palette[Number(pixel)];if(pixel!=='.'&&color){g.fillStyle=color;g.fillRect(x,y,1,1)}}));
+ const cell=equipmentCells[id];if(cell===undefined||!equipmentSheet.complete||equipmentSheet.naturalWidth!==24*14)return null;
+ const c=document.createElement('canvas');c.width=24;c.height=32;
+ const g=c.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(equipmentSheet,cell*24,0,24,32,0,0,24,32);
  heldSprites.set(id,c);return c;
 }
 function drawHeld(ctx,id,px,py,size,direction,appearance){
@@ -74,16 +74,30 @@ function drawHeld(ctx,id,px,py,size,direction,appearance){
   ctx.fillStyle='#d9a789';ctx.fillRect(Math.round(pivotX-scale),Math.round(pivotY-scale),Math.max(1,Math.round(2*scale)),Math.max(1,Math.round(2*scale)));
   return;
  }
- const offsets={down:[24,26,2.25],left:[8,27,-2.25],right:[24,27,2.25],up:[24,25,2.5]};
- const [handX,handY,baseAngle]=offsets[direction]||offsets.down;
- const armReach=swing===null?0:Math.sin(swing*Math.PI)*4;
- const pivotX=px-size/2+(handX+(direction==='left'?-armReach:armReach))*scale;
- const pivotY=py+size*.12-47*scale+(handY-(swing===null?0:Math.sin(swing*Math.PI)*3)+(crouch?5:0))*scale;
- const angle=guard?(direction==='left'?-1.45:1.45):swing===null?baseAngle:(direction==='left'?-1:1)*(2.8-swing*2.7);
- ctx.save();ctx.imageSmoothingEnabled=false;ctx.translate(Math.round(pivotX),Math.round(pivotY));ctx.rotate(angle);
- const long=id==='spear',length=long?19:16,top=long?16:11;
- ctx.drawImage(sprite,Math.round(-8*scale),Math.round(-top*scale),Math.round(length*scale),Math.round(13*scale*(long?1.34:1)));
- ctx.restore();
+ const viewerLeft=direction==='left'||direction==='down',handX=direction==='down'?8:direction==='up'?24:16;
+ const handY=(direction==='left'?23:direction==='right'?31:direction==='up'?27:28)+(crouch?4:0);
+ const arc=swing===null?0:Math.sin(Math.PI*swing);
+ const pivotX=px-size/2+(handX+(viewerLeft?-2:2)*arc)*scale;
+ const pivotY=py+size*.12-47*scale+(handY-3*arc)*scale;
+ let angle=id==='spear'?.5:2.3;
+ if(guard)angle=id==='spear'?.15:.85;
+ else if(swing!==null){const ease=t=>t*t*(3-2*t);angle=swing<.3?2.3-1.55*ease(swing/.3):swing<.78?.75+1.55*ease((swing-.3)/.48):2.3}
+ if(viewerLeft)angle=-angle;
+ ctx.save();ctx.imageSmoothingEnabled=false;ctx.translate(Math.round(pivotX),Math.round(pivotY));ctx.rotate(angle);if(!viewerLeft)ctx.scale(-1,1);
+ ctx.drawImage(sprite,Math.round(-12*scale),Math.round(-23*scale),Math.round(24*scale),Math.round(32*scale));ctx.restore();
+ ctx.fillStyle='#654839';ctx.fillRect(Math.round(pivotX-2*scale),Math.round(pivotY-scale),Math.max(2,Math.round(4*scale)),Math.max(2,Math.round(3*scale)));
+ ctx.fillStyle='#d9a789';ctx.fillRect(Math.round(pivotX-scale),Math.round(pivotY-scale),Math.max(1,Math.round(2*scale)),Math.max(1,Math.round(2*scale)));
+}
+function drawOffhand(ctx,id,px,py,size,direction,appearance){
+ const sprite=heldSprite(id);if(!sprite)return;
+ const scale=size/32,crouch=appearance.crouch===true,guard=appearance.guard===true;
+ const handX=direction==='down'?24:direction==='up'?8:direction==='left'?23:8;
+ const handY=(direction==='up'?26:direction==='down'?28:direction==='left'?29:25)+(crouch?4:0);
+ const x=px-size/2+handX*scale,y=py+size*.12-47*scale+handY*scale;
+ ctx.save();ctx.imageSmoothingEnabled=false;ctx.translate(Math.round(x),Math.round(y));
+ if(direction==='right')ctx.scale(-1,1);
+ ctx.drawImage(sprite,Math.round(-10*scale),Math.round((-12-(guard?4:0))*scale),Math.round(20*scale),Math.round(27*scale));ctx.restore();
+ ctx.fillStyle='#d9a789';ctx.fillRect(Math.round(x-scale),Math.round(y-scale),Math.max(2,Math.round(3*scale)),Math.max(2,Math.round(3*scale)));
 }
 function drawBack(ctx,id,px,py,size,direction,appearance){
  const sprite=heldSprite(id);if(!sprite)return;
@@ -91,7 +105,7 @@ function drawBack(ctx,id,px,py,size,direction,appearance){
  const x=px-size/2+(up?17:direction==='down'?17:19)*scale,y=py+size*.12-47*scale+(crouch?31:28)*scale;
  ctx.save();ctx.imageSmoothingEnabled=false;ctx.translate(Math.round(x),Math.round(y));ctx.rotate(direction==='right'?-.9:.9);
  if(id==='axe'){if(direction!=='right')ctx.scale(-1,1);ctx.drawImage(sprite,Math.round(-12*scale),Math.round(-17*scale),Math.round(20*scale),Math.round(25*scale))}
- else ctx.drawImage(sprite,Math.round(-8*scale),Math.round(-10*scale),Math.round(16*scale),Math.round(13*scale));
+ else ctx.drawImage(sprite,Math.round(-12*scale),Math.round(-17*scale),Math.round(24*scale),Math.round(32*scale));
  ctx.restore();
 }
 function ready(){return !failed&&Object.entries(images).every(([part,img])=>img.complete&&img.naturalWidth===384&&img.naturalHeight===(part.startsWith("resident-v1-")?576:48))}
@@ -121,10 +135,12 @@ function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
    if(stable){if(crouchCache.size>120)crouchCache.clear();crouchCache.set(key,bent)}
   }
   if(appearance.backItem&&direction!=='up')drawBack(ctx,appearance.backItem,px,py,size,direction,appearance);
+  if(appearance.offhandItem&&direction==='right')drawOffhand(ctx,appearance.offhandItem,px,py,size,direction,appearance);
   if(appearance.handItem&&(direction==='up'||(direction==='left'&&appearance.handItem==='axe')))drawHeld(ctx,appearance.handItem,px,py,size,direction,appearance);
   ctx.imageSmoothingEnabled=false;ctx.drawImage(bent,0,1,32,48,destX,destY,size,drawHeight);
   if(appearance.backItem&&direction==='up')drawBack(ctx,appearance.backItem,px,py,size,direction,appearance);
   if(appearance.handItem&&direction!=='up'&&(direction!=='left'||appearance.handItem!=='axe'))drawHeld(ctx,appearance.handItem,px,py,size,direction,appearance);
+  if(appearance.offhandItem&&direction!=='right')drawOffhand(ctx,appearance.offhandItem,px,py,size,direction,appearance);
   return true;
  }
  const attackLean=id===12&&Number.isFinite(appearance.attackPhase)?Math.sin(appearance.attackPhase*Math.PI)*.13:0;
@@ -133,6 +149,7 @@ function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
  const drawGear=(name,tint=null)=>{const original=gearImages[name];if(!original?.complete||original.naturalWidth!==576||original.naturalHeight!==256)return;let img=original;if(tint){const key=name+':'+tint;if(!tintedGear.has(key)){const canvas=document.createElement('canvas');canvas.width=576;canvas.height=256;const g=canvas.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(original,0,0);g.globalCompositeOperation='multiply';g.fillStyle=tint;g.fillRect(0,0,576,256);g.globalCompositeOperation='destination-in';g.drawImage(original,0,0);tintedGear.set(key,canvas)}img=tintedGear.get(key)}const frame=pose.frame,row=[2,1,3,0][Math.floor(frame/3)],col=[0,2,6][frame%3];ctx.drawImage(img,col*64+16,row*64+12,32,52,destX,destY,Math.round(size),drawHeight)};
  const draw=(part,row,tint=null)=>{const source=tint?clothingSheet(part,tint):images[part];ctx.drawImage(source,pose.frame*32,row*48,32,48,destX,destY,Math.round(size),drawHeight)};
  if(id===12&&appearance.backItem&&direction!=='up')drawBack(ctx,appearance.backItem,px,py,size,direction,appearance);
+ if(id===12&&appearance.offhandItem&&direction==='right')drawOffhand(ctx,appearance.offhandItem,px,py,size,direction,appearance);
  if(id===12&&appearance.handItem&&(direction==='up'||(direction==='left'&&appearance.handItem==='axe')))drawHeld(ctx,appearance.handItem,px,py,size,direction,appearance);
  if(id===12){
   const body=appearance.bodyType==="female"?"female":"male";
@@ -158,6 +175,7 @@ function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
   if(gear.head==='plateHelm'||gear.head==='steelHelm')drawGear('armet',gear.head==='steelHelm'?steel:null);
   if(appearance.backItem&&direction==='up')drawBack(ctx,appearance.backItem,px,py,size,direction,appearance);
   if(appearance.handItem&&direction!=='up'&&(direction!=='left'||appearance.handItem!=='axe'))drawHeld(ctx,appearance.handItem,px,py,size,direction,appearance);
+  if(appearance.offhandItem&&direction!=='right')drawOffhand(ctx,appearance.offhandItem,px,py,size,direction,appearance);
   if(attackLean)ctx.restore();
   return true;
  }
