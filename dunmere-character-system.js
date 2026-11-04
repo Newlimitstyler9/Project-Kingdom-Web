@@ -53,19 +53,20 @@ function drawHeld(ctx,id,px,py,size,direction,appearance){
  const scale=size/32,crouch=appearance.crouch===true,guard=appearance.guard===true;
  const swing=Number.isFinite(appearance.attackPhase)?Math.max(0,Math.min(1,appearance.attackPhase)):null;
  if(id==='axe'){
-  const left=direction==='left',mirror=left||direction==='down',up=direction==='up';
+  const left=direction==='left',viewerLeft=left||direction==='down',flipBlade=!viewerLeft,up=direction==='up';
   // In the front view the character's right hand is on the viewer's left.
-  const handX=mirror?8:up?23:24,handY=(up?27:28)+(crouch?4:0);
+  const handX=direction==='down'?8:up?24:16;
+  const handY=(direction==='left'?23:direction==='right'?31:direction==='up'?27:28)+(crouch?4:0);
   const arc=swing===null?0:Math.sin(Math.PI*swing);
-  const pivotX=px-size/2+(handX+(mirror?-2:2)*arc)*scale;
+  const pivotX=px-size/2+(handX+(viewerLeft?-2:2)*arc)*scale;
   const pivotY=py+size*.12-47*scale+(handY-3*arc)*scale;
   // Grip near the butt of the haft: the heavy stone head hangs below the hand at rest.
-  let angle=2.8;
+  let angle=2.3;
   if(guard)angle=.85;
-  else if(swing!==null){const ease=t=>t*t*(3-2*t);angle=swing<.3?2.8-2.05*ease(swing/.3):swing<.78?.75+2.05*ease((swing-.3)/.48):2.8}
-  if(mirror)angle=-angle;
+  else if(swing!==null){const ease=t=>t*t*(3-2*t);angle=swing<.3?2.3-1.55*ease(swing/.3):swing<.78?.75+1.55*ease((swing-.3)/.48):2.3}
+  if(viewerLeft)angle=-angle;
   ctx.save();ctx.imageSmoothingEnabled=false;ctx.translate(Math.round(pivotX),Math.round(pivotY));ctx.rotate(angle);
-  if(mirror)ctx.scale(-1,1);
+  if(flipBlade)ctx.scale(-1,1);
   ctx.drawImage(sprite,Math.round(-12*scale),Math.round(-23*scale),Math.round(20*scale),Math.round(25*scale));
   ctx.restore();
   // The fingers overlap the haft at its grip, rather than the haft covering the hand.
@@ -87,9 +88,9 @@ function drawHeld(ctx,id,px,py,size,direction,appearance){
 function drawBack(ctx,id,px,py,size,direction,appearance){
  const sprite=heldSprite(id);if(!sprite)return;
  const scale=size/32,up=direction==='up',crouch=appearance.crouch===true;
- const x=px-size/2+(up?20:direction==='down'?20:19)*scale,y=py+size*.12-47*scale+(crouch?31:28)*scale;
- ctx.save();ctx.imageSmoothingEnabled=false;ctx.translate(Math.round(x),Math.round(y));ctx.rotate(.9);
- if(id==='axe')ctx.drawImage(sprite,Math.round(-12*scale),Math.round(-17*scale),Math.round(20*scale),Math.round(25*scale));
+ const x=px-size/2+(up?17:direction==='down'?17:19)*scale,y=py+size*.12-47*scale+(crouch?31:28)*scale;
+ ctx.save();ctx.imageSmoothingEnabled=false;ctx.translate(Math.round(x),Math.round(y));ctx.rotate(direction==='right'?-.9:.9);
+ if(id==='axe'){if(direction!=='right')ctx.scale(-1,1);ctx.drawImage(sprite,Math.round(-12*scale),Math.round(-17*scale),Math.round(20*scale),Math.round(25*scale))}
  else ctx.drawImage(sprite,Math.round(-8*scale),Math.round(-10*scale),Math.round(16*scale),Math.round(13*scale));
  ctx.restore();
 }
@@ -119,10 +120,11 @@ function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
    g.drawImage(source,16,40,16,9,17,40,16,9);
    if(stable){if(crouchCache.size>120)crouchCache.clear();crouchCache.set(key,bent)}
   }
-  if(appearance.handItem&&direction==='up')drawHeld(ctx,appearance.handItem,px,py,size,direction,appearance);
+  if(appearance.backItem&&direction!=='up')drawBack(ctx,appearance.backItem,px,py,size,direction,appearance);
+  if(appearance.handItem&&(direction==='up'||(direction==='left'&&appearance.handItem==='axe')))drawHeld(ctx,appearance.handItem,px,py,size,direction,appearance);
   ctx.imageSmoothingEnabled=false;ctx.drawImage(bent,0,1,32,48,destX,destY,size,drawHeight);
-  if(appearance.backItem)drawBack(ctx,appearance.backItem,px,py,size,direction,appearance);
-  if(appearance.handItem&&direction!=='up')drawHeld(ctx,appearance.handItem,px,py,size,direction,appearance);
+  if(appearance.backItem&&direction==='up')drawBack(ctx,appearance.backItem,px,py,size,direction,appearance);
+  if(appearance.handItem&&direction!=='up'&&(direction!=='left'||appearance.handItem!=='axe'))drawHeld(ctx,appearance.handItem,px,py,size,direction,appearance);
   return true;
  }
  const attackLean=id===12&&Number.isFinite(appearance.attackPhase)?Math.sin(appearance.attackPhase*Math.PI)*.13:0;
@@ -130,7 +132,8 @@ function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
  ctx.imageSmoothingEnabled=false;
  const drawGear=(name,tint=null)=>{const original=gearImages[name];if(!original?.complete||original.naturalWidth!==576||original.naturalHeight!==256)return;let img=original;if(tint){const key=name+':'+tint;if(!tintedGear.has(key)){const canvas=document.createElement('canvas');canvas.width=576;canvas.height=256;const g=canvas.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(original,0,0);g.globalCompositeOperation='multiply';g.fillStyle=tint;g.fillRect(0,0,576,256);g.globalCompositeOperation='destination-in';g.drawImage(original,0,0);tintedGear.set(key,canvas)}img=tintedGear.get(key)}const frame=pose.frame,row=[2,1,3,0][Math.floor(frame/3)],col=[0,2,6][frame%3];ctx.drawImage(img,col*64+16,row*64+12,32,52,destX,destY,Math.round(size),drawHeight)};
  const draw=(part,row,tint=null)=>{const source=tint?clothingSheet(part,tint):images[part];ctx.drawImage(source,pose.frame*32,row*48,32,48,destX,destY,Math.round(size),drawHeight)};
- if(id===12&&appearance.handItem&&direction==='up')drawHeld(ctx,appearance.handItem,px,py,size,direction,appearance);
+ if(id===12&&appearance.backItem&&direction!=='up')drawBack(ctx,appearance.backItem,px,py,size,direction,appearance);
+ if(id===12&&appearance.handItem&&(direction==='up'||(direction==='left'&&appearance.handItem==='axe')))drawHeld(ctx,appearance.handItem,px,py,size,direction,appearance);
  if(id===12){
   const body=appearance.bodyType==="female"?"female":"male";
   const layer=part=>draw(`player-v2-${body}-${part}`,0);
@@ -153,8 +156,8 @@ function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
   if(gear.head==='leatherHood')drawGear('leather-hood',hide);
   if(gear.head==='ironKettleHelm')drawGear('kettle');
   if(gear.head==='plateHelm'||gear.head==='steelHelm')drawGear('armet',gear.head==='steelHelm'?steel:null);
-  if(appearance.backItem)drawBack(ctx,appearance.backItem,px,py,size,direction,appearance);
-  if(appearance.handItem&&direction!=='up')drawHeld(ctx,appearance.handItem,px,py,size,direction,appearance);
+  if(appearance.backItem&&direction==='up')drawBack(ctx,appearance.backItem,px,py,size,direction,appearance);
+  if(appearance.handItem&&direction!=='up'&&(direction!=='left'||appearance.handItem!=='axe'))drawHeld(ctx,appearance.handItem,px,py,size,direction,appearance);
   if(attackLean)ctx.restore();
   return true;
  }
