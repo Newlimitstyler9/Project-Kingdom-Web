@@ -171,7 +171,7 @@ function roof(g,b,size){const x=b.x*size,y=b.y*size,w=b.w*size,h=(b.h-1)*size;
  }
  g.textAlign='center';g.font='bold 10px system-ui';g.lineWidth=3;g.strokeStyle='#263027';g.fillStyle='#f3dfaf';
  const label=b.kind==='home'?b.name:b.name.replace("Dunmere ",'');
- g.strokeText(label,x+w/2,y+size*3.45);g.fillText(label,x+w/2,y+size*3.45);
+ g.lineJoin='round';g.strokeText(label,x+w/2,y+size*3.45);g.fillText(label,x+w/2,y+size*3.45);
 }
 function innYard(g,props,size){const sprites=root.KingdomInnSprites;if(!sprites?.ready)return;for(const prop of props)sprites.draw(g,prop.sprite,prop.x*size,prop.y*size,prop.w*size,prop.h*size)}
 let oakImage=null;
