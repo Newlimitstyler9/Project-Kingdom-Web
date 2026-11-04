@@ -190,7 +190,7 @@ function loadRegionImage(id,file){
  return regionImages[id];
 }
 function regionSite(g,id,x,y,size,animationMs=performance.now()){
- const config={inn:['brooklands-inn-v1.png',6.3,5.2],cottage:['brooklands-cottage-roof-v2.png',5.5,4.3],cottageModest:['brooklands-cottage-modest-v1.png',4.9,3.8],cottageLong:['brooklands-cottage-long-v1.png',5.4,3.7],farmhouse:['brooklands-farmhouse-v1.png',5.6,3.7],bakery:['brooklands-bakehouse-v1.png',6.1,4.8],forge:['brooklands-forge-v1.png',6.2,5],mill:['brooklands-watermill-base-v2.png',8.5,6.4],timber:['brooklands-timber-yard-v1.png',9.5,6.4],mine:['brooklands-mine-v1.png',10.5,7]};
+ const config={inn:['brooklands-inn-v1.png',6.3,5.2],cottage:['brooklands-cottage-roof-v2.png',5.5,4.3],cottageModest:['brooklands-cottage-modest-v1.png',4.9,3.8],cottageLong:['brooklands-cottage-long-v1.png',5.4,3.7],farmhouse:['brooklands-farmhouse-v1.png',5.6,3.7],bakery:['brooklands-bakehouse-v1.png',6.1,4.8],forge:['brooklands-forge-v1.png',6.2,5],mill:['brooklands-watermill-base-v2.png',8.5,6.4],timber:['brooklands-timber-yard-v1.png',9.5,6.4],mine:['brooklands-mine-cliff-v2.png',22,9]};
  const entry=config[id];if(!entry)return false;
  const img=loadRegionImage(id,entry[0]);if(!img?.complete||!img.naturalWidth)return false;
  const [,w,h]=entry,left=(x-w/2)*size,top=(y+1-h)*size;

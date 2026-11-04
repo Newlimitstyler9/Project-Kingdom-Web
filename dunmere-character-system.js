@@ -10,7 +10,7 @@ const PEOPLE=Object.freeze([
  ["Player","traveler"]
 ].map(([name,role,bodyType="male"],row)=>Object.freeze({name,role,bodyType,row})));
 const images={};let failed=false;
-const tinted=new Map();
+const tinted=new Map(),tintedGear=new Map(),crouchCache=new Map();
 for(const part of [...PARTS.map(layer=>`resident-v1-${layer}`),...["male","female"].flatMap(body=>PLAYER_PARTS.map(layer=>`player-v2-${body}-${layer}`))]){
  const img=new Image();images[part]=img;
  const resident=part.startsWith("resident-v1-");
@@ -19,7 +19,32 @@ for(const part of [...PARTS.map(layer=>`resident-v1-${layer}`),...["male","femal
  img.src=`assets/${part}.png?v=1`;
 }
 const gearImages={};
-for(const name of ['chain-male','chain-female','plate-torso-male','plate-torso-female','plate-legs-male','plate-legs-female','plate-arms-male','plate-arms-female','gloves-male','gloves-female','plate-boots-male','plate-boots-female','kettle','armet']){const img=new Image();gearImages[name]=img;img.src='assets/gear/'+name+'.png?v=1'}
+for(const name of ['chain-male','chain-female','plate-torso-male','plate-torso-female','plate-legs-male','plate-legs-female','plate-arms-male','plate-arms-female','gloves-male','gloves-female','plate-boots-male','plate-boots-female','kettle','armet','leather-torso-male','leather-torso-female','leather-hood','leather-boots-male','leather-boots-female']){const img=new Image();gearImages[name]=img;img.src='assets/gear/'+name+'.png?v=1'}
+const heldSprites=new Map();
+function heldSprite(id){
+ if(heldSprites.has(id))return heldSprites.get(id);
+ const def=root.KingdomItemCatalog?.defs[id];
+ if(!def?.art||!def.palette||def.slot!=='hand')return null;
+ const c=document.createElement('canvas');c.width=16;c.height=13;
+ const g=c.getContext('2d');g.imageSmoothingEnabled=false;
+ def.art.forEach((row,y)=>[...row].forEach((pixel,x)=>{const color=def.palette[Number(pixel)];if(pixel!=='.'&&color){g.fillStyle=color;g.fillRect(x,y,1,1)}}));
+ heldSprites.set(id,c);return c;
+}
+function drawHeld(ctx,id,px,py,size,direction,appearance){
+ const sprite=heldSprite(id);if(!sprite)return;
+ const scale=size/32,crouch=appearance.crouch===true,guard=appearance.guard===true;
+ const swing=Number.isFinite(appearance.attackPhase)?Math.max(0,Math.min(1,appearance.attackPhase)):null;
+ const offsets={down:[24,26,2.25],left:[8,27,-2.25],right:[24,27,2.25],up:[24,25,2.5]};
+ const [handX,handY,baseAngle]=offsets[direction]||offsets.down;
+ const armReach=swing===null?0:Math.sin(swing*Math.PI)*4;
+ const pivotX=px-size/2+(handX+(direction==='left'?-armReach:armReach))*scale;
+ const pivotY=py+size*.12-47*scale+(handY-(swing===null?0:Math.sin(swing*Math.PI)*3)+(crouch?5:0))*scale;
+ const angle=guard?(direction==='left'?-1.45:1.45):swing===null?baseAngle:(direction==='left'?-1:1)*(2.8-swing*2.7);
+ ctx.save();ctx.imageSmoothingEnabled=false;ctx.translate(Math.round(pivotX),Math.round(pivotY));ctx.rotate(angle);
+ const long=id==='spear',length=long?19:16,top=long?16:11;
+ ctx.drawImage(sprite,Math.round(-8*scale),Math.round(-top*scale),Math.round(length*scale),Math.round(13*scale*(long?1.34:1)));
+ ctx.restore();
+}
 function ready(){return !failed&&Object.entries(images).every(([part,img])=>img.complete&&img.naturalWidth===384&&img.naturalHeight===(part.startsWith("resident-v1-")?576:48))}
 function clothingSheet(part,tint){const key=part+':'+tint;if(tinted.has(key))return tinted.get(key);const original=images[part],canvas=document.createElement('canvas');canvas.width=original.width;canvas.height=original.height;const g=canvas.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(original,0,0);g.globalCompositeOperation='multiply';g.fillStyle=tint;g.fillRect(0,0,canvas.width,canvas.height);g.globalCompositeOperation='destination-in';g.drawImage(original,0,0);tinted.set(key,canvas);return canvas}
 function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
@@ -27,28 +52,60 @@ function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
  const pose=KingdomPlayerFrames.select(direction,moving,walkTimeMs+(id===12?0:id*47));
  const scale=size/32,px=Math.round(x*size),py=Math.round(y*size);
  const shadowY=Math.round(py+size*.12),underwear=appearance.underwear===true,crouch=appearance.crouch===true;
- const drawHeight=Math.round(48*scale*(crouch?.78:1)),destX=Math.round(px-size/2),destY=Math.round(shadowY-drawHeight+scale);
- ctx.fillStyle="#23352c88";ctx.beginPath();ctx.ellipse(px,shadowY,size*.22,size*.07,0,0,Math.PI*2);ctx.fill();
+ const drawHeight=Math.round(48*scale),destX=Math.round(px-size/2),destY=Math.round(shadowY-drawHeight+scale);
+ if(!appearance._noShadow){ctx.fillStyle="#23352c88";ctx.beginPath();ctx.ellipse(px,shadowY,size*.22,size*.07,0,0,Math.PI*2);ctx.fill()}
+ if(crouch){
+  const key=JSON.stringify([id,pose.frame,underwear,appearance.bodyType,appearance.hair,appearance.torso,appearance.legs,appearance.torsoTint,appearance.legTint,appearance.gear]);
+  const stable=!Number.isFinite(appearance.attackPhase)&&Object.values(gearImages).every(img=>img.complete);
+  let bent=stable?crouchCache.get(key):null;
+  if(!bent){
+   const source=document.createElement('canvas');source.width=32;source.height=52;
+   render(source.getContext('2d'),id,.5,1.375,32,direction,moving,walkTimeMs,{...appearance,crouch:false,handItem:null,_noShadow:true});
+   bent=document.createElement('canvas');bent.width=32;bent.height=52;
+   const g=bent.getContext('2d');g.imageSmoothingEnabled=false;
+   // Lower the torso while the boots stay planted. Shift each knee outward to make a squat.
+   g.drawImage(source,0,1,32,27,0,7,32,27);
+   g.drawImage(source,0,28,16,12,-2,31,16,12);
+   g.drawImage(source,16,28,16,12,18,31,16,12);
+   g.drawImage(source,0,40,16,9,-1,40,16,9);
+   g.drawImage(source,16,40,16,9,17,40,16,9);
+   if(stable){if(crouchCache.size>120)crouchCache.clear();crouchCache.set(key,bent)}
+  }
+  if(appearance.handItem&&direction==='up')drawHeld(ctx,appearance.handItem,px,py,size,direction,appearance);
+  ctx.imageSmoothingEnabled=false;ctx.drawImage(bent,0,1,32,48,destX,destY,size,drawHeight);
+  if(appearance.handItem&&direction!=='up')drawHeld(ctx,appearance.handItem,px,py,size,direction,appearance);
+  return true;
+ }
+ const attackLean=id===12&&Number.isFinite(appearance.attackPhase)?Math.sin(appearance.attackPhase*Math.PI)*.13:0;
+ if(attackLean){ctx.save();ctx.translate(px,shadowY-11*scale);ctx.rotate((direction==='left'||direction==='up'?-1:1)*attackLean);ctx.translate(-px,-shadowY+11*scale)}
  ctx.imageSmoothingEnabled=false;
- const drawGear=name=>{const img=gearImages[name];if(!img?.complete||img.naturalWidth!==576||img.naturalHeight!==256)return;const frame=pose.frame,row=[2,1,3,0][Math.floor(frame/3)],col=[0,2,6][frame%3];ctx.drawImage(img,col*64+16,row*64+12,32,52,destX,destY,Math.round(size),drawHeight)};
+ const drawGear=(name,tint=null)=>{const original=gearImages[name];if(!original?.complete||original.naturalWidth!==576||original.naturalHeight!==256)return;let img=original;if(tint){const key=name+':'+tint;if(!tintedGear.has(key)){const canvas=document.createElement('canvas');canvas.width=576;canvas.height=256;const g=canvas.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(original,0,0);g.globalCompositeOperation='multiply';g.fillStyle=tint;g.fillRect(0,0,576,256);g.globalCompositeOperation='destination-in';g.drawImage(original,0,0);tintedGear.set(key,canvas)}img=tintedGear.get(key)}const frame=pose.frame,row=[2,1,3,0][Math.floor(frame/3)],col=[0,2,6][frame%3];ctx.drawImage(img,col*64+16,row*64+12,32,52,destX,destY,Math.round(size),drawHeight)};
  const draw=(part,row,tint=null)=>{const source=tint?clothingSheet(part,tint):images[part];ctx.drawImage(source,pose.frame*32,row*48,32,48,destX,destY,Math.round(size),drawHeight)};
+ if(id===12&&appearance.handItem&&direction==='up')drawHeld(ctx,appearance.handItem,px,py,size,direction,appearance);
  if(id===12){
   const body=appearance.bodyType==="female"?"female":"male";
   const layer=part=>draw(`player-v2-${body}-${part}`,0);
   if(!underwear&&appearance.hair!==false)layer("hair-back");
   layer("base");layer("head");
-  if(underwear){layer("underwear");return true}
+  if(underwear){layer("underwear");if(attackLean)ctx.restore();return true}
   if(appearance.legs!==false)draw(`player-v2-${body}-legs`,0,appearance.legTint||null);
-  if(appearance.gear?.legs==='ironGreaves')drawGear('plate-legs-'+body);
+  const gear=appearance.gear||{},steel='#c0e2ed',hide='#b68c63';
+  if(gear.legs==='ironGreaves'||gear.legs==='steelGreaves')drawGear('plate-legs-'+body,gear.legs==='steelGreaves'?steel:null);
   if(appearance.torso!==false)draw(`player-v2-${body}-torso`,0,appearance.torsoTint||null);
-  if(appearance.gear?.torso==='chainHauberk')drawGear('chain-'+body);
-  if(appearance.gear?.torso==='plateCuirass'){drawGear('plate-torso-'+body);drawGear('plate-arms-'+body)}
+  if(gear.torso==='leatherJerkin')drawGear('leather-torso-'+body);
+  if(gear.torso==='chainHauberk')drawGear('chain-'+body);
+  if(gear.torso==='plateCuirass'||gear.torso==='steelCuirass'){const tint=gear.torso==='steelCuirass'?steel:null;drawGear('plate-torso-'+body,tint);drawGear('plate-arms-'+body,tint)}
   layer("feet");
-  if(appearance.gear?.feet==='ironBoots')drawGear('plate-boots-'+body);
-  if(appearance.gear?.hands==='ironGauntlets')drawGear('gloves-'+body);
-  if(appearance.hair!==false&&appearance.gear?.head!=='plateHelm')layer("hair-front");
-  if(appearance.gear?.head==='ironKettleHelm')drawGear('kettle');
-  if(appearance.gear?.head==='plateHelm')drawGear('armet');
+  if(gear.feet==='leatherBoots')drawGear('leather-boots-'+body,hide);
+  if(gear.feet==='ironBoots'||gear.feet==='steelBoots')drawGear('plate-boots-'+body,gear.feet==='steelBoots'?steel:null);
+  if(gear.hands==='leatherGloves')drawGear('gloves-'+body,hide);
+  if(gear.hands==='ironGauntlets'||gear.hands==='steelGauntlets')drawGear('gloves-'+body,gear.hands==='steelGauntlets'?steel:null);
+  if(appearance.hair!==false&&!['plateHelm','steelHelm','leatherHood'].includes(gear.head))layer("hair-front");
+  if(gear.head==='leatherHood')drawGear('leather-hood',hide);
+  if(gear.head==='ironKettleHelm')drawGear('kettle');
+  if(gear.head==='plateHelm'||gear.head==='steelHelm')drawGear('armet',gear.head==='steelHelm'?steel:null);
+  if(appearance.handItem&&direction!=='up')drawHeld(ctx,appearance.handItem,px,py,size,direction,appearance);
+  if(attackLean)ctx.restore();
   return true;
  }
  const layer=part=>draw(`resident-v1-${part}`,id);
@@ -60,6 +117,7 @@ function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
   layer("feet");
   if(appearance.hair!==false)layer("hair-front");
  }
+ if(attackLean)ctx.restore();
  return true;
 }
 root.KingdomCharacterSystem={PEOPLE,PARTS,PLAYER_PARTS,images,gearImages,render,get ready(){return ready()},get failed(){return failed}};
