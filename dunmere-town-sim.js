@@ -43,7 +43,8 @@ lastAssignments=brain?brain.choose(residents,day,hour,places,haulers.map(c=>c.wo
 if(brain)for(const carrier of haulers){lastAssignments[carrier.worker]={job:"hauling",title:"Transporting "+carrier.job,place:carrier.place,priority:1}}
 for(const r of residents){if(!foodSystem)r.hunger=Math.min(100,r.hunger+4);r.energy=Math.max(0,r.energy-2);r.social=Math.max(0,r.social-3);
 let destination,activity;r.currentTask=null;
-if(hour>=22||hour<6||r.energy<16){destination=r.home;activity="Sleeping";if(hasArrived(r,destination))r.energy=Math.min(100,r.energy+13);else activity="Traveling home"}
+if(r.job==='guard'&&hour>=18&&hour<24&&r.energy>=16){destination='guard';activity='Keeping watch'}
+else if(hour>=22||hour<6||r.energy<16){destination=r.home;activity="Sleeping";if(hasArrived(r,destination))r.energy=Math.min(100,r.energy+13);else activity="Traveling home"}
 else if(r.hunger>=55&&(foodSystem||bread>0&&r.coins>=1)){destination=r.home;activity="Eating";if(!hasArrived(r,destination))activity="Traveling for food";else if(!foodSystem&&bread>0&&r.coins>=1){bread--;r.coins--;coins++;r.hunger=Math.max(0,r.hunger-50);transactions++;if(random()<.12)log(r.name+" bought bread for supper.")}else if(foodSystem){activity="Eating";}else if(activity==="Eating")activity="Seeking food"}
 else if(brain){
 const agenda=brain.plan(r,day,hour,lastAssignments[r.id]);destination=agenda.destination;activity=agenda.activity;r.currentTask=agenda.task;
