@@ -13,7 +13,7 @@ const crops={
  innShingle:['exterior',128,0,32,48],
  innDoor:['doors',208,512,32,48],innWindow:['doors',545,255,30,33],
  innGableRoof:['thatch',310,240,120,110],innTimber:['cottage',2,0,92,128],
- bakeryRoof:['thatch',310,16,120,110],bakeryDoor:['doors',16,512,32,48],bakeryOvenMain:['cooking',240,64,55,96],bakeryOvenRight:['cooking',295,96,9,64],bakeryBench:['furniture',192,263,96,58],bakerySack:['containers',48,800,32,32],bakerySackPile:['containers',96,800,64,48],
+ bakeryRoof:['thatch',310,16,120,110],bakeryDoor:['doors',16,512,32,48],bakeryOvenMain:['cooking',240,64,55,96],bakeryOvenRight:['cooking',295,96,9,64],bakeryBench:['furniture',192,263,96,58],bakerySack:['containers',48,800,32,32],bakerySackPile:['containers',96,800,64,48],carriedSack:['containers',328,831,32,35],
  yardCart:['yard',192,510,92,74],yardTrough:['yard',422,530,90,48],yardLogs:['yard',455,640,57,60],innSign:['yard',254,36,34,30],
  farmWagon:['yard',192,1322,126,77],
  marketStallGold:['yard',192,800,64,160],marketStallBlue:['yard',32,800,64,160],
