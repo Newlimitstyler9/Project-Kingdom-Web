@@ -59,14 +59,14 @@ function drawHeld(ctx,id,px,py,size,direction,appearance){
   const arc=swing===null?0:Math.sin(Math.PI*swing);
   const pivotX=px-size/2+(handX+(mirror?-2:2)*arc)*scale;
   const pivotY=py+size*.12-47*scale+(handY-3*arc)*scale;
-  // The handle's grip pixel (12,17) stays anchored at the hand throughout the chop.
-  let angle=.9;
-  if(guard)angle=.55;
-  else if(swing!==null){const ease=t=>t*t*(3-2*t);angle=swing<.2?.9-.3*ease(swing/.2):swing<.72?.6+2.05*ease((swing-.2)/.52):2.65-1.75*ease((swing-.72)/.28)}
+  // Grip near the butt of the haft: the heavy stone head hangs below the hand at rest.
+  let angle=2.8;
+  if(guard)angle=.85;
+  else if(swing!==null){const ease=t=>t*t*(3-2*t);angle=swing<.3?2.8-2.05*ease(swing/.3):swing<.78?.75+2.05*ease((swing-.3)/.48):2.8}
   if(mirror)angle=-angle;
   ctx.save();ctx.imageSmoothingEnabled=false;ctx.translate(Math.round(pivotX),Math.round(pivotY));ctx.rotate(angle);
   if(mirror)ctx.scale(-1,1);
-  ctx.drawImage(sprite,Math.round(-12*scale),Math.round(-17*scale),Math.round(20*scale),Math.round(25*scale));
+  ctx.drawImage(sprite,Math.round(-12*scale),Math.round(-23*scale),Math.round(20*scale),Math.round(25*scale));
   ctx.restore();
   // The fingers overlap the haft at its grip, rather than the haft covering the hand.
   ctx.fillStyle='#654839';ctx.fillRect(Math.round(pivotX-2*scale),Math.round(pivotY-scale),Math.max(2,Math.round(4*scale)),Math.max(2,Math.round(3*scale)));
