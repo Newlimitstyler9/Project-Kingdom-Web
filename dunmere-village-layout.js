@@ -70,6 +70,16 @@ function create(places,residents=[]){
   const rank=Math.max(0,household.indexOf(id));
   return [b.x+1.5+Math.min(rank,2),b.doorY+1.45];
  }
+ // Short, walkable task loops keep outdoor workers and visitors active between
+ // hourly schedule changes. Each point has a specific village use.
+ function activityGoal(place,id=0,phase=0){
+  const step=((phase%3)+3)%3;
+  if(place==='farm')return [[4.5,17.5],[7.5,21.5],[10.5,17.5]][(step+id)%3];
+  if(place==='market')return id===2?[[17.5,16.5],[18.5,20.5],[18.5,17.5]][step]:id===6?[[23.5,17.5],[23.5,20.5],[22.5,16.5]][step]:goal(place,id);
+  if(place==='guard')return [[33.5,27.5],[30.5,22.5],[29.5,27.5]][step];
+  if(place==='green')return [[18.5,22.5],[22.5,24.5],[20.5,25.5]][(step+id)%3];
+  return goal(place,id);
+ }
  function road(x,y){
   if(x===19&&y>=8&&y<=28)return true;
   if([9,15,19,20,28].includes(y)&&x>=5&&x<=35)return true;
@@ -79,7 +89,7 @@ function create(places,residents=[]){
    return x===b.doorX&&y>b.doorY&&y<=lane;
   });
  }
- return {width:WIDTH,height:HEIGHT,solid,buildings,innYard,bakeryYard,marketStalls,greenOak,goal,porch,road};
+ return {width:WIDTH,height:HEIGHT,solid,buildings,innYard,bakeryYard,marketStalls,greenOak,goal,activityGoal,porch,road};
 }
 root.DunmereVillageLayout={create};
 })(window);

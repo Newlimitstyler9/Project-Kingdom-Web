@@ -1,6 +1,6 @@
 // One physical Marrowfield grain contract. Hours are the town's game clock.
 (function(root){"use strict";
-const outward=[[55.5,92.5],[55.5,68.5],[55.5,52.5]];
+const outward=[[55.5,188.5],[55.5,151.5],[55.5,68.5],[55.5,52.5]];
 function pointAlong(points,fraction){
  const lengths=points.slice(1).map((p,i)=>Math.hypot(p[0]-points[i][0],p[1]-points[i][1]));
  let remaining=Math.max(0,Math.min(1,fraction))*lengths.reduce((a,b)=>a+b,0);
