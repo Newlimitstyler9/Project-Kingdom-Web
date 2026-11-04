@@ -1,0 +1,8 @@
+[LPC] Horses, brown horse sprite sheet
+Artist: bluecarrot16
+Source: https://opengameart.org/content/lpc-horses
+Original file: https://opengameart.org/sites/default/files/horse-brown_0.png
+License selected for Project Kingdom: Creative Commons Attribution 3.0
+License: https://creativecommons.org/licenses/by/3.0/
+Downloaded: 2026-11-03
+Changes: None to the source file. Walking frames are cropped and scaled at runtime.

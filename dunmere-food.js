@@ -16,7 +16,7 @@ function create(world,seed=874){
   const season=Math.floor(((day-1)%360)/90),winter=season===3,harvest=season===2;
   // Explicit cultivation with seasonal productivity and soil condition.
   for(const p of plots){const yieldPerTile=p.crop==="grain"?2:1,seasonFactor=winter?0:harvest?2:1;
-   if(day%2===0&&seasonFactor>0&&p.condition>25){const quantity=p.area*yieldPerTile*seasonFactor;if(logistics&&p.crop==="grain")logistics.harvest(quantity);else add(p.crop,quantity);harvested+=quantity;p.condition=Math.max(25,p.condition-1)}
+   if(day%2===0&&seasonFactor>0&&p.condition>25){const quantity=logistics&&p.crop==="grain"?Math.max(1,Math.floor(p.area*yieldPerTile*seasonFactor*.12)):p.area*yieldPerTile*seasonFactor;if(logistics&&p.crop==="grain")logistics.harvest(quantity);else add(p.crop,quantity);harvested+=quantity;p.condition=Math.max(25,p.condition-1)}
    if(day%30===0)p.condition=Math.min(90,p.condition+8);
   }
   // The village well refills a bounded clean-water store each day.
@@ -56,8 +56,9 @@ function restore(data){if(!data||data.version!==1||!Array.isArray(data.plots)||d
 for(const key of Object.keys(publicStock))if(key!=="wellWater"&&(!Number.isInteger(data.stocks[key])||data.stocks[key]<0))return false;
 if(data.stocks.wellWater!==undefined&&(!Number.isInteger(data.stocks.wellWater)||data.stocks.wellWater<0))return false;
 day=data.day;missed=data.missed;spoiled=data.spoiled;harvested=data.harvested;consumed=data.consumed;imports=data.imports;
-Object.assign(publicStock,data.stocks);if(data.stocks.wellWater===undefined)publicStock.wellWater=catalog.worldStockStart.wellWater;for(let i=0;i<plots.length;i++)Object.assign(plots[i],data.plots[i]);for(let i=0;i<stores.length;i++){stores[i].hungryDays=data.households[i].hungryDays;stores[i].food={...data.households[i].food}}events.splice(0,events.length,...(Array.isArray(data.events)?data.events.slice(-100):[]));return true}
-return {update,snapshot,save,restore,attachLogistics(value){logistics=value},transferIn(item,quantity){if(!Object.hasOwn(publicStock,item)||!Number.isInteger(quantity)||quantity<=0)return false;add(item,quantity);return true},withdraw(item,quantity){if(!Number.isInteger(quantity)||quantity<=0||!Object.hasOwn(publicStock,item)||publicStock[item]<quantity)return false;publicStock[item]-=quantity;return true}};
+Object.assign(publicStock,data.stocks);if(logistics)publicStock.grain=0; // Old abstract grain never entered the physical mill pipeline.
+if(data.stocks.wellWater===undefined)publicStock.wellWater=catalog.worldStockStart.wellWater;for(let i=0;i<plots.length;i++)Object.assign(plots[i],data.plots[i]);for(let i=0;i<stores.length;i++){stores[i].hungryDays=data.households[i].hungryDays;stores[i].food={...data.households[i].food}}events.splice(0,events.length,...(Array.isArray(data.events)?data.events.slice(-100):[]));return true}
+return {update,snapshot,save,restore,attachLogistics(value){logistics=value;if(value)publicStock.grain=0},transferIn(item,quantity){if(!Object.hasOwn(publicStock,item)||!Number.isInteger(quantity)||quantity<=0||item==='grain'&&logistics)return false;add(item,quantity);return true},withdraw(item,quantity){if(!Number.isInteger(quantity)||quantity<=0||!Object.hasOwn(publicStock,item)||publicStock[item]<quantity)return false;publicStock[item]-=quantity;return true}};
 }
 global.DunmereFood={create};
 })(window);

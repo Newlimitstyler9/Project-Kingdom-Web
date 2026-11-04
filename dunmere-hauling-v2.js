@@ -10,6 +10,7 @@ function create(world,food){
  ].map(c=>({...c,phase:"pickup",cargo:0,deliveries:0}));
  let harvested=0,milled=0,baked=0,delivered=0;
  function harvest(n){if(!Number.isInteger(n)||n<0)throw Error("Invalid harvest");stock.farm.grain+=n;harvested+=n}
+ function receiveGrain(n){if(!Number.isInteger(n)||n<=0)throw Error("Invalid grain delivery");stock.mill.grain+=n;return stock.mill.grain}
  function destination(id){const c=carriers.find(c=>c.worker===id);const hour=world.snapshot().hour;return c&&hour>=8&&hour<17&&(c.phase==="delivery"||(stock[c.source][c.item]||0)>0)?locations[c.phase==="pickup"?c.source:c.target]:null}
  function step(arrived){
   const hour=world.snapshot().hour;if(hour<8||hour>=17)return;
@@ -40,7 +41,7 @@ function create(world,food){
  }
  function snapshot(){return {stock:JSON.parse(JSON.stringify(stock)),carriers:carriers.map(c=>({...c})),harvested,milled,baked,delivered}}
  function restore(data){if(!data||!data.stock||!Array.isArray(data.carriers)||data.carriers.length!==carriers.length)return false;for(const site of Object.keys(stock)){if(!data.stock[site])return false;for(const item of Object.keys(stock[site]))if(!Number.isInteger(data.stock[site][item])||data.stock[site][item]<0)return false}for(let i=0;i<carriers.length;i++){const c=data.carriers[i];if(c.worker!==carriers[i].worker||!["pickup","delivery"].includes(c.phase)||!Number.isInteger(c.cargo)||c.cargo<0)return false}for(const site of Object.keys(stock))Object.assign(stock[site],data.stock[site]);for(let i=0;i<carriers.length;i++)Object.assign(carriers[i],data.carriers[i]);harvested=data.harvested;milled=data.milled;baked=data.baked;delivered=data.delivered;return true}
-return {harvest,destination,step,process,snapshot,restore};
+return {harvest,receiveGrain,destination,step,process,snapshot,restore};
 }
 root.DunmereHaulingV2={create};
 })(window);
