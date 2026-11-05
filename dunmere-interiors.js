@@ -8,14 +8,14 @@ const FURNITURE={
  mill:[['millstone',2.15,2.5,2.4,2.1],['wallShelf',8.1,1.15,2.4,.72],['sacks',8,2.7,2,1.15],['sacks',8.2,5.25,1.65,1],['table',3.2,5.2,2.8,1.1]],
  bakery:[['oven',1.55,1.1,2.65,2.75],['wallShelf',8.25,1.35,2.55,.72],['counter',5,3.25,3,1.05],['sacks',8.8,2.55,1.8,1.4],['table',3.1,5.1,2.8,1.15]],
  healer:[['bed',2,2,2,2],['wallShelf',8,.18,2,.72],['table',6,5,2,1]],
- weaver:[['loom',2,2,3,2],['wallShelf',8,.18,2,.72],['table',6,5,2,1]],
+ weaver:[['loom',2,2,3,2],['wallShelf',8,.18,2,.72],['table',6,5,2,1],['chest',8.6,6.9,1.35,.85]],
  guard:[['rack',2,2,2,1],['table',6,3,2,1],['bed',8,5,2,2]],
  court:[['wallShelf',1.3,1.15,2.4,.7],['table',2,3,2.4,1],['table',8,3,2,1],['bench',2,6,2,.4]],
  warehouse:[['sacks',2,2.6,2,1.2],['rack',8,2.3,2,1],['table',8,6,2,1]],
  smithy:[['forge',2,2,2,2],['anvil',8,3,1.5,1],['chest',8.1,6.05,1.7,.95],['table',2,6,2.5,1]],
  chapel:[['hearth',2,1.4,2,1.5],['bench',2,4,2,1],['bench',8,4,2,1]],
- stable:[['sacks',2,2.6,2,1.2],['rack',8,2.3,2,1],['table',8,6,2,1]],
- apothecary:[['wallShelf',1.4,1.15,2.5,.7],['table',2,3,2,1],['bed',8,2,2,2]],
+ stable:[['sacks',2,2.6,2,1.2],['rack',8,2.3,2,1],['table',8,6,2,1],['chest',8.6,7.1,1.35,.85]],
+ apothecary:[['wallShelf',1.4,1.15,2.5,.7],['table',2,3,2,1],['bed',8,2,2,2],['chest',8.6,6.9,1.35,.85]],
  granary:[['sacks',2,2.6,2,1.2],['sacks',8,2.6,2,1.2],['table',8,6,2,1]],
  carpenter:[['rack',2,2.3,2,1],['table',8,3,2,1],['table',2,6,2,1]],
  tollhouse:[['table',2,3,2,1],['rack',8,2.3,2,1],['bench',8,6,2,.4]],
@@ -126,7 +126,7 @@ function create(buildings){
   for(const f of room.furniture){
    if(f.type==='wallShelf'&&sprites?.ready){sprites.draw(ctx,room.kind==='bakery'?'bakeryWallShelf':'cupboard',f.x*size,f.y*size,f.w*size,f.h*size);continue}
    if(room.greyfordBuilding&&sprites?.ready){
-    const sprite={table:'table',counter:'counter',bench:'bakeryBench',sacks:'bakerySackPile',rack:'cupboard',chest:'guestChest',hearth:'hearth',forge:'hearth',oven:'bakeryOvenMain'}[f.type];
+    const sprite={table:'table',bed:'guestBed',counter:'counter',bench:'bakeryBench',sacks:'bakerySackPile',rack:'cupboard',chest:'guestChest',hearth:'hearth',forge:'hearth',oven:'bakeryOvenMain'}[f.type];
     if(sprite){sprites.draw(ctx,sprite,f.x*size,f.y*size,f.w*size,f.h*size);if(f.type==='forge')sprites.draw(ctx,'fire',(f.x+.48)*size,(f.y+.78)*size,f.w*.46*size,f.h*.3*size);continue}
    }
    if(room.kind==='mill'&&sprites?.ready){
@@ -163,7 +163,7 @@ function create(buildings){
    display.forEach((piece,i)=>drawSmithyIcon(ctx,piece.id,(2.17+i*.71)*size,5.69*size,size));
   }
   if(room.kind==='tavern'){
-   const stock=details.shop?.stock||{bread:0,ale:0};
+   const stock=details.greyfordShop?.stock||details.shop?.stock||{bread:0,ale:0};
    // Sprite goods are tied to the saved stock ledger; a sold loaf disappears from view.
    if(sprites?.ready){
     for(let i=0;i<Math.min(stock.bread,5);i++)sprites.draw(ctx,'bread',(2.24+i*.96)*size,3.28*size,.52*size,.45*size);
@@ -171,6 +171,10 @@ function create(buildings){
     sprites.draw(ctx,'ale',3.12*size,5.11*size,.35*size,.4*size);
     sprites.draw(ctx,'ale',8.05*size,5.11*size,.35*size,.4*size);
    }
+  }
+  if(details.greyfordShop&&['stable','weaver','apothecary'].includes(room.kind)){
+   const goods=Object.entries(details.greyfordShop.goods).filter(([id])=>details.greyfordShop.stock[id]>0).slice(0,3);
+   goods.forEach(([id],i)=>drawSmithyIcon(ctx,id,(room.kind==='apothecary'?2.15+i*.5:room.kind==='stable'?8.15+i*.5:6.15+i*.5)*size,(room.kind==='apothecary'?3.05:room.kind==='stable'?6.04:5.04)*size,size*.7));
   }
   if(room.kind==='bakery'&&sprites?.ready){
    for(let i=0;i<Math.min(5,(details.greyfordBakery||details.bakery)?.bread||0);i++)sprites.draw(ctx,'bread',(5.22+i*.5)*size,3.15*size,.42*size,.4*size);

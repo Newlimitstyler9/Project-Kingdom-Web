@@ -64,6 +64,7 @@ const campArt={
 for(const [id,art] of Object.entries(campArt)){
  defs[id]={...defs[id],portable:true,phase:"playable",art,palette:id==='campfire'?["#00000000","#54463a","#d6813b","#f6d070"]:id==='fiber'?["#00000000","#5b7540","#9eb66a","#d1c783"]:["#00000000","#473f33","#b19b71","#ded0a8"]};
 }
+defs.herbalDraught={name:'Herbal draught',type:'drink',stack:5,weight:.25,energy:14,portable:true,phase:'playable',art:['................','......1111......','.....122221.....','.....123321.....','.....123321.....','.....122221.....','......1111......','................'],palette:['#00000000','#66513a','#859b65','#ced999']};
 defs.torch={...defs.torch,portable:true,phase:'playable',art:['.......3........','......232.......','......232.......','.......1........','......111.......','.......1........','.......1........','.......1........','.......1........','.......1........','................'],palette:['#00000000','#67452c','#d88435','#ffe18b']};
 // Starter gear uses the same body-layer silhouettes for both player models.
 const gearArt={
