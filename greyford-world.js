@@ -144,6 +144,17 @@ function create(saved){
  function insidePeople(buildingId){return people.filter(p=>{const a=agents.get(p.id);return a?.inside&&a.insideBuilding===buildingId&&!asleep(p)}).map(p=>{const a=agents.get(p.id);return {...p,x:a.roomX,y:a.roomY,facing:a.facing,moving:a.moving,walkMs:a.walkMs,activity:a.activity}})}
  function record(kind,detail,extra={}){if(!events.some(e=>e.kind===kind))events.push({id:caravan.id+':'+kind,kind,detail,day,hour,...extra})}
  function learn(personId,reportId,from){if(!knowledge[personId])knowledge[personId]=[];if(!knowledge[personId].some(k=>k.reportId===reportId))knowledge[personId].push({reportId,from,at:absolute()})}
+ function reportSmithyTheft(theft){
+  const id='smithy-theft:'+theft.uid;if(reports.some(r=>r.id===id))return false;
+  const witnesses=theft.witnesses.filter(w=>people.some(p=>p.id===w));
+  const identified=witnesses.length>0,source=identified?people.find(p=>p.id===witnesses[0]).name:'Brann Ash';
+  const detail=identified?source+' saw the traveler take '+root.KingdomItemCatalog.defs[theft.id].name.toLowerCase()+' from the Ash Smithy stock chest.':'The Ash family discovered '+root.KingdomItemCatalog.defs[theft.id].name.toLowerCase()+' missing from the stock chest. No one knows who took it.';
+  events.push({id,kind:'smithy-theft',detail,day,hour,place:'Ash Smithy',actors:witnesses,itemUid:theft.uid,identified});
+  reports.push({id,eventId:id,kind:'smithy-theft',source,place:'Ash Smithy',occurredAt:theft.at,arrived:absolute()+(identified?1:2),detail,identified,itemUid:theft.uid});
+  for(const witness of witnesses)learn(witness,id,'witnessed');
+  if(!identified){learn('brann',id,'discovered');learn('sella',id,'brann')}
+  return true;
+ }
  function tick(){
   hour++;if(hour===24){hour=0;day++}
   // Needs advance on the world clock even when no rendered agent is loaded.
@@ -171,13 +182,17 @@ function create(saved){
    if(caravan.cargo>0){grain+=caravan.cargo;for(const order of orders)if(order.status==="requested")order.status=caravan.cargo>=order.quantity?"filled":"part-filled";record("grain-arrived",caravan.cargo+" sacks arrived at Pell Storehouse.");caravan.status="delivered"}
    else{caravan.status="missing";for(const order of orders)if(order.status==="requested")order.status="failed"}
   }
-  for(const report of reports){if(report.arrived===null)continue;
+  for(const report of reports){if(report.kind==='smithy-theft'){
+    if(time>=report.arrived){learn('rafe',report.id,report.source);learn('pavel',report.id,'rafe');learn('ida',report.id,'rafe');learn('bren',report.id,'rafe')}
+    if(time>=report.arrived+4)learn('maera',report.id,'rafe');
+    continue;
+   }if(report.arrived===null)continue;
    if(time>=report.arrived+2){learn("alda",report.id,"rafe");learn("mira",report.id,"alda");learn("maera",report.id,"alda");
     if(!orders.some(o=>o.id===caravan.id+':replacement')&&grain<20){const quantity=Math.max(12,24-grain);orders.push({id:caravan.id+':replacement',item:"grain",quantity,requestedBy:"alda",source:"Dunmere",day,hour,status:"requested",destination:"Pell Storehouse",sourceEvent:report.eventId});record("replacement-order","Alda requested "+quantity+" replacement grain sacks from Dunmere after Mira confirmed the shortage.",{sourceEvent:report.eventId,actors:["alda","mira"]})}
    }
    if(time>report.arrived&&hour>=18&&hour<22){learn("nellis",report.id,"orla");learn("jorin",report.id,"nellis")}
   }
-  if(reports.some(r=>r.arrived!==null&&time>=r.arrived+14))record("court-inquiry","Maera ordered an inquiry into the road attack and missing grain.",{sourceEvent:caravan.id+':road-attack',actors:["maera","alda"]});
+  if(reports.some(r=>r.kind!=='smithy-theft'&&r.arrived!==null&&time>=r.arrived+14))record("court-inquiry","Maera ordered an inquiry into the road attack and missing grain.",{sourceEvent:caravan.id+':road-attack',actors:["maera","alda"]});
  }
  function advance(hours){const count=Math.min(24*30,Math.max(0,Math.floor(hours)));for(let i=0;i<count;i++)tick();return count}
  function snapshot(){return {version:2,day,hour,grain,caravan:{...caravan},reports:reports.map(r=>({...r})),events:events.map(e=>({...e})),orders:orders.map(o=>({...o})),knowledge:Object.fromEntries(Object.entries(knowledge).map(([id,entries])=>[id,entries.map(k=>({...k}))])),met:[...met],energy:{...energy},agents:people.map(p=>{const a=agents.get(p.id);return {id:p.id,x:a.x,y:a.y,level:a.level,inside:a.inside,insideBuilding:a.insideBuilding,roomX:a.roomX,roomY:a.roomY}})}}
@@ -262,7 +277,7 @@ function create(saved){
  }
  function peopleOnMap(){return people.flatMap(p=>{const a=agents.get(p.id);return a.inside||a.away?[]:[{...p,x:a.x,y:a.y,level:a.level,activity:a.activity,facing:a.facing,moving:a.moving,walkMs:a.walkMs}]})}
  function gatePassageAt(id){const g=GATES.find(g=>g.id===id);return !!g&&!gateOpen&&people.some(p=>{const a=agents.get(p.id);return a&&!a.inside&&!a.away&&Math.hypot(a.x-g.x,a.y-g.y)<2.1})}
- return {advance,step,snapshot,introduce,knownReports,schedule,peopleOnMap,insidePeople,indoorOccupants,gatePassageAt,get day(){return day},get hour(){return hour},get gateOpen(){return gateOpen},get caravan(){return caravan},get events(){return events},get grain(){return grain},get orders(){return orders}};
+ return {advance,step,snapshot,introduce,knownReports,reportSmithyTheft,schedule,peopleOnMap,insidePeople,indoorOccupants,gatePassageAt,get day(){return day},get hour(){return hour},get gateOpen(){return gateOpen},get caravan(){return caravan},get events(){return events},get grain(){return grain},get orders(){return orders}};
 }
 root.GreyfordWorld={WIDTH,HEIGHT,GATES,homes,workplaces,offices,buildings,decor,people,at,decorAt,gateAt,wallAt,wallWalkAt,roadAt,pass,house,porch,create};
 })(window);
