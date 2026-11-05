@@ -98,6 +98,7 @@ function create(saved){
   if(p.id==="rafe")return {x:47.5,y:53.5,level:0,activity:gateOpen?"Watching the south gate":"On night watch"};
   if(p.id==="pavel")return {x:70.5,y:53,level:0,activity:"Keeping the jail"};
   if(["orla","bren"].includes(p.id)&&["approaching","delayed","lost","arriving"].includes(caravan.status)&&caravan.progress>=2)return null;
+  if(p.id==="bren")return {x:45.5,y:53.5,level:0,activity:caravan.status==="missing"?"Reporting the lost shipment":"Keeping watch by the road"};
   if(p.id==="orla"&&caravan.status==="missing")return {x:28,y:48,level:0,activity:"Recovering at home"};
   if(hour>=22||hour<6)return null;
   if(hour>=18&&hour<22&&["jorin","orla","cassian","nellis","fel"].includes(p.id)){
