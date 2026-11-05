@@ -5,7 +5,6 @@ const FURNITURE={
  home:[['bed',2,2,2,2],['bed',8,2,2,2],['hearth',5,1.3,2,1.5],['table',6,4,2,1]],
  tavern:[['wallShelf',1.2,1.14,2.3,.8],['hearth',11.8,1.35,1.8,1.9],['counter',2,3,6,1],['table',2,5,2,1],['table',7,5,2,1],['table',11,5,2,1],['bench',2,6,2,.35],['bench',7,6,2,.35],['bench',11,6,2,.35],['stairs',12.5,8,2,2]],
  upstairs:[['bed',1.12,1.76,1.7,2.65],['bed',9.12,1.76,1.7,2.65],['table',4.8,3.1,1.5,.85],['table',12.4,3.1,1.5,.85],['chest',1.25,4.08,1.3,1],['chest',9.25,4.08,1.3,1]],
- smithy:[['forge',2,2,2,2],['anvil',7,3,2,1],['rack',2,6,2,1]],
  mill:[['millstone',2.15,2.5,2.4,2.1],['wallShelf',8.1,1.15,2.4,.72],['sacks',8,2.7,2,1.15],['sacks',8.2,5.25,1.65,1],['table',3.2,5.2,2.8,1.1]],
  bakery:[['oven',1.55,1.1,2.65,2.75],['wallShelf',8.25,1.35,2.55,.72],['counter',5,3.25,3,1.05],['sacks',8.8,2.55,1.8,1.4],['table',3.1,5.1,2.8,1.15]],
  healer:[['bed',2,2,2,2],['wallShelf',8,.18,2,.72],['table',6,5,2,1]],
@@ -13,7 +12,7 @@ const FURNITURE={
  guard:[['rack',2,2,2,1],['table',6,3,2,1],['bed',8,5,2,2]],
  court:[['wallShelf',1.3,1.15,2.4,.7],['table',2,3,2.4,1],['table',8,3,2,1],['bench',2,6,2,.4]],
  warehouse:[['sacks',2,2.6,2,1.2],['rack',8,2.3,2,1],['table',8,6,2,1]],
- smithy:[['forge',2,2,2,2],['anvil',8,3,1.5,1],['rack',8,6,2,1],['table',2,6,2,1]],
+ smithy:[['forge',2,2,2,2],['anvil',8,3,1.5,1],['chest',8.1,6.05,1.7,.95],['table',2,6,2.5,1]],
  chapel:[['hearth',2,1.4,2,1.5],['bench',2,4,2,1],['bench',8,4,2,1]],
  stable:[['sacks',2,2.6,2,1.2],['rack',8,2.3,2,1],['table',8,6,2,1]],
  apothecary:[['wallShelf',1.4,1.15,2.5,.7],['table',2,3,2,1],['bed',8,2,2,2]],
@@ -25,6 +24,17 @@ const FURNITURE={
 };
 const CAVE={id:'north-cave',name:'North Cave',kind:'cave',portal:{x:36.5,y:8.5}};
 let millstoneArt=null;
+const smithyIconImages={};
+function drawSmithyIcon(ctx,id,x,y,size){
+ if(['ironAxe','ironSword','ironShield'].includes(id)){
+  const img=smithyIconImages[id]||(smithyIconImages[id]=new Image());
+  if(!img.src)img.src='assets/held-icons/'+id+'.png?v=1';
+  if(img.complete&&img.naturalWidth){ctx.drawImage(img,x,y,size*.6,size*.72);return}
+ }
+ const def=root.KingdomItemCatalog?.defs[id];if(!def)return;
+ const art=def.art,palette=def.palette,pixel=size/Math.max(art.length,16);
+ art.forEach((line,py)=>[...line].forEach((c,px)=>{const color=palette[Number(c)];if(c!=='.'&&color){ctx.fillStyle=color;ctx.fillRect(x+px*pixel,y+py*pixel,pixel,pixel)}}));
+}
 function millstoneSprite(){
  if(millstoneArt)return millstoneArt;
  const c=document.createElement('canvas');c.width=48;c.height=44;const g=c.getContext('2d');g.imageSmoothingEnabled=false;
@@ -116,7 +126,7 @@ function create(buildings){
   for(const f of room.furniture){
    if(f.type==='wallShelf'&&sprites?.ready){sprites.draw(ctx,room.kind==='bakery'?'bakeryWallShelf':'cupboard',f.x*size,f.y*size,f.w*size,f.h*size);continue}
    if(room.greyfordBuilding&&sprites?.ready){
-    const sprite={table:'table',counter:'counter',bench:'bakeryBench',sacks:'bakerySackPile',rack:'cupboard',hearth:'hearth',forge:'hearth',oven:'bakeryOvenMain'}[f.type];
+    const sprite={table:'table',counter:'counter',bench:'bakeryBench',sacks:'bakerySackPile',rack:'cupboard',chest:'guestChest',hearth:'hearth',forge:'hearth',oven:'bakeryOvenMain'}[f.type];
     if(sprite){sprites.draw(ctx,sprite,f.x*size,f.y*size,f.w*size,f.h*size);if(f.type==='forge')sprites.draw(ctx,'fire',(f.x+.48)*size,(f.y+.78)*size,f.w*.46*size,f.h*.3*size);continue}
    }
    if(room.kind==='mill'&&sprites?.ready){
@@ -147,6 +157,10 @@ function create(buildings){
     if(f.type==='chest'){sprites.draw(ctx,'guestChest',f.x*size,f.y*size,f.w*size,f.h*size);continue}
    }
    furniture(ctx,f,size);
+  }
+  if(room.greyfordBuilding==='smithy'&&details.smithy){
+   const display=details.smithy.pieces.filter(p=>p.location==='display').slice(0,3);
+   display.forEach((piece,i)=>drawSmithyIcon(ctx,piece.id,(2.17+i*.71)*size,5.69*size,size));
   }
   if(room.kind==='tavern'){
    const stock=details.shop?.stock||{bread:0,ale:0};

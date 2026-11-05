@@ -5,7 +5,12 @@ const BUY_MATERIAL={ironOre:1,charcoal:1,wood:1,ironIngot:3,leather:2};
 const SELL_MATERIAL={ironOre:{price:2},charcoal:{price:2},wood:{price:2},ironIngot:{price:5},leather:{price:4}};
 const MATERIALS=['ironOre','charcoal','wood','ironIngot','leather'];
 function create(bag,purse){
- const state={version:1,materials:{ironOre:12,charcoal:8,wood:8,ironIngot:4,leather:2},front:{ironAxe:1,ironSword:0,ironShield:1,ironKettleHelm:1},back:{ironAxe:1,ironSword:1,ironShield:0,ironKettleHelm:0},till:24,orders:[],active:null,nextOrder:1,lastWorkAt:-1};
+ const state={version:2,materials:{ironOre:12,charcoal:8,wood:8,ironIngot:4,leather:2},pieces:[],nextPiece:1,till:24,orders:[],active:null,nextOrder:1,lastWorkAt:-1};
+ const seed={display:{ironAxe:1,ironShield:1,ironKettleHelm:1},chest:{ironAxe:1,ironSword:1}};
+ function makePiece(id,location,at=-1){const piece={uid:'ash-piece-'+state.nextPiece++,id,location,quality:2,condition:100,maker:'Brann Ash',owner:'ash-smithy',madeAt:at};state.pieces.push(piece);return piece}
+ for(const [location,goods] of Object.entries(seed))for(const [id,qty] of Object.entries(goods))for(let n=0;n<qty;n++)makePiece(id,location);
+ function pieces(id,location){return state.pieces.filter(p=>(!id||p.id===id)&&(!location||p.location===location)).map(p=>({...p}))}
+ const count=(id,location)=>state.pieces.filter(p=>p.id===id&&(!location||p.location===location)).length;
  const recipe=id=>root.KingdomCraft.production[id];
  const name=id=>root.KingdomItemCatalog.defs[id]?.name||id;
  function requirements(id){const r=recipe(id);return {...r.ingredients,...(r.fuel||{})}}
@@ -19,7 +24,7 @@ function create(bag,purse){
   state.orders.push(o);
   return {ok:true,message:'Sella writes commission #'+number+' in the book. Brann will make a new '+name(id).toLowerCase()+' when materials and time allow.'};
  }
- function available(id){return SELL_MATERIAL[id]?(state.materials[id]||0):(state.front[id]||0)+(state.back[id]||0)}
+ function available(id){return SELL_MATERIAL[id]?(state.materials[id]||0):count(id,'display')+count(id,'chest')}
  function trade(basket){
   const buys=basket?.buy||{},sells=basket?.sell||{};
   if(!Object.keys(buys).length&&!Object.keys(sells).length)return {ok:false,message:'Choose goods to buy or sell first.'};
@@ -33,21 +38,28 @@ function create(bag,purse){
   if(nextWeight>bag.capacity+.0001)return {ok:false,message:'Your pack would be over its carry limit.'};
   const before=bag.snapshot();
   for(const [id,n] of Object.entries(sells))if(!bag.takeItem(id,n)){bag.restore(before);return {ok:false,message:'The sale could not be completed.'}}
-  for(const [id,n] of Object.entries(buys))for(let i=0;i<n;i++)if(!bag.add(id,1,GOODS[id]?{quality:2,maker:'Brann Ash'}:null)){bag.restore(before);return {ok:false,message:'Make space in your pack before trading.'}}
+  const moved=[];
+  for(const [id,n] of Object.entries(buys))for(let i=0;i<n;i++){
+   const piece=GOODS[id]?state.pieces.find(p=>p.id===id&&!moved.includes(p.uid)&&['display','chest'].includes(p.location)):null;
+   if(piece)moved.push(piece.uid);
+   if(!bag.add(id,1,piece?{uid:piece.uid,quality:piece.quality,condition:piece.condition,maker:piece.maker,owner:'player'}:null)){bag.restore(before);return {ok:false,message:'Make space in your pack before trading.'}}
+  }
   if(net>0&&!purse.debit(net)){bag.restore(before);return {ok:false,message:'You need '+net+' copper.'}}
   if(net<0&&!purse.credit(-net)){bag.restore(before);return {ok:false,message:'The payment could not be completed.'}}
-  for(const [id,n] of Object.entries(buys)){if(SELL_MATERIAL[id])state.materials[id]-=n;else{const front=Math.min(n,state.front[id]);state.front[id]-=front;state.back[id]-=n-front}}
+  for(const [id,n] of Object.entries(buys))if(SELL_MATERIAL[id])state.materials[id]-=n;
+  state.pieces=state.pieces.filter(p=>!moved.includes(p.uid));
   for(const [id,n] of Object.entries(sells))state.materials[id]+=n;
   state.till+=net;
   return {ok:true,message:net>0?'Trade settled: paid '+net+' copper.':net<0?'Trade settled: received '+(-net)+' copper.':'Trade settled with an even exchange.'};
  }
  function collect(id){const o=state.orders.find(v=>v.id===id);if(!o||o.status!=='ready')return {ok:false,message:'That order is not ready.'};
-  if(!bag.add(o.item,1,{quality:2,maker:'Brann Ash'}))return {ok:false,message:'Your bag is full; Sella keeps your order safe.'};
-  o.status='collected';return {ok:true,message:'Collected '+name(o.item).toLowerCase()+' from Sella.'};
+  const piece=state.pieces.find(p=>p.uid===o.pieceUid&&p.location==='commission');if(!piece)return {ok:false,message:'Sella cannot find that commissioned piece.'};
+  if(!bag.add(o.item,1,{uid:piece.uid,quality:piece.quality,condition:piece.condition,maker:piece.maker,owner:'player'}))return {ok:false,message:'Your bag is full; Sella keeps your order safe.'};
+  state.pieces=state.pieces.filter(p=>p.uid!==piece.uid);o.status='collected';return {ok:true,message:'Collected '+name(o.item).toLowerCase()+' from Sella.'};
  }
  function nextJob(){
   const order=state.orders.find(o=>o.status==='queued');let item=order?.item;
-  if(!item)item=Object.keys(GOODS).find(id=>state.front[id]<1&&state.back[id]<2);
+  if(!item)item=Object.keys(GOODS).find(id=>count(id,'display')<1&&count(id,'chest')<2);
   if(!item)return null;
   if(!canMake(item)){
    const smelt=recipe('ironIngot');
@@ -66,21 +78,24 @@ function create(bag,purse){
   if(state.active.hoursLeft>0)return true;
   const job=state.active;state.active=null;
   if(job.item==='ironIngot')state.materials.ironIngot++;
-  else if(job.orderId){const o=state.orders.find(v=>v.id===job.orderId);if(o){o.status='ready';o.readyAt=at}else state.back[job.item]++}
-  else if(state.front[job.item]<1)state.front[job.item]++;
-  else state.back[job.item]++;
+  else if(job.orderId){const o=state.orders.find(v=>v.id===job.orderId);if(o){const piece=makePiece(job.item,'commission',at);o.status='ready';o.readyAt=at;o.pieceUid=piece.uid}else makePiece(job.item,'chest',at)}
+  else makePiece(job.item,count(job.item,'display')<1?'display':'chest',at);
   return true;
  }
- function snapshot(){return {version:1,materials:{...state.materials},front:{...state.front},back:{...state.back},till:state.till,orders:state.orders.map(o=>({...o})),active:state.active?{...state.active}:null,nextOrder:state.nextOrder,lastWorkAt:state.lastWorkAt}}
+ function snapshot(){return {version:2,materials:{...state.materials},pieces:state.pieces.map(p=>({...p})),nextPiece:state.nextPiece,front:Object.fromEntries(Object.keys(GOODS).map(id=>[id,count(id,'display')])),back:Object.fromEntries(Object.keys(GOODS).map(id=>[id,count(id,'chest')])),till:state.till,orders:state.orders.map(o=>({...o})),active:state.active?{...state.active}:null,nextOrder:state.nextOrder,lastWorkAt:state.lastWorkAt}}
  function restore(data){
-  if(!data||data.version!==1||!Number.isInteger(data.till)||data.till<0||!Number.isInteger(data.nextOrder)||data.nextOrder<1||!Number.isInteger(data.lastWorkAt))return false;
+  if(!data||![1,2].includes(data.version)||!Number.isInteger(data.till)||data.till<0||!Number.isInteger(data.nextOrder)||data.nextOrder<1||!Number.isInteger(data.lastWorkAt))return false;
   // Older saves had only axes and swords; keep their counts while adding new stock types.
   for(const bucket of ['materials','front','back'])for(const id of bucket==='materials'?MATERIALS:Object.keys(GOODS))if(data[bucket]?.[id]!==undefined&&(!Number.isInteger(data[bucket][id])||data[bucket][id]<0))return false;
+  if(data.version===2&&(!Array.isArray(data.pieces)||!Number.isInteger(data.nextPiece)||data.nextPiece<1||data.pieces.length>200||data.pieces.some(p=>!GOODS[p.id]||!['display','chest','commission'].includes(p.location)||typeof p.uid!=='string'||!p.uid.startsWith('ash-piece-'))||new Set(data.pieces.map(p=>p.uid)).size!==data.pieces.length))return false;
   if(!Array.isArray(data.orders)||data.orders.length>100||data.orders.some(o=>!GOODS[o.item]||!['queued','working','ready','collected'].includes(o.status)))return false;
   if(data.active&&(!['ironIngot',...Object.keys(GOODS)].includes(data.active.item)||!Number.isInteger(data.active.hoursLeft)||data.active.hoursLeft<1))return false;
-  for(const bucket of ['materials','front','back'])state[bucket]={...state[bucket],...data[bucket]};state.till=data.till;state.orders=data.orders.map(o=>({...o}));state.active=data.active?{...data.active}:null;state.nextOrder=data.nextOrder;state.lastWorkAt=data.lastWorkAt;return true;
+  state.materials={...state.materials,...data.materials};
+  if(data.version===2){state.pieces=data.pieces.map(p=>({...p}));state.nextPiece=data.nextPiece}
+  else{state.pieces=[];state.nextPiece=1;for(const [bucket,location] of [['front','display'],['back','chest']])for(const id of Object.keys(GOODS))for(let n=0;n<(data[bucket]?.[id]||0);n++)makePiece(id,location);for(const o of data.orders)if(o.status==='ready')o.pieceUid=makePiece(o.item,'commission',o.readyAt).uid}
+  state.till=data.till;state.orders=data.orders.map(o=>({...o}));state.active=data.active?{...data.active}:null;state.nextOrder=data.nextOrder;state.lastWorkAt=data.lastWorkAt;return true;
  }
- return {trade,available,order,collect,advance,snapshot,restore,missing,get prices(){return GOODS},get tradePrices(){return {...GOODS,...SELL_MATERIAL}},get materialPrices(){return BUY_MATERIAL}};
+ return {trade,available,pieces,order,collect,advance,snapshot,restore,missing,get prices(){return GOODS},get tradePrices(){return {...GOODS,...SELL_MATERIAL}},get materialPrices(){return BUY_MATERIAL}};
 }
 root.KingdomGreyfordSmithy={create};
 })(window);
