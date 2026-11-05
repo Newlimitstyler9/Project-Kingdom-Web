@@ -38,14 +38,17 @@ function create(bag,purse){
  }
  function detectThefts(at,staffPresent){
   if(!staffPresent)return [];
-  const found=state.thefts.filter(t=>t.detectedAt===null);
+  const found=state.thefts.filter(t=>t.detectedAt===null&&t.resolvedAt===null);
   for(const theft of found)theft.detectedAt=at;
   return found.map(t=>({...t}));
  }
- function pendingReports(){return state.thefts.filter(t=>t.detectedAt!==null&&t.reportedAt===null).map(t=>({...t,witnesses:[...t.witnesses]}))}
+ function pendingReports(){return state.thefts.filter(t=>t.detectedAt!==null&&t.reportedAt===null&&t.resolvedAt===null).map(t=>({...t,witnesses:[...t.witnesses]}))}
  function markReported(uid,at){const theft=state.thefts.find(t=>t.uid===uid&&t.reportedAt===null);if(!theft)return false;theft.reportedAt=at;return true}
  function restitution(){const open=state.thefts.filter(t=>t.identified&&t.reportedAt!==null&&t.resolvedAt===null);return open.reduce((sum,t)=>sum+(GOODS[t.id]?.price||0)+4,0)}
- function settleThefts(at){const due=restitution();if(!due)return {ok:false,message:'No identified smithy theft is awaiting restitution.'};if(!purse.debit(due))return {ok:false,message:'The bailiff demands '+due+' copper in restitution and fines.'};for(const t of state.thefts)if(t.identified&&t.reportedAt!==null&&t.resolvedAt===null)t.resolvedAt=at;state.till+=due;return {ok:true,message:'You paid '+due+' copper. The Ash family has been compensated; the complaint is settled.'}}
+ function settleThefts(at){const due=restitution();if(!due)return {ok:false,message:'No identified smithy theft is awaiting restitution.'};if(!purse.debit(due))return {ok:false,message:'The bailiff demands '+due+' copper in restitution and fines.'};for(const t of state.thefts)if(t.identified&&t.reportedAt!==null&&t.resolvedAt===null){t.resolvedAt=at;t.resolution='paid'}state.till+=due;return {ok:true,message:'You paid '+due+' copper. The Ash family has been compensated; the complaint is settled.'}}
+ function returnStolen(uid,at){const theft=state.thefts.find(t=>t.uid===uid&&t.resolvedAt===null);const held=bag.findInstance(uid);if(!theft||!held||held.item.id!==theft.id||held.item.meta?.stolenFrom!=='ash-smithy')return {ok:false,message:'You do not have that missing Ash Smithy piece.'};if(state.pieces.some(p=>p.uid===uid))return {ok:false,message:'That piece is already in the smithy stock.'};const item=bag.takeInstance(uid);if(!item)return {ok:false,message:'The piece could not be returned.'};state.pieces.push({uid,id:item.id,location:'chest',quality:item.meta.quality||2,condition:item.meta.condition??100,maker:item.meta.maker||'Brann Ash',owner:'ash-smithy',madeAt:-1});theft.resolvedAt=at;theft.resolution='returned';return {ok:true,message:'You returned the exact '+name(item.id).toLowerCase()+' ('+uid+'). The Ash family has its property back.'}}
+ function buybackOffer(slot){const item=bag.slots[slot],base=item&&GOODS[item.id];if(!item||item.count!==1||!base)return {ok:false,message:'Sella only buys finished iron gear she can inspect.'};if(item.meta?.stolenFrom)return {ok:false,message:'Sella refuses gear marked as stolen. Return it to its owner.'};if(item.meta?.uid&&state.pieces.some(p=>p.uid===item.meta.uid))return {ok:false,message:'That piece is already in smithy stock.'};const condition=Math.max(0,Math.min(100,item.meta?.condition??100));const quality=Math.max(1,Math.min(5,item.meta?.quality||1));const price=Math.max(1,Math.floor(base.price*(.28+.06*quality)*condition/100));return {ok:true,price,uid:item.meta?.uid||null,condition,quality,maker:item.meta?.maker||'Unknown',id:item.id}}
+ function buyback(slot){const offer=buybackOffer(slot);if(!offer.ok)return offer;if(state.till<offer.price)return {ok:false,message:'The smithy till cannot cover that purchase.'};if(state.pieces.length>=200)return {ok:false,message:'The smithy has no space for more stock.'};const before=bag.snapshot(),item=bag.slots[slot];if(!bag.take(slot,1))return {ok:false,message:'The piece is no longer in your pack.'};if(!purse.credit(offer.price)){bag.restore(before);return {ok:false,message:'The payment could not be completed.'}}const uid=offer.uid||'ash-piece-'+state.nextPiece++;state.pieces.push({uid,id:item.id,location:'chest',quality:offer.quality,condition:offer.condition,maker:offer.maker,owner:'ash-smithy',madeAt:-1});state.till-=offer.price;return {ok:true,message:'Sella inspected '+name(item.id).toLowerCase()+' ('+uid+') and paid '+offer.price+' copper.'}}
  function trade(basket){
   const buys=basket?.buy||{},sells=basket?.sell||{};
   if(!Object.keys(buys).length&&!Object.keys(sells).length)return {ok:false,message:'Choose goods to buy or sell first.'};
@@ -117,7 +120,7 @@ function create(bag,purse){
   else{state.pieces=[];state.nextPiece=1;for(const [bucket,location] of [['front','display'],['back','chest']])for(const id of Object.keys(GOODS))for(let n=0;n<(data[bucket]?.[id]||0);n++)makePiece(id,location);for(const o of data.orders)if(o.status==='ready')o.pieceUid=makePiece(o.item,'commission',o.readyAt).uid}
   state.till=data.till;state.orders=data.orders.map(o=>({...o}));state.active=data.active?{...data.active}:null;state.nextOrder=data.nextOrder;state.lastWorkAt=data.lastWorkAt;state.thefts=data.version===3?data.thefts.map(t=>({...t,witnesses:[...t.witnesses]})):[];return true;
  }
- return {trade,available,pieces,steal,detectThefts,pendingReports,markReported,restitution,settleThefts,order,collect,advance,snapshot,restore,missing,get prices(){return GOODS},get tradePrices(){return {...GOODS,...SELL_MATERIAL}},get materialPrices(){return BUY_MATERIAL}};
+ return {trade,available,pieces,steal,detectThefts,pendingReports,markReported,restitution,settleThefts,returnStolen,buybackOffer,buyback,order,collect,advance,snapshot,restore,missing,get prices(){return GOODS},get tradePrices(){return {...GOODS,...SELL_MATERIAL}},get materialPrices(){return BUY_MATERIAL}};
 }
 root.KingdomGreyfordSmithy={create};
 })(window);
