@@ -123,17 +123,30 @@ function house(id){return buildings.find(b=>b.id===id)}
 function porch(id){const b=house(id);if(!b)return {x:47.5,y:35.5};return {x:b.x+b.w/2,y:b.y+b.h+.9}}
 function seeded(n){let x=(n^0x6b884e1)>>>0;x^=x<<13;x^=x>>>17;x^=x<<5;return x>>>0}
 function create(saved){
- let day=1,hour=6,grain=9,caravan={id:"marrow-grain-1",driver:"Orla Reed",escort:"Bren Tor",cargo:12,status:"approaching",progress:0},reports=[],events=[],met=[],gateOpen=true,orders=[],energy=Object.fromEntries(people.map(p=>[p.id,80]));
- if(saved&&saved.version===1){day=Math.max(1,saved.day|0);hour=Math.min(23,Math.max(0,saved.hour|0));grain=Math.max(0,saved.grain|0);if(saved.caravan?.id===caravan.id)caravan={...caravan,...saved.caravan};reports=Array.isArray(saved.reports)?saved.reports.slice(0,30):[];events=Array.isArray(saved.events)?saved.events.slice(0,30):[];met=Array.isArray(saved.met)?saved.met.filter(id=>people.some(p=>p.id===id)):[];orders=Array.isArray(saved.orders)?saved.orders.slice(0,20):[];if(saved.energy&&typeof saved.energy==='object')for(const p of people)if(Number.isFinite(saved.energy[p.id]))energy[p.id]=Math.max(0,Math.min(100,saved.energy[p.id]))}
+ let day=1,hour=6,grain=9,caravan={id:"marrow-grain-1",driver:"Orla Reed",escort:"Bren Tor",cargo:12,status:"approaching",progress:0},reports=[],events=[],met=[],gateOpen=true,orders=[],knowledge={},energy=Object.fromEntries(people.map(p=>[p.id,80]));
+ if(saved&&(saved.version===1||saved.version===2)){day=Math.max(1,saved.day|0);hour=Math.min(23,Math.max(0,saved.hour|0));grain=Math.max(0,saved.grain|0);if(saved.caravan?.id===caravan.id)caravan={...caravan,...saved.caravan};reports=Array.isArray(saved.reports)?saved.reports.slice(0,30):[];events=Array.isArray(saved.events)?saved.events.slice(0,30):[];met=Array.isArray(saved.met)?saved.met.filter(id=>people.some(p=>p.id===id)):[];orders=Array.isArray(saved.orders)?saved.orders.slice(0,20):[];if(saved.knowledge&&typeof saved.knowledge==='object')for(const p of people){const entries=Array.isArray(saved.knowledge[p.id])?saved.knowledge[p.id].filter(k=>reports.some(r=>r.id===k.reportId)).slice(0,12).map(k=>({...k})):[];if(entries.length)knowledge[p.id]=entries}if(saved.energy&&typeof saved.energy==='object')for(const p of people)if(Number.isFinite(saved.energy[p.id]))energy[p.id]=Math.max(0,Math.min(100,saved.energy[p.id]))}
+ if(saved?.version===1){
+  const attack=events.find(e=>e.kind==="road-attack");
+  if(attack){
+   attack.id=caravan.id+':road-attack';attack.place="Marrowfield road";attack.actors=["orla","bren"];attack.shipment=caravan.id;attack.cargoLost=12-caravan.cargo;
+   let report=reports.find(r=>r.id==="orla-witness");
+   if(!report){report={id:attack.id,source:"Orla Reed",place:"Marrowfield road",arrived:null,detail:attack.detail};reports.push(report)}
+   report.id=attack.id;report.eventId=attack.id;report.occurredAt=(attack.day-1)*24+attack.hour;
+   learn("orla",report.id,"witnessed");learn("bren",report.id,"witnessed");
+   if(Number.isFinite(report.arrived)&&report.arrived<=absolute())learn("rafe",report.id,"orla");
+  }
+ }
  gateOpen=hour>=6&&hour<22;
  function absolute(){return (day-1)*24+hour}
  function sleepHours(p){if(p.id==='rafe')return hour>=2&&hour<9;if(p.id==='pavel')return hour>=23||hour<7;return hour>=22||hour<6}
  function asleep(p){return sleepHours(p)||energy[p.id]<=18}
  function indoorOccupants(homeId){return people.filter(p=>p.home===homeId&&asleep(p)&&agents.get(p.id)?.inside).map(p=>({...p,bedIndex:people.filter(q=>q.home===homeId).findIndex(q=>q.id===p.id),energy:energy[p.id],activity:'Sleeping in bed'}))}
- function record(kind,detail){if(!events.some(e=>e.kind===kind))events.push({kind,detail,day,hour})}
+ function record(kind,detail,extra={}){if(!events.some(e=>e.kind===kind))events.push({id:caravan.id+':'+kind,kind,detail,day,hour,...extra})}
+ function learn(personId,reportId,from){if(!knowledge[personId])knowledge[personId]=[];if(!knowledge[personId].some(k=>k.reportId===reportId))knowledge[personId].push({reportId,from,at:absolute()})}
  function tick(){
   hour++;if(hour===24){hour=0;day++}
-  for(const p of people)energy[p.id]=Math.max(0,Math.min(100,energy[p.id]+(asleep(p)&&agents.get(p.id)?.inside?15:-3)));
+  // Needs advance on the world clock even when no rendered agent is loaded.
+  for(const p of people)energy[p.id]=Math.max(0,Math.min(100,energy[p.id]+(sleepHours(p)?15:-3)));
   const time=absolute();gateOpen=hour>=6&&hour<22;
   if(hour===7&&grain<20&&!orders.some(o=>o.status==="requested")){
    orders.push({id:"grain-"+day,item:"grain",quantity:Math.max(12,24-grain),requestedBy:"alda",day,hour,status:"requested",destination:"Pell Storehouse"});
@@ -144,20 +157,31 @@ function create(saved){
   if(caravan.progress===8&&caravan.status==="approaching"){
    const risk=seeded(day+874)%100;
    if(risk<35){caravan.status="arriving";record("road-clear","Orla's grain cart passed the ridge patrol without trouble.")}
-   else if(risk<78){caravan.status="delayed";caravan.cargo=9;record("road-attack","Bandits struck Orla's grain cart. Bren drove them off, but three sacks were lost.")}
-   else{caravan.status="lost";caravan.cargo=0;record("road-attack","Bandits seized the grain cart. Orla and Bren escaped and are returning on foot.")}
+   else{
+    const lost=risk<78?3:12;caravan.cargo-=lost;caravan.status=lost===12?"lost":"delayed";
+    const detail=lost===12?"Bandits seized the grain cart. Orla and Bren escaped and are returning on foot.":"Bandits struck Orla's grain cart. Bren drove them off, but three sacks were lost.";
+    record("road-attack",detail,{place:"Marrowfield road",actors:["orla","bren"],shipment:caravan.id,cargoLost:lost});
+    const reportId=caravan.id+':road-attack';reports.push({id:reportId,eventId:reportId,source:"Orla Reed",place:"Marrowfield road",occurredAt:time,arrived:null,detail});
+    learn("orla",reportId,"witnessed");learn("bren",reportId,"witnessed");
+   }
   }
   if(caravan.progress>=14&&["delayed","lost","arriving"].includes(caravan.status)){
-   const attack=events.find(e=>e.kind==="road-attack");if(attack){reports.push({id:"orla-witness",source:"Orla Reed",place:"south gate",arrived:time,newsAt:time+2,detail:attack.detail});record("witness-returned","Orla reached the south gate and told Rafe what happened on the Marrowfield road.")}
+   const attack=reports.find(r=>r.eventId===caravan.id+':road-attack');if(attack&&attack.arrived===null){attack.arrived=time;learn("rafe",attack.id,"orla");record("witness-returned","Orla reached the south gate and told Rafe what happened on the Marrowfield road.",{sourceEvent:attack.eventId,actors:["orla","rafe"]})}
    if(caravan.cargo>0){grain+=caravan.cargo;for(const order of orders)if(order.status==="requested")order.status=caravan.cargo>=order.quantity?"filled":"part-filled";record("grain-arrived",caravan.cargo+" sacks arrived at Pell Storehouse.");caravan.status="delivered"}
    else{caravan.status="missing";for(const order of orders)if(order.status==="requested")order.status="failed"}
   }
-  if(reports.length&&time>=reports[0].arrived+14)record("court-inquiry","Maera ordered an inquiry into the road attack and missing grain.");
+  for(const report of reports){if(report.arrived===null)continue;
+   if(time>=report.arrived+2){learn("alda",report.id,"rafe");learn("mira",report.id,"alda");learn("maera",report.id,"alda");
+    if(!orders.some(o=>o.id===caravan.id+':replacement')&&grain<20){const quantity=Math.max(12,24-grain);orders.push({id:caravan.id+':replacement',item:"grain",quantity,requestedBy:"alda",source:"Dunmere",day,hour,status:"requested",destination:"Pell Storehouse",sourceEvent:report.eventId});record("replacement-order","Alda requested "+quantity+" replacement grain sacks from Dunmere after Mira confirmed the shortage.",{sourceEvent:report.eventId,actors:["alda","mira"]})}
+   }
+   if(time>report.arrived&&hour>=18&&hour<22){learn("nellis",report.id,"orla");learn("jorin",report.id,"nellis")}
+  }
+  if(reports.some(r=>r.arrived!==null&&time>=r.arrived+14))record("court-inquiry","Maera ordered an inquiry into the road attack and missing grain.",{sourceEvent:caravan.id+':road-attack',actors:["maera","alda"]});
  }
  function advance(hours){const count=Math.min(24*30,Math.max(0,Math.floor(hours)));for(let i=0;i<count;i++)tick();return count}
- function snapshot(){return {version:1,day,hour,grain,caravan:{...caravan},reports:reports.map(r=>({...r})),events:events.map(e=>({...e})),orders:orders.map(o=>({...o})),met:[...met],energy:{...energy},agents:people.map(p=>{const a=agents.get(p.id);return {id:p.id,x:a.x,y:a.y,level:a.level,inside:a.inside}})}}
+ function snapshot(){return {version:2,day,hour,grain,caravan:{...caravan},reports:reports.map(r=>({...r})),events:events.map(e=>({...e})),orders:orders.map(o=>({...o})),knowledge:Object.fromEntries(Object.entries(knowledge).map(([id,entries])=>[id,entries.map(k=>({...k}))])),met:[...met],energy:{...energy},agents:people.map(p=>{const a=agents.get(p.id);return {id:p.id,x:a.x,y:a.y,level:a.level,inside:a.inside}})}}
  function introduce(id){if(!met.includes(id))met.push(id)}
- function knownReports(person){const t=absolute();return reports.filter(r=>t>=r.newsAt&&(person.role==="innkeeper"||person.role==="court apprentice"||person.role==="gate guard"||person.role==="march judge"||person.role==="merchant"||person.id==="orla"))}
+ function knownReports(person){return (knowledge[person.id]||[]).map(k=>{const report=reports.find(r=>r.id===k.reportId);return report?{...report,heardFrom:k.from,heardAt:k.at}:null}).filter(Boolean)}
  function schedule(p){
   if(asleep(p))return null;
   if(p.id==="ida")return {x:25+(Math.floor(absolute()/2)%2)*16,y:12.5,level:1,activity:"Patrolling the north wall"};
