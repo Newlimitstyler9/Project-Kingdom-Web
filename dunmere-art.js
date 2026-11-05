@@ -4,6 +4,11 @@
 const P={grass:"#637f4b",grass2:"#779057",grass3:"#425d3d",dirt:"#796348",path:"#a48b62",dark:"#283a2d",wood:"#715037",woodLight:"#a27a52",roof:"#6d493b",roofHi:"#9a6a4c",leaf:"#2e573d",leaf2:"#47784a",leafHi:"#7e9754",rock:"#858b85",rockHi:"#c1c1ae",skin:"#c99876",shirt:"#607f92",shadow:"#22352688",black:"#171c1d"};
 const cache=new Map();
 function sprite(name,draw,w=32,h=48){const key=name;if(cache.has(key))return cache.get(key);const c=document.createElement("canvas");c.width=w;c.height=h;const g=c.getContext("2d");g.imageSmoothingEnabled=false;draw(g);cache.set(key,c);return c}
+function outlinedText(g,label,x,y,outline=g.strokeStyle,fill=g.fillStyle){
+ g.save();g.fillStyle=outline;
+ for(const [dx,dy] of [[-1,-1],[0,-1],[1,-1],[-1,0],[1,0],[-1,1],[0,1],[1,1]])g.fillText(label,x+dx,y+dy);
+ g.fillStyle=fill;g.fillText(label,x,y);g.restore();
+}
 function r(g,x,y,w,h,color){g.fillStyle=color;g.fillRect(x,y,w,h)}
 function terrain(g,x,y,size,road,roadAt){
  const px=x*size,py=y*size;
@@ -171,7 +176,7 @@ function roof(g,b,size){const x=b.x*size,y=b.y*size,w=b.w*size,h=(b.h-1)*size;
  }
  g.textAlign='center';g.font='bold 10px system-ui';g.lineWidth=3;g.strokeStyle='#263027';g.fillStyle='#f3dfaf';
  const label=b.kind==='home'?b.name:b.name.replace("Dunmere ",'');
- g.lineJoin='round';g.strokeText(label,x+w/2,y+size*3.45);g.fillText(label,x+w/2,y+size*3.45);
+ outlinedText(g,label,x+w/2,y+size*3.45);
 }
 function innYard(g,props,size){const sprites=root.KingdomInnSprites;if(!sprites?.ready)return;for(const prop of props)sprites.draw(g,prop.sprite,prop.x*size,prop.y*size,prop.w*size,prop.h*size)}
 let oakImage=null;
@@ -255,5 +260,5 @@ function person(g,x,y,size,color,dir,walk,tool){const art=sprite("person:"+color
  g.drawImage(art,Math.round(px-w/2),Math.round(py+size*.12-44*scale),Math.round(w),Math.round(h));
 }
 function resource(g,name,x,y,size){const px=x*size,py=y*size;g.fillStyle=P.shadow;g.beginPath();g.ellipse(px,py+size*.13,size*.2,size*.07,0,0,Math.PI*2);g.fill();if(name==="charcoal"){r(g,px-10,py-6,20,12,P.black);r(g,px-7,py-10,10,7,"#34393b");r(g,px+3,py-4,5,3,"#596062")}else if(name==="wood"){r(g,px-13,py-5,26,9,P.wood);r(g,px-10,py-3,7,5,P.woodLight)}else if(name==="stone"){r(g,px-10,py-8,20,13,P.rock);r(g,px-7,py-8,9,3,P.rockHi)}}
-root.KingdomArt={terrain,plant,crop,building,roof,innYard,landmarkOak,regionSite,field,villageSite,water,shelter,person,resource,palette:P};
+root.KingdomArt={terrain,plant,crop,building,roof,innYard,landmarkOak,regionSite,field,villageSite,water,shelter,person,resource,outlinedText,palette:P};
 })(window);

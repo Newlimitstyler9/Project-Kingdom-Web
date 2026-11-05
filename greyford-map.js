@@ -97,7 +97,7 @@ function draw(ctx,sim,player,vw,vh,size,character,options={}){
  }
  const names=[["GREYFORD",48,27],["VEL BRIDGE",10,32],["MARCH COURT",61,26],["BRIDGE LANTERN",35,35]];
  ctx.textAlign="center";ctx.font="bold 10px system-ui";ctx.lineWidth=3;ctx.strokeStyle="#28362d";ctx.fillStyle="#f7e7bd";
- for(const [name,x,y] of names){ctx.strokeText(name,x*size,y*size);ctx.fillText(name,x*size,y*size)}
+ for(const [name,x,y] of names)root.KingdomArt.outlinedText(ctx,name,x*size,y*size);
  ctx.restore();
  return [camX,camY];
 }
@@ -105,7 +105,7 @@ function drawPerson(ctx,a,size,player,character){
  character(ctx,a.x,a.y,size,a.facing||"down",a.moving,a.walkMs,{bodyType:a.sex,sprite:a.sprite});
  if(Math.hypot(a.x-player.x,a.y-player.y)<7){
   ctx.textAlign="center";ctx.font="bold 10px system-ui";ctx.lineWidth=3;ctx.strokeStyle="#26372d";ctx.fillStyle="#f4e5c3";
-  ctx.strokeText(a.name,a.x*size,(a.y-1.1)*size);ctx.fillText(a.name,a.x*size,(a.y-1.1)*size);
+  root.KingdomArt.outlinedText(ctx,a.name,a.x*size,(a.y-1.1)*size);
  }
 }
 root.GreyfordMap={draw,get ready(){return castle.complete&&!!castle.naturalWidth&&sheet.complete&&!!sheet.naturalWidth}};
