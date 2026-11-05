@@ -1,6 +1,6 @@
 // Greyford is authored on the same 32 px game grid as Brooklands.
 (function(root){"use strict";
-const castle=new Image();castle.src="assets/greyford-stone-pieces.png?v=1";
+const castle=new Image();castle.src="assets/greyford-stone-pieces.png?v=2";
 function draw(ctx,sim,player,vw,vh,size,character){
  const map=root.GreyfordWorld,W=map.WIDTH,H=map.HEIGHT;
  const camX=Math.max(0,Math.min(W*size-vw,player.x*size-vw/2)),camY=Math.max(0,Math.min(H*size-vh,player.y*size-vh/2));
