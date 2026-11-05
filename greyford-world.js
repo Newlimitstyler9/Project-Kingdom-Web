@@ -14,7 +14,7 @@ const homes=[
  {id:"fen-house",name:"Fen House",x:52,y:17,w:5,h:4,beds:3,household:"Fen",kind:"home"},
  {id:"dyer-house",name:"Dyer House",x:51,y:26,w:5,h:4,beds:3,household:"Dyer",kind:"home"},
  {id:"bridge-row-a",name:"Bridge Row I",x:20,y:39,w:5,h:4,beds:3,household:"Morn",kind:"home"},
- {id:"bridge-row-b",name:"Bridge Row II",x:20,y:45,w:5,h:4,beds:3,household:"Voss",kind:"home"},
+ {id:"bridge-row-b",name:"Bridge Row II",x:20,y:44,w:5,h:4,beds:3,household:"Voss",kind:"home"},
  {id:"east-row-a",name:"East Row I",x:52,y:38,w:5,h:4,beds:3,household:"Kell",kind:"home"},
  {id:"east-row-b",name:"East Row II",x:51,y:43,w:5,h:4,beds:3,household:"Dane",kind:"home"},
  {id:"south-croft-two",name:"South Croft II",x:34,y:62,w:5,h:4,beds:3,household:"Tern",kind:"home"},
@@ -27,7 +27,7 @@ const workplaces=[
  {id:"jail",name:"Gate Jail",x:68,y:47,w:6,h:5,type:"jail"},
  {id:"bakery",name:"Bridge Bakery",x:39,y:39,w:5,h:5,type:"bakery"},
  {id:"chapel",name:"Old Stone Chapel",x:67,y:26,w:6,h:5,type:"chapel"},
- {id:"stable",name:"Pell Stables",x:21,y:51,w:7,h:5,type:"stable"},
+ {id:"stable",name:"Pell Stables",x:21,y:49,w:7,h:5,type:"stable"},
  {id:"weaver",name:"Dyer and Weaver",x:62,y:45,w:5,h:5,type:"weaver"},
  {id:"apothecary",name:"Fen Remedies",x:39,y:27,w:5,h:5,type:"apothecary"},
  {id:"granary",name:"Public Granary",x:29,y:51,w:7,h:5,type:"granary"},
@@ -53,7 +53,7 @@ const decor=[
 const people=[
  {id:"maera",name:"Duchess Maera Vell",age:42,sex:"female",home:"vell-house",work:"court",role:"march judge",status:"noble",sprite:3,kin:["elin"],x:61,y:34},
  {id:"elin",name:"Elin Vell",age:17,sex:"female",home:"vell-house",work:"court",role:"court apprentice",sprite:10,kin:["maera"],x:59,y:33},
- {id:"jorin",name:"Jorin Pell",age:39,sex:"male",home:"pell-house",work:"warehouse",role:"horse trader",sprite:2,spouse:"mira",kin:["mira","tavin"],x:33,y:34},
+ {id:"jorin",name:"Jorin Pell",age:39,sex:"male",home:"pell-house",work:"stable",role:"horse trader",sprite:2,spouse:"mira",kin:["mira","tavin"],x:33,y:34},
  {id:"mira",name:"Mira Pell",age:36,sex:"female",home:"pell-house",work:"warehouse",role:"merchant",sprite:6,spouse:"jorin",kin:["jorin","tavin"],x:36,y:34},
  {id:"tavin",name:"Tavin Pell",age:12,sex:"male",home:"pell-house",work:"pell-house",role:"child",sprite:11,kin:["jorin","mira"],x:29,y:25},
  {id:"orla",name:"Orla Reed",age:31,sex:"female",home:"reed-house",work:"warehouse",role:"carter",sprite:1,kin:["nia"],x:29,y:48},
@@ -268,7 +268,7 @@ function create(saved){
   if(!previous.has(goalKey))return [];
   const path=[];let key=goalKey;while(key!==startKey){const [x,y]=key.split(',').map(Number);path.push({x:x+.5,y:y+.5});key=previous.get(key)}path.reverse();path.push({x:tx,y:ty});return path;
  }
- function step(dt,roomSpot,roomBlocked){
+ function step(dt,roomSpot,roomBlocked,outsideBlocked){
   routineSeconds+=Math.max(0,dt);
   const goals=targets(),occupied=new Set();
   for(const p of people){const a=agents.get(p.id),goal=goals.get(p.id);a.moving=false;
@@ -284,7 +284,7 @@ function create(saved){
    if(a.level!==goal.level){if(a.level===1){a.x=40.5;a.y=15.5;a.level=0}else{a.x=40.5;a.y=12.5;a.level=1}a.path=[];a.dodge=null;a.goalKey=''}
    const key=goal.x.toFixed(2)+','+goal.y.toFixed(2)+','+goal.level;if(a.goalKey!==key){a.path=route(a.x,a.y,goal.x,goal.y,goal.level,p.id);a.goalKey=key}
    let budget=Math.min(.12,Math.max(0,dt))*1.7;
-   while(budget>0&&(a.path.length||a.dodge)){const target=a.dodge||a.path[0],dx=target.x-a.x,dy=target.y-a.y,d=Math.hypot(dx,dy);if(d<.05){if(a.dodge){a.dodge=null;a.path=route(a.x,a.y,goal.x,goal.y,goal.level,p.id)}else a.path.shift();continue}const move=Math.min(d,budget),nx=a.x+dx/d*move,ny=a.y+dy/d*move;if(!pass(nx,ny,a.level,true))break;const blocked=people.some(other=>other.id!==p.id&&(()=>{const o=agents.get(other.id);return !o.inside&&!o.away&&o.level===a.level&&Math.hypot(o.x-nx,o.y-ny)<.58&&Math.hypot(o.x-nx,o.y-ny)<Math.hypot(o.x-a.x,o.y-a.y)-.005})());if(blocked){const avoid=new Set(people.filter(other=>other.id!==p.id).flatMap(other=>{const o=agents.get(other.id);return !o.inside&&!o.away&&o.level===a.level?[pathKey(Math.floor(o.x),Math.floor(o.y))]:[]}));const detour=route(a.x,a.y,goal.x,goal.y,goal.level,p.id,avoid);if(detour.length&&(detour[0].x!==a.path[0]?.x||detour[0].y!==a.path[0]?.y)){a.dodge=null;a.path=detour}else if(!a.dodge){for(const [px,py] of [[-dy/d,dx/d],[dy/d,-dx/d]]){const sx=a.x+px*.85,sy=a.y+py*.85;if(pass(sx,sy,a.level,true)&&!people.some(other=>other.id!==p.id&&(()=>{const o=agents.get(other.id);return !o.inside&&!o.away&&o.level===a.level&&Math.hypot(o.x-sx,o.y-sy)<.75})())){a.dodge={x:sx,y:sy};break}}}break}a.x=nx;a.y=ny;budget-=move;a.moving=true;a.facing=Math.abs(dx)>Math.abs(dy)?dx>0?'right':'left':dy>0?'down':'up';a.walkMs+=move/1.7*1000;if(move>=d-.01){if(a.dodge){a.dodge=null;a.path=route(a.x,a.y,goal.x,goal.y,goal.level,p.id)}else a.path.shift()}}
+   while(budget>0&&(a.path.length||a.dodge)){const target=a.dodge||a.path[0],dx=target.x-a.x,dy=target.y-a.y,d=Math.hypot(dx,dy);if(d<.05){if(a.dodge){a.dodge=null;a.path=route(a.x,a.y,goal.x,goal.y,goal.level,p.id)}else a.path.shift();continue}const move=Math.min(d,budget),nx=a.x+dx/d*move,ny=a.y+dy/d*move;if(!pass(nx,ny,a.level,true))break;const blocked=(a.level===0&&outsideBlocked?.(nx,ny))||people.some(other=>other.id!==p.id&&(()=>{const o=agents.get(other.id);return !o.inside&&!o.away&&o.level===a.level&&Math.hypot(o.x-nx,o.y-ny)<.58&&Math.hypot(o.x-nx,o.y-ny)<Math.hypot(o.x-a.x,o.y-a.y)-.005})());if(blocked){const avoid=new Set(people.filter(other=>other.id!==p.id).flatMap(other=>{const o=agents.get(other.id);return !o.inside&&!o.away&&o.level===a.level?[pathKey(Math.floor(o.x),Math.floor(o.y))]:[]}));const detour=route(a.x,a.y,goal.x,goal.y,goal.level,p.id,avoid);if(detour.length&&(detour[0].x!==a.path[0]?.x||detour[0].y!==a.path[0]?.y)){a.dodge=null;a.path=detour}else if(!a.dodge){for(const [px,py] of [[-dy/d,dx/d],[dy/d,-dx/d]]){const sx=a.x+px*.85,sy=a.y+py*.85;if(pass(sx,sy,a.level,true)&&!people.some(other=>other.id!==p.id&&(()=>{const o=agents.get(other.id);return !o.inside&&!o.away&&o.level===a.level&&Math.hypot(o.x-sx,o.y-sy)<.75})())){a.dodge={x:sx,y:sy};break}}}break}a.x=nx;a.y=ny;budget-=move;a.moving=true;a.facing=Math.abs(dx)>Math.abs(dy)?dx>0?'right':'left':dy>0?'down':'up';a.walkMs+=move/1.7*1000;if(move>=d-.01){if(a.dodge){a.dodge=null;a.path=route(a.x,a.y,goal.x,goal.y,goal.level,p.id)}else a.path.shift()}}
    if(goal.indoors&&Math.hypot(a.x-goal.x,a.y-goal.y)<.55){a.inside=true;a.insideBuilding=goal.building;a.path=[];const station=roomSpot?.(goal.building,p.id,goal.phase||0);if(station){a.roomX=station.x;a.roomY=station.y}a.activity=goal.sleep?'Sleeping in bed':goal.activity}else a.activity=goal.activity;
    if(!a.inside)occupied.add(Math.round(a.x)+','+Math.round(a.y)+','+a.level);
   }

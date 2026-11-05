@@ -77,6 +77,7 @@ function draw(ctx,sim,player,vw,vh,size,character,options={}){
  if(root.KingdomInnSprites?.ready){
   for(const prop of map.decor)root.KingdomInnSprites.draw(ctx,prop.sprite,prop.x*size,prop.y*size,prop.w*size,prop.h*size);
  }
+ if(options.horse){const h=options.horse;root.KingdomInnSprites.drawHorse(ctx,h.facing,Math.floor(h.walkMs/170)%4,(h.x-1.6)*size,(h.y-2.4)*size,3.2*size,3.2*size)}
  const list=sim.peopleOnMap();
  for(const a of list.filter(a=>a.level===0))drawPerson(ctx,a,size,player,character);
  if(options.drawPlayer!==false)character(ctx,player.x,player.y,size,player.facing,player.moving,player.walkMs,player.appearance);
