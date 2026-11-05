@@ -4,7 +4,7 @@
 const width=256,height=192;
 const sites={
  dunmere:{name:'Dunmere',x:64.5,y:47.5,kind:'settlement'},
- greyford:{name:'Greyford',x:86.5,y:10.5,kind:'settlement'},
+ greyford:{name:'Greyford',x:154.5,y:40.5,kind:'settlement'},
  mill:{name:'Brook Mill',x:49.5,y:55.5,kind:'mill'},
  westfield:{name:'Westfield',x:63.5,y:68.5,kind:'field'},
  timber:{name:'Eastwood Timber Yard',x:104.5,y:67.5,kind:'timber'},
@@ -36,7 +36,7 @@ const routes=[
  [[55,44],[55,47]],[[74,44],[74,47]],
  [[61,38],[59,43],[59,47]],[[70,38],[69,43],[69,47]],
  [[101,51],[102,39],[105,29],[107,22]],
- [[87,48],[86,34],[86,22],[86,10]],
+ [[117,52],[137,52],[154,40]],
  [[102,51],[104,68]],[[49,55],[55,55],[59,53],[60,52],[64,47]],
  [[55,68],[57.5,68.5]]
  ,[[55,190],[55,151],[55,94],[55,68]],
