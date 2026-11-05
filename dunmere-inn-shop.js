@@ -38,9 +38,11 @@ function create(world,food,bag){
   if(!Number.isInteger(id)||!world.residents[id]||!Number.isInteger(amount)||amount<1||state.coins<amount)return false;
   state.coins-=amount;world.residents[id].coins+=amount;return true;
  }
+ function debit(amount){if(!Number.isInteger(amount)||amount<1||state.coins<amount)return false;state.coins-=amount;return true}
+ function credit(amount){if(!Number.isInteger(amount)||amount<1)return false;state.coins+=amount;return true}
  function snapshot(){return {version:1,seeded:state.seeded,coins:state.coins,till:state.till,stock:{...state.stock}}}
  function restore(data){if(!data||data.version!==1||data.seeded!==true||![data.coins,data.till,data.stock?.bread,data.stock?.ale].every(n=>Number.isInteger(n)&&n>=0))return false;state.seeded=true;state.coins=data.coins;state.till=data.till;state.stock={bread:data.stock.bread,ale:data.stock.ale};return true}
- return {seed,buy,sellBread,pay,spendToResident,snapshot,restore,get prices(){return PRICES}};
+ return {seed,buy,sellBread,pay,spendToResident,debit,credit,snapshot,restore,get prices(){return PRICES}};
 }
 root.KingdomInnShop={create};
 })(window);
