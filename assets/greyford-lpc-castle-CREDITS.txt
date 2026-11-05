@@ -1,0 +1,8 @@
+Greyford stone wall tile and arch
+Source: LPC Castle, Version 3, by Evert
+https://opengameart.org/content/lpc-castle
+License: Creative Commons Attribution 3.0
+https://creativecommons.org/licenses/by/3.0/
+
+The creator's attribution instruction: credit Evert and link to the source page; also credit Lanea Zimmerman (Sharm) for base LPC wood and Xenodora for rounded towers.
+The source sheet is stored as greyford-lpc-castle.png. The game uses greyford-stone-pieces.png, an edited extraction with unrelated neighboring art removed. The source authors do not endorse this game.
