@@ -28,29 +28,10 @@ const equipmentCells={pick:0,hoe:1,ironSword:2,steelSword:3,knife:4,steelDagger:
 // The right hand is viewer-left when facing down, viewer-right when facing up.
 // In profile the main hand leads the body, so a drawn weapon stays visible.
 const GRIP={down:[[5,32],[5,31],[5,33]],left:[[7,31],[7,30],[6,33]],right:[[25,32],[25,31],[26,33]],up:[[27,31],[27,30],[28,32]]};
-const REAR_GRIP={left:[[21,31],[21,30],[23,33]],right:[[8,32],[8,31],[6,33]]};
 const OFFGRIP={down:[[27,32],[27,33],[27,31]],left:[[23,32],[23,33],[24,31]],right:[[8,31],[8,32],[7,31]],up:[[5,31],[5,32],[5,30]]};
 function handAnchor(direction,frame,bodyType,offhand=false){const frames=(offhand?OFFGRIP:GRIP)[direction]||GRIP.down;const index=Number.isInteger(frame)?frame%3:0;const [x,y]=frames[index];return [x,y+(bodyType==='female'&&direction!=='up'?1:0)]}
 function heldSprite(id){
  if(heldSprites.has(id))return heldSprites.get(id);
- if(id==='axe'){
-  // A separate 20×25 world sprite keeps a readable stone head and a real hand grip.
-  const c=document.createElement('canvas');c.width=20;c.height=25;
-  const g=c.getContext('2d');g.imageSmoothingEnabled=false;
-  const blocks=(color,rects)=>{g.fillStyle=color;for(const [x,y,w,h] of rects)g.fillRect(x,y,w,h)};
-  blocks('#302b25',[[10,3,4,22],[4,2,8,9],[2,4,11,5],[1,5,13,3]]);
-  blocks('#775137',[[11,4,2,20]]);
-  blocks('#b47c4a',[[11,6,1,17]]);
-  // Chipped, tapered stone blade; the narrow end is lashed to the wooden haft.
-  blocks('#46504c',[[5,2,6,1],[3,3,9,1],[2,4,10,1],[1,5,11,3],[2,8,10,1],[4,9,7,1],[6,10,4,1]]);
-  blocks('#89948b',[[5,3,5,1],[4,4,7,1],[3,5,8,3],[4,8,7,1],[6,9,4,1]]);
-  blocks('#c2c9ba',[[5,3,3,1],[3,5,4,1],[2,6,3,1],[4,8,3,1]]);
-  blocks('#d5ddcb',[[1,6,1,1],[2,5,1,1]]);
-  blocks('#4b3528',[[10,7,4,1],[10,10,4,1],[10,12,4,1]]);
-  blocks('#c5ab7b',[[10,8,4,1],[10,11,4,1]]);
-  blocks('#593c29',[[10,16,4,2],[10,22,4,2]]);
-  heldSprites.set(id,c);return c;
- }
  const cell=equipmentCells[id];if(cell===undefined||!equipmentSheet.complete||equipmentSheet.naturalWidth!==24*14)return null;
  const c=document.createElement('canvas');c.width=24;c.height=32;
  const g=c.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(equipmentSheet,cell*24,0,24,32,0,0,24,32);
@@ -62,14 +43,13 @@ function drawHeld(ctx,id,px,py,size,direction,appearance){
  const swing=Number.isFinite(appearance.attackPhase)?Math.max(0,Math.min(1,appearance.attackPhase)):null;
  const [handX,handY0]=handAnchor(direction,appearance._frame,appearance.bodyType),handY=handY0+(crouch?4:0);
  const viewerLeft=direction==='left'||direction==='down';
- const arc=swing===null?0:Math.sin(Math.PI*swing);
- const pivotX=px-size/2+(handX+(viewerLeft?-2:2)*arc)*scale;
- const pivotY=py+size*.12-47*scale+(handY-3*arc)*scale;
+ const pivotX=px-size/2+handX*scale;
+ const pivotY=py+size*.12-47*scale+handY*scale;
  const upright=['axe','ironSword','steelSword','knife','steelDagger','spear','ironAxe','steelAxe','torch'].includes(id);
  const rest=id==='torch'?0:upright?.25:2.3;
  let angle=rest;
  if(guard)angle=id==='torch'?0:upright?.25:.85;
- else if(swing!==null){const ease=t=>t*t*(3-2*t);if(id==='torch')angle=rest+.3*Math.sin(Math.PI*swing);else if(upright)angle=swing<.25?rest-.75*ease(swing/.25):swing<.75?rest-.75+2.5*ease((swing-.25)/.5):rest+1.75-1.75*ease((swing-.75)/.25);else angle=swing<.3?2.3-1.55*ease(swing/.3):swing<.78?.75+1.55*ease((swing-.3)/.48):2.3}
+ else if(swing!==null){const ease=t=>t*t*(3-2*t);if(upright)angle=rest+(id==='torch'?.2:1.3)*Math.sin(Math.PI*swing);else angle=swing<.3?2.3-1.55*ease(swing/.3):swing<.78?.75+1.55*ease((swing-.3)/.48):2.3}
  if(upright?(direction==='down'||direction==='left'):viewerLeft)angle=-angle;
  ctx.save();ctx.imageSmoothingEnabled=false;ctx.translate(Math.round(pivotX),Math.round(pivotY));ctx.rotate(angle);if(!viewerLeft)ctx.scale(-1,1);
  ctx.drawImage(sprite,Math.round(-12*scale),Math.round(-23*scale),Math.round(24*scale),Math.round(32*scale));ctx.restore();
@@ -132,7 +112,7 @@ function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
   if(appearance.backItem&&direction==='up')drawBack(ctx,appearance.backItem,px,py,size,direction,equippedView);
   if(appearance.handItem)drawHeld(ctx,appearance.handItem,px,py,size,direction,equippedView);
   if(appearance.offhandItem&&direction!=='right'&&direction!=='up')drawOffhand(ctx,appearance.offhandItem,px,py,size,direction,equippedView);
-  for(const offhand of [false,true])if(offhand?appearance.offhandItem&&direction!=='right'&&direction!=='up':appearance.handItem){const [hx,hy]=handAnchor(direction,pose.frame,appearance.bodyType,offhand);ctx.save();ctx.beginPath();ctx.rect(Math.round(destX+(hx-5)*scale),Math.round(destY+(hy-2)*scale),Math.round(10*scale),Math.round(12*scale));ctx.clip();ctx.drawImage(bent,0,1,32,48,destX,destY,size,drawHeight);ctx.restore()}
+  for(const offhand of [false,true])if(offhand?appearance.offhandItem&&direction!=='right'&&direction!=='up':appearance.handItem){const [hx,hy]=handAnchor(direction,pose.frame,appearance.bodyType,offhand);ctx.save();ctx.beginPath();ctx.rect(Math.round(destX+(hx-2)*scale),Math.round(destY+(hy+2)*scale),Math.round(4*scale),Math.round(4*scale));ctx.clip();ctx.drawImage(bent,0,1,32,48,destX,destY,size,drawHeight);ctx.restore()}
   return true;
  }
  const attackLean=id===12&&Number.isFinite(appearance.attackPhase)?Math.sin(appearance.attackPhase*Math.PI)*.13:0;
@@ -169,7 +149,7 @@ function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
   if(appearance.offhandItem&&direction!=='right'&&direction!=='up')drawOffhand(ctx,appearance.offhandItem,px,py,size,direction,equippedView);
   // Only the fingers cross the grip. Redrawing the whole forearm here hides
   // the blade and torch shaft, especially in the side-facing frames.
-  const redrawGripArm=offhand=>{const [hx,hy]=handAnchor(direction,pose.frame,body,offhand);ctx.save();ctx.beginPath();ctx.rect(Math.round(destX+(hx-2)*scale),Math.round(destY+(hy-2)*scale),Math.round(4*scale),Math.round(5*scale));ctx.clip();if(!offhand&&(direction==='left'||direction==='right')){const [sx,sy]=REAR_GRIP[direction][pose.frame%3];ctx.drawImage(images[`player-v2-${body}-base`],pose.frame*32+sx-2,sy-2,4,5,Math.round(destX+(hx-2)*scale),Math.round(destY+(hy-2)*scale),Math.round(4*scale),Math.round(5*scale))}else layer('base');if(gear.hands==='leatherGloves')drawGear('gloves-'+body,hide);if(gear.hands==='ironGauntlets'||gear.hands==='steelGauntlets')drawGear('gloves-'+body,gear.hands==='steelGauntlets'?steel:null);ctx.restore()};
+  const redrawGripArm=offhand=>{const [hx,hy]=handAnchor(direction,pose.frame,body,offhand);ctx.save();ctx.beginPath();ctx.rect(Math.round(destX+(hx-2)*scale),Math.round(destY+(hy-2)*scale),Math.round(4*scale),Math.round(5*scale));ctx.clip();layer('base');if(gear.hands==='leatherGloves')drawGear('gloves-'+body,hide);if(gear.hands==='ironGauntlets'||gear.hands==='steelGauntlets')drawGear('gloves-'+body,gear.hands==='steelGauntlets'?steel:null);ctx.restore()};
   if(appearance.handItem)redrawGripArm(false);
   if(appearance.offhandItem&&direction!=='right'&&direction!=='up')redrawGripArm(true);
   if(attackLean)ctx.restore();
