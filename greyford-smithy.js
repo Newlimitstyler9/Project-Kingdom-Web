@@ -54,14 +54,14 @@ function create(bag,purse){
   if(!Object.keys(buys).length&&!Object.keys(sells).length)return {ok:false,message:'Choose goods to buy or sell first.'};
   let cost=0,payout=0;
   for(const [id,n] of Object.entries(buys)){const offer=GOODS[id]||SELL_MATERIAL[id];if(!offer||!Number.isInteger(n)||n<1||n>available(id))return {ok:false,message:'That stock is no longer available.'};cost+=offer.price*n}
-  for(const [id,n] of Object.entries(sells)){if(!BUY_MATERIAL[id]||!Number.isInteger(n)||n<1||n>bag.slots.reduce((sum,slot)=>sum+(slot?.id===id?slot.count:0),0))return {ok:false,message:'You do not have those goods in your pack.'};payout+=BUY_MATERIAL[id]*n}
+  for(const [id,n] of Object.entries(sells)){if(!BUY_MATERIAL[id]||!Number.isInteger(n)||n<1||n>bag.slots.reduce((sum,slot)=>sum+(slot?.id===id&&!slot.meta?.stolenFrom?slot.count:0),0))return {ok:false,message:'You need legally owned goods in your pack.'};payout+=BUY_MATERIAL[id]*n}
   const net=cost-payout;
   if(net>purse.snapshot().coins)return {ok:false,message:'You need '+net+' copper after your sales.'};
   if(net<0&&state.till< -net)return {ok:false,message:'The smithy till cannot cover that sale.'};
   const nextWeight=bag.weight+Object.entries(buys).reduce((sum,[id,n])=>sum+root.KingdomItemCatalog.defs[id].weight*n,0)-Object.entries(sells).reduce((sum,[id,n])=>sum+root.KingdomItemCatalog.defs[id].weight*n,0);
   if(nextWeight>bag.capacity+.0001)return {ok:false,message:'Your pack would be over its carry limit.'};
   const before=bag.snapshot();
-  for(const [id,n] of Object.entries(sells))if(!bag.takeItem(id,n)){bag.restore(before);return {ok:false,message:'The sale could not be completed.'}}
+  for(const [id,n] of Object.entries(sells)){let left=n;for(let i=bag.slots.length-1;i>=0&&left;i--){const slot=bag.slots[i];if(slot?.id!==id||slot.meta?.stolenFrom)continue;const amount=Math.min(left,slot.count);if(!bag.take(i,amount)){bag.restore(before);return {ok:false,message:'The sale could not be completed.'}}left-=amount}if(left){bag.restore(before);return {ok:false,message:'The sale could not be completed.'}}}
   const moved=[];
   for(const [id,n] of Object.entries(buys))for(let i=0;i<n;i++){
    const piece=GOODS[id]?state.pieces.find(p=>p.id===id&&!moved.includes(p.uid)&&['display','chest'].includes(p.location)):null;

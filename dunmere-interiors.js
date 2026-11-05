@@ -64,7 +64,7 @@ function furniture(ctx,f,size){
 }
 function greyfordHomeFurniture(count){
  const beds=[[1.5,2],[4,2],[6.5,2],[9,2],[1.5,5]].slice(0,Math.max(1,Math.min(5,count||2))).map(([x,y])=>['bed',x,y,1.65,2.3]);
- return [...beds,['table',6,5,2,1],['hearth',9.4,5.2,1.2,1.3]];
+ return [...beds,['table',6,5,2,1],['hearth',9.4,5.2,1.2,1.3],['chest',8.6,7.15,1.4,.85]];
 }
 const WORKSTATIONS={
  smithy:[[4.5,3.5],[7.5,4.5],[7.5,6.5],[4.5,6.5],[5.5,6.5],[6.5,6.5]],
@@ -79,7 +79,7 @@ const WORKSTATIONS={
   };
 function create(buildings){
  const upstairs={id:'inn-upstairs',name:'Hearth & Hound · guest rooms',kind:'upstairs',portal:null};
- const rooms=Object.fromEntries([...buildings.map(b=>[b.id,{id:b.id,name:b.name,kind:b.kind,portal:{x:b.doorX+.5,y:b.doorY+.5},greyfordBuilding:b.greyfordBuilding||null,beds:b.beds||0}]),[CAVE.id,CAVE],...(buildings.some(b=>b.id==='inn')?[[upstairs.id,upstairs]]:[])].map(([id,room])=>[id,{...room,width:['tavern','upstairs'].includes(room.kind)?INN_W:W,height:['tavern','upstairs'].includes(room.kind)?INN_H:H,furniture:(room.greyfordBuilding&&room.kind==='home'?greyfordHomeFurniture(room.beds):FURNITURE[room.kind]||FURNITURE.home).map(([type,x,y,w,h])=>({type,x,y,w,h})),lights:room.kind==='tavern'?[{x:3.7,y:1.7,type:'wall-candle'},{x:9.4,y:1.7,type:'wall-candle'},{x:12.7,y:2.45,type:'hearth'}]:room.kind==='upstairs'?[{x:6.5,y:1.7,type:'wall-candle'},{x:14.5,y:1.7,type:'wall-candle'}]:[]}]));
+ const rooms=Object.fromEntries([...buildings.map(b=>[b.id,{id:b.id,name:b.name,kind:b.kind,portal:{x:b.doorX+.5,y:b.doorY+.5},greyfordBuilding:b.greyfordBuilding||null,beds:b.beds||0}]),[CAVE.id,CAVE],...(buildings.some(b=>b.id==='inn')?[[upstairs.id,upstairs]]:[])].map(([id,room])=>[id,{...room,width:['tavern','upstairs'].includes(room.kind)?INN_W:W,height:['tavern','upstairs'].includes(room.kind)?INN_H:H,furniture:[...(room.greyfordBuilding&&room.kind==='home'?greyfordHomeFurniture(room.beds):FURNITURE[room.kind]||FURNITURE.home),...(room.greyfordBuilding&&room.kind==='bakery'?[['chest',8.45,5.45,1.45,1]]:[])].map(([type,x,y,w,h])=>({type,x,y,w,h})),lights:room.kind==='tavern'?[{x:3.7,y:1.7,type:'wall-candle'},{x:9.4,y:1.7,type:'wall-candle'},{x:12.7,y:2.45,type:'hearth'}]:room.kind==='upstairs'?[{x:6.5,y:1.7,type:'wall-candle'},{x:14.5,y:1.7,type:'wall-candle'}]:[]}]));
  function get(id){return rooms[id]||null}
  function pass(room,x,y){const minY=room?.kind==='tavern'?2.25:room?.kind==='bakery'?3.05:1.2;if(!room||x<1.2||x>room.width-1.2||y<minY||y>room.height-1.05)return false;if(room.kind==='upstairs'&&((y>6.8&&y<7.45&&Math.abs(x-4.5)>.55&&Math.abs(x-11.5)>.55)||(x>7.7&&x<8.3&&y<7.4)))return false;return !room.furniture.some(f=>!['wallShelf','stairs'].includes(f.type)&&x>=f.x-.2&&x<f.x+f.w+.2&&y>=f.y-.2&&y<f.y+f.h+.2)}
  function slot(room,index){if(room.kind==='tavern'&&index===0)return {x:4.5,y:2.55};if(room.kind==='bakery'&&index===0)return {x:8.5,y:4.5};const candidates=[];for(const y of room.kind==='tavern'?[4.5,5.5,6.5,7.5,8.5,9.5]:[4.5,5.5,6.5,3.5,2.5])for(const x of room.kind==='tavern'?[3.5,5.5,7.5,9.5,11.5,13.5,4.5,6.5,8.5,10.5,12.5]:[3.5,5.5,7.5,9.5,4.5,6.5,8.5])if(pass(room,x,y)&&Math.hypot(x-room.width/2,y-room.height-1.7)>1.4)candidates.push({x,y});return candidates[(room.kind==='tavern'?index-1:index)%candidates.length]||{x:5.5,y:5.5}}
@@ -173,7 +173,7 @@ function create(buildings){
    }
   }
   if(room.kind==='bakery'&&sprites?.ready){
-   for(let i=0;i<Math.min(5,details.bakery?.bread||0);i++)sprites.draw(ctx,'bread',(5.22+i*.5)*size,3.15*size,.42*size,.4*size);
+   for(let i=0;i<Math.min(5,(details.greyfordBakery||details.bakery)?.bread||0);i++)sprites.draw(ctx,'bread',(5.22+i*.5)*size,3.15*size,.42*size,.4*size);
    sprites.draw(ctx,'bakerySack',7.8*size,5.54*size,.65*size,.7*size);
    if(details.bakeryTask==='Kneading dough'){
     ctx.fillStyle='#d9c7a0';for(const [x,y,w,h] of [[3.82,5.3,.42,.19],[4.45,5.35,.4,.16]]){ctx.beginPath();ctx.ellipse(x*size,y*size,w*size,h*size,0,0,Math.PI*2);ctx.fill()}
