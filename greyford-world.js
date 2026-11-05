@@ -90,8 +90,8 @@ const WIDTH=96,HEIGHT=76;
 function artBounds(b){return {left:b.x,right:b.x+b.w,top:b.y,bottom:b.y+b.h}}
 function at(x,y){return buildings.find(b=>{const r=artBounds(b);return x>=r.left&&x<r.right&&y>=r.top&&y<r.bottom})}
 function decorAt(x,y){return decor.find(p=>x>=p.x&&x<p.x+p.w&&y>=p.y&&y<p.y+p.h)}
-function gateAt(x,y){return GATES.find(g=>Math.hypot(x-g.x,y-g.y)<2.2)}
-function wallAt(x,y){const north=y>=12&&y<14&&x>=18&&x<=76,south=y>=57&&y<59&&x>=18&&x<=76,west=x>=18&&x<20&&y>=12&&y<=58,east=x>=75&&x<77&&y>=12&&y<=58;if(!(north||south||west||east))return false;return !GATES.some(g=>g.axis==="horizontal"?Math.abs(y-g.y)<2&&Math.abs(x-g.x)<2:Math.abs(x-g.x)<2&&Math.abs(y-g.y)<2)}
+function gateAt(x,y){return GATES.find(g=>g.axis==='horizontal'?x>=g.x-1&&x<g.x+2&&y>=g.y-1&&y<g.y+1:x>=g.x-1&&x<g.x+1&&y>=g.y-1&&y<g.y+1)}
+function wallAt(x,y){const north=y>=12&&y<14&&x>=18&&x<=76,south=y>=57&&y<59&&x>=18&&x<=76,west=x>=18&&x<20&&y>=12&&y<=58,east=x>=75&&x<77&&y>=12&&y<=58;if(!(north||south||west||east))return false;return !GATES.some(g=>g.axis==="horizontal"?Math.abs(y-g.y)<2&&Math.abs(x-g.x)<2:Math.abs(x-g.x)<2&&y>=g.y-1&&y<g.y+1)}
 const lanes=[[[27.5,25.5],[66.5,25.5]],[[32.5,44.5],[50.5,44.5]],[[60.5,48.5],[61.5,53.5],[67.5,53.5]]];
 function segmentDistance(x,y,a,b){const dx=b[0]-a[0],dy=b[1]-a[1],t=Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy||1)));return Math.hypot(x-a[0]-t*dx,y-a[1]-t*dy)}
 function mainRoadAt(x,y){return Math.abs(x-47.5)<1.7||Math.abs(y-35)<1.5&&x>=17&&x<=79||Math.abs(y-48)<1.2&&x>=28&&x<=61}
@@ -118,7 +118,7 @@ function buildFootpaths(){
 }
 buildFootpaths();
 function wallWalkAt(x,y){return y>=12&&y<14&&x>=18&&x<=76||y>=57&&y<59&&x>=18&&x<=76||x>=18&&x<20&&y>=12&&y<=58||x>=75&&x<77&&y>=12&&y<=58}
-function pass(x,y,level=0,gatesOpen=true){if(x<1||y<1||x>=WIDTH-1||y>=HEIGHT-1)return false;if(level===1)return wallWalkAt(Math.floor(x),Math.floor(y));if(wallAt(Math.floor(x),Math.floor(y))||at(x,y)||decorAt(x,y))return false;const g=gateAt(x,y);return !g||gatesOpen||g.id==="south"&&y>59}
+function pass(x,y,level=0,gatesOpen=true){if(x<0||y<0||x>=WIDTH||y>=HEIGHT)return false;if(level===1)return wallWalkAt(Math.floor(x),Math.floor(y));const northLip=y>=11&&y<12&&x>=18&&x<77&&!(x>=46&&x<49);if(northLip||wallAt(Math.floor(x),Math.floor(y))||at(x,y)||decorAt(x,y))return false;const g=gateAt(x,y);return !g||gatesOpen||g.id==="south"&&y>59}
 function house(id){return buildings.find(b=>b.id===id)}
 function porch(id){const b=house(id);if(!b)return {x:47.5,y:35.5};return {x:b.x+b.w/2,y:b.y+b.h+.9}}
 function seeded(n){let x=(n^0x6b884e1)>>>0;x^=x<<13;x^=x>>>17;x^=x<<5;return x>>>0}

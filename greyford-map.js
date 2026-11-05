@@ -4,8 +4,7 @@ const castle=new Image();castle.src="assets/greyford-stone-pieces.png?v=2";
 const sheet=new Image();sheet.src="assets/kenney-roguelike-sheet.png";
 const styles={court:['stone','slate'],warehouse:['timber','brown'],smithy:['stone','slate'],jail:['stone','slate'],bakery:['plaster','light'],chapel:['stone','slate'],stable:['timber','brown'],weaver:['timber','light'],apothecary:['plaster','light'],granary:['timber','brown'],carpenter:['timber','brown'],tollhouse:['stone','slate']};
 const homeStyles={'vell-house':['stone','slate'],'pell-house':['timber','brown'],'reed-house':['plaster','light'],'forge-house':['timber','brown'],'clerk-house':['plaster','light'],'guard-barracks':['stone','slate'],'market-inn':['timber','brown'],'south-croft':['plaster','brown'],'tanner-house':['timber','brown'],'mason-house':['stone','slate'],'fen-house':['plaster','light'],'dyer-house':['timber','light'],'bridge-row-a':['plaster','brown'],'bridge-row-b':['timber','brown'],'east-row-a':['plaster','light'],'east-row-b':['timber','brown'],'south-croft-two':['plaster','brown'],'south-croft-three':['plaster','light']};
-const wallTiles={plaster:[17,18,19],stone:[27,28,29],timber:[34,35,40]};
-const roofTiles={brown:[[20,21],[25,21],[21,21],[20,22],[25,22],[21,22],[20,23],[22,22],[21,23]],slate:[[27,21],[32,21],[28,21],[27,22],[32,22],[28,22],[27,23],[29,22],[28,23]],light:[[34,21],[39,21],[35,21],[34,22],[39,22],[35,22],[34,23],[36,22],[35,23]]};
+const {walls:wallTiles,roofs:roofTiles,windows,doors}=root.KingdomAssetRegistry.buildingTiles;
 function tile(ctx,col,row,x,y,size){if(sheet.complete&&sheet.naturalWidth)ctx.drawImage(sheet,col*17,row*17,16,16,Math.round(x*size),Math.round(y*size),size+1,size+1)}
 function drawBuilding(ctx,b,size,alpha=1){
  if(!sheet.complete||!sheet.naturalWidth)return;
@@ -16,22 +15,25 @@ function drawBuilding(ctx,b,size,alpha=1){
   const pos=x===0?0:x===b.w-1?2:1;
   for(let y=0;y<3;y++){const [col,row]=roof[y*3+pos];tile(ctx,col,row,b.x+x,b.y-1+y,size)}
   if(x>0&&x<b.w-1&&x!==door&&(x===1||x===b.w-2||b.w>=8&&x===door-2)&&!['warehouse','stable','granary','jail'].includes(b.type)){
-   tile(ctx,wallKind==='stone'?40:46,wallKind==='stone'?4:5,b.x+x,b.y+b.h-2,size);
-   if(b.h>=6)tile(ctx,wallKind==='stone'?40:46,wallKind==='stone'?4:5,b.x+x,b.y+2,size);
+   tile(ctx,...windows[wallKind],b.x+x,b.y+b.h-2,size);
+   if(b.h>=6)tile(ctx,...windows[wallKind],b.x+x,b.y+2,size);
   }
   if(x!==door)tile(ctx,wall[1],16,b.x+x,b.y+b.h-1,size);
  }
- tile(ctx,b.type==='court'||b.type==='chapel'?40:33,b.type==='court'||b.type==='chapel'?7:1,b.x+door,b.y+b.h-1,size);
+ tile(ctx,...(b.type==='court'||b.type==='chapel'?doors.stone:doors.wood),b.x+door,b.y+b.h-1,size);
  ctx.restore();
 }
-function draw(ctx,sim,player,vw,vh,size,character){
+function draw(ctx,sim,player,vw,vh,size,character,options={}){
  const map=root.GreyfordWorld,W=map.WIDTH,H=map.HEIGHT;
- const camX=Math.max(0,Math.min(W*size-vw,player.x*size-vw/2)),camY=Math.max(0,Math.min(H*size-vh,player.y*size-vh/2));
- const x0=Math.max(0,Math.floor(camX/size)-3),x1=Math.min(W,Math.ceil((camX+vw)/size)+3),y0=Math.max(0,Math.floor(camY/size)-4),y1=Math.min(H,Math.ceil((camY+vh)/size)+4);
- ctx.fillStyle="#687e55";ctx.fillRect(0,0,vw,vh);ctx.save();ctx.translate(-Math.round(camX),-Math.round(camY));ctx.imageSmoothingEnabled=false;
+ const ox=options.originX||0,oy=options.originY||0;
+ const camX=options.cameraX??Math.max(0,Math.min(W*size-vw,player.x*size-vw/2)),camY=options.cameraY??Math.max(0,Math.min(H*size-vh,player.y*size-vh/2));
+ const localX=camX/size-ox,localY=camY/size-oy;
+ const x0=Math.max(0,Math.floor(localX)-3),x1=Math.min(W,Math.ceil(localX+vw/size)+3),y0=Math.max(0,Math.floor(localY)-4),y1=Math.min(H,Math.ceil(localY+vh/size)+4);
+ if(!options.embedded){ctx.fillStyle="#687e55";ctx.fillRect(0,0,vw,vh)}ctx.save();ctx.translate(options.embedded?Math.round(ox*size):Math.round(ox*size-camX),options.embedded?Math.round(oy*size):Math.round(oy*size-camY));ctx.beginPath();ctx.rect(0,0,W*size,H*size);ctx.clip();ctx.imageSmoothingEnabled=false;
  for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++){
   const nearRiver=x<13,bridge=y>=33&&y<=37&&x<20;
   if(nearRiver&&!bridge){root.KingdomArt.water(ctx,x,y,size);continue}
+  if(nearRiver&&bridge){ctx.fillStyle='#49372d';ctx.fillRect(x*size,y*size,size+1,size+1);ctx.fillStyle=(y%2?'#866747':'#997653');ctx.fillRect(x*size,y*size+size*.08,size+1,size*.78);ctx.fillStyle='#c1a176';ctx.fillRect(x*size,y*size+size*.12,size+1,size*.08);ctx.fillStyle='#584638';ctx.fillRect(x*size,y*size+size*.82,size+1,size*.08);continue}
   root.KingdomArt.terrain(ctx,x,y,size,map.roadAt(x+.5,y+.5)||bridge,(rx,ry)=>map.roadAt(rx+.5,ry+.5));
   if(x>=20&&x<76&&y>=14&&y<57&&!map.roadAt(x+.5,y+.5)&&(x*11+y*17)%31===0)root.KingdomArt.plant(ctx,"grass",x,y,size);
   if(x>=6&&x<15&&y>=38&&y<57&&(x+y)%5===0)root.KingdomArt.plant(ctx,"grass",x,y,size);
@@ -46,9 +48,15 @@ function draw(ctx,sim,player,vw,vh,size,character){
   }
   for(const g of map.GATES){
    const gx=(g.x+.5)*size,gy=g.y*size;
-   // Tall arched stone entrance, aligned with the passable road gap.
-   ctx.drawImage(castle,0,32,96,88,gx-size*1.5,gy-size*1.8,size*3,size*2.75);
-   if(!sim.gateOpen&&!sim.gatePassageAt(g.id)){ctx.fillStyle="#765037";ctx.fillRect(gx-size*.6,gy-size*.35,size*1.2,size*.85);ctx.fillStyle="#a67950";for(let i=0;i<4;i++)ctx.fillRect(gx-size*.54+i*size*.29,gy-size*.3,size*.055,size*.75)}
+   // The timber leaves are clipped to the arch and sit behind its stone face.
+   if(!sim.gateOpen&&!sim.gatePassageAt(g.id)){
+    ctx.save();ctx.beginPath();ctx.moveTo(gx-size*1.11,gy+size*.98);ctx.lineTo(gx-size*1.11,gy-size*.18);ctx.quadraticCurveTo(gx,gy-size*.85,gx+size*1.11,gy-size*.18);ctx.lineTo(gx+size*1.11,gy+size*.98);ctx.closePath();ctx.clip();
+    ctx.fillStyle='#5d3d2b';ctx.fillRect(gx-size*1.12,gy-size*.85,size*2.24,size*1.85);
+    for(let i=0;i<8;i++){const x=gx-size*1.08+i*size*.28;ctx.fillStyle=i%2?'#7a5237':'#8e6240';ctx.fillRect(x,gy-size*.85,size*.25,size*1.85);ctx.fillStyle='#3d302a';ctx.fillRect(x+size*.22,gy-size*.85,size*.035,size*1.85)}
+    ctx.fillStyle='#363337';for(const dy of [-.15,.55])ctx.fillRect(gx-size*1.12,gy+dy*size,size*2.24,size*.12);
+    ctx.fillStyle='#271f1c';ctx.fillRect(gx-size*.025,gy-size*.5,size*.05,size*1.5);ctx.restore();
+   }
+   ctx.drawImage(castle,0,32,96,64,gx-size*1.5,gy-size,size*3,size*2);
   }
  }
  // A navigable upper surface uses a different stone value from the wall face.
@@ -66,7 +74,16 @@ function draw(ctx,sim,player,vw,vh,size,character){
  }
  const list=sim.peopleOnMap();
  for(const a of list.filter(a=>a.level===0))drawPerson(ctx,a,size,player,character);
- character(ctx,player.x,player.y,size,player.facing,player.moving,player.walkMs,player.appearance);
+ if(options.drawPlayer!==false)character(ctx,player.x,player.y,size,player.facing,player.moving,player.walkMs,player.appearance);
+ // When the player is behind a wall, its raised stone lip must cover the sprite.
+ if(options.drawPlayer!==false&&player.level===0&&castle.complete&&castle.naturalWidth){
+  const wallRow=player.y<14&&player.y>=9?12:player.y<59&&player.y>=54?57:-1;
+  if(wallRow>=0)for(let x=Math.max(18,Math.floor(player.x)-2);x<=Math.min(76,Math.floor(player.x)+2);x++){
+   if(!map.wallAt(x,wallRow))continue;
+   ctx.drawImage(castle,0,0,24,24,x*size,wallRow*size,size+1,size+1);
+   ctx.drawImage(castle,32,0,32,24,x*size,wallRow*size-size*.72,size+1,size*.9);
+  }
+ }
  for(const b of map.buildings)if(player.x>=b.x-.2&&player.x<b.x+b.w+.2&&player.y>=b.y-1&&player.y<b.y+b.h)drawBuilding(ctx,b,size,.52);
  for(const a of list.filter(a=>a.level===1))drawPerson(ctx,a,size,player,character);
  if(player.level===1){

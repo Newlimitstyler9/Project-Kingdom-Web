@@ -1,0 +1,1016 @@
+{
+  "schemaVersion": 1,
+  "notes": "referenced means the filename occurs in prototype JS/HTML; it does not prove the asset renders in the current scene. No source license is inferred from a filename.",
+  "files": [
+    {
+      "path": "bakery-containers.png",
+      "category": "Interiors, furniture, and building sheets",
+      "size": [
+        512,
+        2048
+      ],
+      "referenced": true,
+      "sourceRecord": "bakery-containers-CREDITS.txt"
+    },
+    {
+      "path": "brooklands-bakehouse-v1.png",
+      "category": "Buildings and world structures",
+      "size": [
+        1374,
+        1145
+      ],
+      "referenced": true,
+      "sourceRecord": null
+    },
+    {
+      "path": "brooklands-cottage-long-v1.png",
+      "category": "Buildings and world structures",
+      "size": [
+        1541,
+        1021
+      ],
+      "referenced": true,
+      "sourceRecord": null
+    },
+    {
+      "path": "brooklands-cottage-modest-v1.png",
+      "category": "Buildings and world structures",
+      "size": [
+        925,
+        891
+      ],
+      "referenced": true,
+      "sourceRecord": null
+    },
+    {
+      "path": "brooklands-cottage-roof-v2.png",
+      "category": "Buildings and world structures",
+      "size": [
+        1402,
+        1122
+      ],
+      "referenced": true,
+      "sourceRecord": null
+    },
+    {
+      "path": "brooklands-cottage-v1.png",
+      "category": "Buildings and world structures",
+      "size": [
+        1322,
+        1190
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "brooklands-farmhouse-v1.png",
+      "category": "Buildings and world structures",
+      "size": [
+        1716,
+        771
+      ],
+      "referenced": true,
+      "sourceRecord": null
+    },
+    {
+      "path": "brooklands-forge-v1.png",
+      "category": "Buildings and world structures",
+      "size": [
+        1374,
+        1145
+      ],
+      "referenced": true,
+      "sourceRecord": null
+    },
+    {
+      "path": "brooklands-inn-v1.png",
+      "category": "Buildings and world structures",
+      "size": [
+        1354,
+        1161
+      ],
+      "referenced": true,
+      "sourceRecord": null
+    },
+    {
+      "path": "brooklands-mine-cliff-v2.png",
+      "category": "Buildings and world structures",
+      "size": [
+        1959,
+        803
+      ],
+      "referenced": true,
+      "sourceRecord": null
+    },
+    {
+      "path": "brooklands-mine-v1.png",
+      "category": "Buildings and world structures",
+      "size": [
+        1536,
+        1024
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "brooklands-timber-yard-v1.png",
+      "category": "Buildings and world structures",
+      "size": [
+        1536,
+        1024
+      ],
+      "referenced": true,
+      "sourceRecord": null
+    },
+    {
+      "path": "brooklands-watermill-base-v2.png",
+      "category": "Buildings and world structures",
+      "size": [
+        1448,
+        1086
+      ],
+      "referenced": true,
+      "sourceRecord": null
+    },
+    {
+      "path": "brooklands-watermill-v1.png",
+      "category": "Buildings and world structures",
+      "size": [
+        1448,
+        1086
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "brooklands-waterwheel-v2.png",
+      "category": "Buildings and world structures",
+      "size": [
+        1448,
+        1086
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "dunmere-current-layout.png",
+      "category": "Map references",
+      "size": [
+        1768,
+        1415
+      ],
+      "referenced": true,
+      "sourceRecord": null
+    },
+    {
+      "path": "dunmere-region-map-v2.png",
+      "category": "Map references",
+      "size": [
+        1512,
+        1040
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "gear/armet.png",
+      "category": "Wearable armor",
+      "size": [
+        576,
+        256
+      ],
+      "referenced": false,
+      "sourceRecord": "gear/CREDITS.csv"
+    },
+    {
+      "path": "gear/chain-female.png",
+      "category": "Wearable armor",
+      "size": [
+        576,
+        256
+      ],
+      "referenced": false,
+      "sourceRecord": "gear/CREDITS.csv"
+    },
+    {
+      "path": "gear/chain-male.png",
+      "category": "Wearable armor",
+      "size": [
+        576,
+        256
+      ],
+      "referenced": false,
+      "sourceRecord": "gear/CREDITS.csv"
+    },
+    {
+      "path": "gear/gloves-female.png",
+      "category": "Wearable armor",
+      "size": [
+        576,
+        256
+      ],
+      "referenced": false,
+      "sourceRecord": "gear/CREDITS.csv"
+    },
+    {
+      "path": "gear/gloves-male.png",
+      "category": "Wearable armor",
+      "size": [
+        576,
+        256
+      ],
+      "referenced": false,
+      "sourceRecord": "gear/CREDITS.csv"
+    },
+    {
+      "path": "gear/kettle.png",
+      "category": "Wearable armor",
+      "size": [
+        576,
+        256
+      ],
+      "referenced": false,
+      "sourceRecord": "gear/CREDITS.csv"
+    },
+    {
+      "path": "gear/leather-boots-female.png",
+      "category": "Wearable armor",
+      "size": [
+        576,
+        256
+      ],
+      "referenced": false,
+      "sourceRecord": "gear/CREDITS.csv"
+    },
+    {
+      "path": "gear/leather-boots-male.png",
+      "category": "Wearable armor",
+      "size": [
+        576,
+        256
+      ],
+      "referenced": false,
+      "sourceRecord": "gear/CREDITS.csv"
+    },
+    {
+      "path": "gear/leather-hood.png",
+      "category": "Wearable armor",
+      "size": [
+        576,
+        256
+      ],
+      "referenced": false,
+      "sourceRecord": "gear/CREDITS.csv"
+    },
+    {
+      "path": "gear/leather-torso-female.png",
+      "category": "Wearable armor",
+      "size": [
+        576,
+        256
+      ],
+      "referenced": false,
+      "sourceRecord": "gear/CREDITS.csv"
+    },
+    {
+      "path": "gear/leather-torso-male.png",
+      "category": "Wearable armor",
+      "size": [
+        576,
+        256
+      ],
+      "referenced": false,
+      "sourceRecord": "gear/CREDITS.csv"
+    },
+    {
+      "path": "gear/plate-arms-female.png",
+      "category": "Wearable armor",
+      "size": [
+        576,
+        256
+      ],
+      "referenced": false,
+      "sourceRecord": "gear/CREDITS.csv"
+    },
+    {
+      "path": "gear/plate-arms-male.png",
+      "category": "Wearable armor",
+      "size": [
+        576,
+        256
+      ],
+      "referenced": false,
+      "sourceRecord": "gear/CREDITS.csv"
+    },
+    {
+      "path": "gear/plate-boots-female.png",
+      "category": "Wearable armor",
+      "size": [
+        576,
+        256
+      ],
+      "referenced": false,
+      "sourceRecord": "gear/CREDITS.csv"
+    },
+    {
+      "path": "gear/plate-boots-male.png",
+      "category": "Wearable armor",
+      "size": [
+        576,
+        256
+      ],
+      "referenced": false,
+      "sourceRecord": "gear/CREDITS.csv"
+    },
+    {
+      "path": "gear/plate-legs-female.png",
+      "category": "Wearable armor",
+      "size": [
+        576,
+        256
+      ],
+      "referenced": false,
+      "sourceRecord": "gear/CREDITS.csv"
+    },
+    {
+      "path": "gear/plate-legs-male.png",
+      "category": "Wearable armor",
+      "size": [
+        576,
+        256
+      ],
+      "referenced": false,
+      "sourceRecord": "gear/CREDITS.csv"
+    },
+    {
+      "path": "gear/plate-torso-female.png",
+      "category": "Wearable armor",
+      "size": [
+        576,
+        256
+      ],
+      "referenced": false,
+      "sourceRecord": "gear/CREDITS.csv"
+    },
+    {
+      "path": "gear/plate-torso-male.png",
+      "category": "Wearable armor",
+      "size": [
+        576,
+        256
+      ],
+      "referenced": false,
+      "sourceRecord": "gear/CREDITS.csv"
+    },
+    {
+      "path": "greyford-lpc-castle.png",
+      "category": "Source tile sheets",
+      "size": [
+        480,
+        320
+      ],
+      "referenced": false,
+      "sourceRecord": "greyford-lpc-castle-CREDITS.txt"
+    },
+    {
+      "path": "greyford-stone-pieces.png",
+      "category": "Buildings and world structures",
+      "size": [
+        128,
+        128
+      ],
+      "referenced": true,
+      "sourceRecord": null
+    },
+    {
+      "path": "held-equipment.png",
+      "category": "Animals and equipment atlases",
+      "size": [
+        336,
+        32
+      ],
+      "referenced": true,
+      "sourceRecord": null
+    },
+    {
+      "path": "held-icons/axe.png",
+      "category": "Held tools and weapons",
+      "size": [
+        24,
+        32
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "held-icons/hoe.png",
+      "category": "Held tools and weapons",
+      "size": [
+        24,
+        32
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "held-icons/ironAxe.png",
+      "category": "Held tools and weapons",
+      "size": [
+        24,
+        32
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "held-icons/ironShield.png",
+      "category": "Held tools and weapons",
+      "size": [
+        24,
+        32
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "held-icons/ironSword.png",
+      "category": "Held tools and weapons",
+      "size": [
+        24,
+        32
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "held-icons/knife.png",
+      "category": "Held tools and weapons",
+      "size": [
+        24,
+        32
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "held-icons/pick.png",
+      "category": "Held tools and weapons",
+      "size": [
+        24,
+        32
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "held-icons/spear.png",
+      "category": "Held tools and weapons",
+      "size": [
+        24,
+        32
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "held-icons/steelAxe.png",
+      "category": "Held tools and weapons",
+      "size": [
+        24,
+        32
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "held-icons/steelDagger.png",
+      "category": "Held tools and weapons",
+      "size": [
+        24,
+        32
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "held-icons/steelPick.png",
+      "category": "Held tools and weapons",
+      "size": [
+        24,
+        32
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "held-icons/steelSword.png",
+      "category": "Held tools and weapons",
+      "size": [
+        24,
+        32
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "held-icons/torch.png",
+      "category": "Held tools and weapons",
+      "size": [
+        24,
+        32
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "held-icons/woodShield.png",
+      "category": "Held tools and weapons",
+      "size": [
+        24,
+        32
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "inn-cottage-wall.png",
+      "category": "Interiors, furniture, and building sheets",
+      "size": [
+        512,
+        512
+      ],
+      "referenced": true,
+      "sourceRecord": null
+    },
+    {
+      "path": "inn-guest-bed.png",
+      "category": "Interiors, furniture, and building sheets",
+      "size": [
+        54,
+        86
+      ],
+      "referenced": true,
+      "sourceRecord": "inn-guest-bed-SOURCE.txt"
+    },
+    {
+      "path": "inn-medieval-exterior.png",
+      "category": "Interiors, furniture, and building sheets",
+      "size": [
+        384,
+        256
+      ],
+      "referenced": true,
+      "sourceRecord": null
+    },
+    {
+      "path": "inn-medieval-interior.png",
+      "category": "Interiors, furniture, and building sheets",
+      "size": [
+        320,
+        320
+      ],
+      "referenced": true,
+      "sourceRecord": null
+    },
+    {
+      "path": "inn-tavern-cooking.png",
+      "category": "Interiors, furniture, and building sheets",
+      "size": [
+        512,
+        512
+      ],
+      "referenced": true,
+      "sourceRecord": "inn-tavern-CREDITS.txt"
+    },
+    {
+      "path": "inn-tavern-deco.png",
+      "category": "Interiors, furniture, and building sheets",
+      "size": [
+        512,
+        1792
+      ],
+      "referenced": true,
+      "sourceRecord": "inn-tavern-CREDITS.txt"
+    },
+    {
+      "path": "inn-tavern-furniture.png",
+      "category": "Interiors, furniture, and building sheets",
+      "size": [
+        1024,
+        1024
+      ],
+      "referenced": true,
+      "sourceRecord": "inn-tavern-CREDITS.txt"
+    },
+    {
+      "path": "inn-thatch-roof.png",
+      "category": "Interiors, furniture, and building sheets",
+      "size": [
+        512,
+        512
+      ],
+      "referenced": true,
+      "sourceRecord": "inn-thatch-CREDITS.txt"
+    },
+    {
+      "path": "inn-windows-doors.png",
+      "category": "Interiors, furniture, and building sheets",
+      "size": [
+        1024,
+        1024
+      ],
+      "referenced": true,
+      "sourceRecord": "inn-windows-doors-CREDITS.txt"
+    },
+    {
+      "path": "inn-yard-decorations.png",
+      "category": "Interiors, furniture, and building sheets",
+      "size": [
+        512,
+        2048
+      ],
+      "referenced": true,
+      "sourceRecord": "inn-yard-CREDITS.txt"
+    },
+    {
+      "path": "kenney-roguelike-sheet.png",
+      "category": "Source tile sheets",
+      "size": [
+        968,
+        526
+      ],
+      "referenced": true,
+      "sourceRecord": "kenney-roguelike-SOURCE.txt"
+    },
+    {
+      "path": "lpc-horse-brown.png",
+      "category": "Animals and equipment atlases",
+      "size": [
+        512,
+        2560
+      ],
+      "referenced": true,
+      "sourceRecord": "lpc-horse-brown-CREDITS.txt"
+    },
+    {
+      "path": "player-male-v1.svg",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        48
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "player-male-v2.svg",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        48
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "player-male-v3.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        48
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "player-outfit-walk-v1.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        48
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "player-outfit-walk-v2.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        48
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "player-outfit-walk-v3.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        48
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "player-outfit-walk-v4.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        48
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "player-underwear-v1.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        48
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "player-underwear-walk-v2.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        48
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "player-underwear-walk-v3.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        48
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "player-underwear-walk-v4.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        48
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "player-v2-female-base.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        48
+      ],
+      "referenced": false,
+      "sourceRecord": "player-v2-lpc-credits.csv"
+    },
+    {
+      "path": "player-v2-female-feet.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        48
+      ],
+      "referenced": false,
+      "sourceRecord": "player-v2-lpc-credits.csv"
+    },
+    {
+      "path": "player-v2-female-hair-back.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        48
+      ],
+      "referenced": false,
+      "sourceRecord": "player-v2-lpc-credits.csv"
+    },
+    {
+      "path": "player-v2-female-hair-front.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        48
+      ],
+      "referenced": false,
+      "sourceRecord": "player-v2-lpc-credits.csv"
+    },
+    {
+      "path": "player-v2-female-head.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        48
+      ],
+      "referenced": false,
+      "sourceRecord": "player-v2-lpc-credits.csv"
+    },
+    {
+      "path": "player-v2-female-legs.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        48
+      ],
+      "referenced": false,
+      "sourceRecord": "player-v2-lpc-credits.csv"
+    },
+    {
+      "path": "player-v2-female-torso.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        48
+      ],
+      "referenced": false,
+      "sourceRecord": "player-v2-lpc-credits.csv"
+    },
+    {
+      "path": "player-v2-female-underwear.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        48
+      ],
+      "referenced": false,
+      "sourceRecord": "player-v2-lpc-credits.csv"
+    },
+    {
+      "path": "player-v2-male-base.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        48
+      ],
+      "referenced": false,
+      "sourceRecord": "player-v2-lpc-credits.csv"
+    },
+    {
+      "path": "player-v2-male-feet.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        48
+      ],
+      "referenced": false,
+      "sourceRecord": "player-v2-lpc-credits.csv"
+    },
+    {
+      "path": "player-v2-male-hair-back.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        48
+      ],
+      "referenced": false,
+      "sourceRecord": "player-v2-lpc-credits.csv"
+    },
+    {
+      "path": "player-v2-male-hair-front.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        48
+      ],
+      "referenced": false,
+      "sourceRecord": "player-v2-lpc-credits.csv"
+    },
+    {
+      "path": "player-v2-male-head.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        48
+      ],
+      "referenced": false,
+      "sourceRecord": "player-v2-lpc-credits.csv"
+    },
+    {
+      "path": "player-v2-male-legs.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        48
+      ],
+      "referenced": false,
+      "sourceRecord": "player-v2-lpc-credits.csv"
+    },
+    {
+      "path": "player-v2-male-torso.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        48
+      ],
+      "referenced": false,
+      "sourceRecord": "player-v2-lpc-credits.csv"
+    },
+    {
+      "path": "player-v2-male-underwear.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        48
+      ],
+      "referenced": false,
+      "sourceRecord": "player-v2-lpc-credits.csv"
+    },
+    {
+      "path": "resident-v1-base.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        576
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "resident-v1-feet.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        576
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "resident-v1-hair-back.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        576
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "resident-v1-hair-front.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        576
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "resident-v1-head.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        576
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "resident-v1-legs.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        576
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "resident-v1-torso.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        576
+      ],
+      "referenced": false,
+      "sourceRecord": null
+    },
+    {
+      "path": "shield-back.png",
+      "category": "Animals and equipment atlases",
+      "size": [
+        16,
+        28
+      ],
+      "referenced": true,
+      "sourceRecord": null
+    },
+    {
+      "path": "village-oak-v1.png",
+      "category": "Trees and landscape",
+      "size": [
+        1312,
+        1199
+      ],
+      "referenced": true,
+      "sourceRecord": null
+    }
+  ]
+}
