@@ -29,6 +29,7 @@ function draw(ctx,sim,player,vw,vh,size,character,options={}){
  const camX=options.cameraX??Math.max(0,Math.min(W*size-vw,player.x*size-vw/2)),camY=options.cameraY??Math.max(0,Math.min(H*size-vh,player.y*size-vh/2));
  const localX=camX/size-ox,localY=camY/size-oy;
  const x0=Math.max(0,Math.floor(localX)-3),x1=Math.min(W,Math.ceil(localX+vw/size)+3),y0=Math.max(0,Math.floor(localY)-4),y1=Math.min(H,Math.ceil(localY+vh/size)+4);
+ const wallAlpha=(x,y)=>{if(player.level!==0||player.y>=y+1.2)return 1;const distance=Math.hypot(player.x-(x+.5),player.y-(y+.5));return 1-.65*Math.max(0,1-distance/4)};
  if(!options.embedded){ctx.fillStyle="#687e55";ctx.fillRect(0,0,vw,vh)}ctx.save();ctx.translate(options.embedded?Math.round(ox*size):Math.round(ox*size-camX),options.embedded?Math.round(oy*size):Math.round(oy*size-camY));ctx.beginPath();ctx.rect(0,0,W*size,H*size);ctx.clip();ctx.imageSmoothingEnabled=false;
  for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++){
   const nearRiver=x<13,bridge=y>=33&&y<=37&&x<20;
@@ -41,13 +42,16 @@ function draw(ctx,sim,player,vw,vh,size,character,options={}){
  for(const b of map.buildings)drawBuilding(ctx,b,size);
  if(castle.complete&&castle.naturalWidth){
   for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++)if(map.wallAt(x,y)){
+   ctx.save();ctx.globalAlpha=wallAlpha(x,y);
    // Stone face and battlement are separate source-art slices; the top is walkable.
    ctx.fillStyle="#32333a66";ctx.fillRect(x*size+size*.12,y*size+size*.33,size,size);
    ctx.drawImage(castle,0,0,24,24,x*size,y*size,size+1,size+1);
    if(y===12||y===57)ctx.drawImage(castle,32,0,32,24,x*size,y*size-size*.72,size+1,size*.9);
+   ctx.restore();
   }
   for(const g of map.GATES){
    const gx=(g.x+.5)*size,gy=g.y*size;
+   ctx.save();ctx.globalAlpha=wallAlpha(g.x,g.y);
    // The timber leaves are clipped to the arch and sit behind its stone face.
    if(!sim.gateOpen&&!sim.gatePassageAt(g.id)){
     ctx.save();ctx.beginPath();ctx.moveTo(gx-size*1.11,gy+size*.98);ctx.lineTo(gx-size*1.11,gy-size*.18);ctx.quadraticCurveTo(gx,gy-size*.85,gx+size*1.11,gy-size*.18);ctx.lineTo(gx+size*1.11,gy+size*.98);ctx.closePath();ctx.clip();
@@ -57,6 +61,7 @@ function draw(ctx,sim,player,vw,vh,size,character,options={}){
     ctx.fillStyle='#271f1c';ctx.fillRect(gx-size*.025,gy-size*.5,size*.05,size*1.5);ctx.restore();
    }
    ctx.drawImage(castle,0,32,96,64,gx-size*1.5,gy-size,size*3,size*2);
+   ctx.restore();
   }
  }
  // A navigable upper surface uses a different stone value from the wall face.
@@ -80,8 +85,9 @@ function draw(ctx,sim,player,vw,vh,size,character,options={}){
   const wallRow=player.y<14&&player.y>=9?12:player.y<59&&player.y>=54?57:-1;
   if(wallRow>=0)for(let x=Math.max(18,Math.floor(player.x)-2);x<=Math.min(76,Math.floor(player.x)+2);x++){
    if(!map.wallAt(x,wallRow))continue;
+   ctx.save();ctx.globalAlpha=wallAlpha(x,wallRow);
    ctx.drawImage(castle,0,0,24,24,x*size,wallRow*size,size+1,size+1);
-   ctx.drawImage(castle,32,0,32,24,x*size,wallRow*size-size*.72,size+1,size*.9);
+   ctx.drawImage(castle,32,0,32,24,x*size,wallRow*size-size*.72,size+1,size*.9);ctx.restore();
   }
  }
  for(const b of map.buildings)if(player.x>=b.x-.2&&player.x<b.x+b.w+.2&&player.y>=b.y-1&&player.y<b.y+b.h)drawBuilding(ctx,b,size,.52);
