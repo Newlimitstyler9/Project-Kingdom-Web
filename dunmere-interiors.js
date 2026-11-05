@@ -11,6 +11,16 @@ const FURNITURE={
  healer:[['bed',2,2,2,2],['wallShelf',8,.18,2,.72],['table',6,5,2,1]],
  weaver:[['loom',2,2,3,2],['wallShelf',8,.18,2,.72],['table',6,5,2,1]],
  guard:[['rack',2,2,2,1],['table',6,3,2,1],['bed',8,5,2,2]],
+ court:[['wallShelf',1.3,1.15,2.4,.7],['table',2,3,2.4,1],['table',8,3,2,1],['bench',2,6,2,.4]],
+ warehouse:[['sacks',2,2.6,2,1.2],['rack',8,2.3,2,1],['table',8,6,2,1]],
+ smithy:[['forge',2,2,2,2],['anvil',8,3,1.5,1],['rack',8,6,2,1],['table',2,6,2,1]],
+ chapel:[['hearth',2,1.4,2,1.5],['bench',2,4,2,1],['bench',8,4,2,1]],
+ stable:[['sacks',2,2.6,2,1.2],['rack',8,2.3,2,1],['table',8,6,2,1]],
+ apothecary:[['wallShelf',1.4,1.15,2.5,.7],['table',2,3,2,1],['bed',8,2,2,2]],
+ granary:[['sacks',2,2.6,2,1.2],['sacks',8,2.6,2,1.2],['table',8,6,2,1]],
+ carpenter:[['rack',2,2.3,2,1],['table',8,3,2,1],['table',2,6,2,1]],
+ tollhouse:[['table',2,3,2,1],['rack',8,2.3,2,1],['bench',8,6,2,.4]],
+ jail:[['rack',2,2.3,2,1],['table',8,3,2,1],['bench',8,6,2,.4]],
  cave:[['boulder',2,2,2,1],['boulder',8,5,2,1],['stone',8,2,1,1]]
 };
 const CAVE={id:'north-cave',name:'North Cave',kind:'cave',portal:{x:36.5,y:8.5}};
@@ -46,12 +56,37 @@ function greyfordHomeFurniture(count){
  const beds=[[1.5,2],[4,2],[6.5,2],[9,2],[1.5,5]].slice(0,Math.max(1,Math.min(5,count||2))).map(([x,y])=>['bed',x,y,1.65,2.3]);
  return [...beds,['table',6,5,2,1],['hearth',9.4,5.2,1.2,1.3]];
 }
+const WORKSTATIONS={
+ smithy:[[4.5,3.5],[7.5,4.5],[7.5,6.5],[4.5,6.5],[5.5,6.5],[6.5,6.5]],
+ warehouse:[[4.5,3.5],[7.5,3.5],[7.5,6.5],[4.5,4.5],[6.5,4.5],[6.5,6.5]],
+ bakery:[[4.5,4.5],[8.3,4.6],[6.5,6.5],[6.5,4.7],[7.5,6.5],[8.5,5.5]],
+ carpenter:[[4.5,3.5],[7.5,4.5],[4.5,6.5],[5.5,4.5],[6.5,5.5],[7.5,6.5]],
+ granary:[[4.5,3.5],[7.5,3.5],[7.5,6.5],[4.5,4.5],[6.5,5.5],[6.5,6.5]],
+ stable:[[4.5,3.5],[7.5,3.5],[7.5,6.5],[4.5,4.5],[6.5,5.5],[6.5,6.5]],
+ court:[[4.7,4.5],[7.5,4.5],[5.5,6.5],[5.5,4.5],[7.5,5.5],[8.5,6.5]],
+ apothecary:[[4.5,4.5],[7.5,4.5],[6.5,6.5]],
+ tavern:[[4.5,4.5],[5.5,5.5],[8.5,6.5],[9.5,4.5],[10.5,6.5],[11.5,7.5]]
+  };
 function create(buildings){
  const upstairs={id:'inn-upstairs',name:'Hearth & Hound · guest rooms',kind:'upstairs',portal:null};
  const rooms=Object.fromEntries([...buildings.map(b=>[b.id,{id:b.id,name:b.name,kind:b.kind,portal:{x:b.doorX+.5,y:b.doorY+.5},greyfordBuilding:b.greyfordBuilding||null,beds:b.beds||0}]),[CAVE.id,CAVE],...(buildings.some(b=>b.id==='inn')?[[upstairs.id,upstairs]]:[])].map(([id,room])=>[id,{...room,width:['tavern','upstairs'].includes(room.kind)?INN_W:W,height:['tavern','upstairs'].includes(room.kind)?INN_H:H,furniture:(room.greyfordBuilding&&room.kind==='home'?greyfordHomeFurniture(room.beds):FURNITURE[room.kind]||FURNITURE.home).map(([type,x,y,w,h])=>({type,x,y,w,h})),lights:room.kind==='tavern'?[{x:3.7,y:1.7,type:'wall-candle'},{x:9.4,y:1.7,type:'wall-candle'},{x:12.7,y:2.45,type:'hearth'}]:room.kind==='upstairs'?[{x:6.5,y:1.7,type:'wall-candle'},{x:14.5,y:1.7,type:'wall-candle'}]:[]}]));
  function get(id){return rooms[id]||null}
  function pass(room,x,y){const minY=room?.kind==='tavern'?2.25:room?.kind==='bakery'?3.05:1.2;if(!room||x<1.2||x>room.width-1.2||y<minY||y>room.height-1.05)return false;if(room.kind==='upstairs'&&((y>6.8&&y<7.45&&Math.abs(x-4.5)>.55&&Math.abs(x-11.5)>.55)||(x>7.7&&x<8.3&&y<7.4)))return false;return !room.furniture.some(f=>!['wallShelf','stairs'].includes(f.type)&&x>=f.x-.2&&x<f.x+f.w+.2&&y>=f.y-.2&&y<f.y+f.h+.2)}
  function slot(room,index){if(room.kind==='tavern'&&index===0)return {x:4.5,y:2.55};if(room.kind==='bakery'&&index===0)return {x:8.5,y:4.5};const candidates=[];for(const y of room.kind==='tavern'?[4.5,5.5,6.5,7.5,8.5,9.5]:[4.5,5.5,6.5,3.5,2.5])for(const x of room.kind==='tavern'?[3.5,5.5,7.5,9.5,11.5,13.5,4.5,6.5,8.5,10.5,12.5]:[3.5,5.5,7.5,9.5,4.5,6.5,8.5])if(pass(room,x,y)&&Math.hypot(x-room.width/2,y-room.height-1.7)>1.4)candidates.push({x,y});return candidates[(room.kind==='tavern'?index-1:index)%candidates.length]||{x:5.5,y:5.5}}
+ function workSlot(room,rank,phase,from){
+  const lanes=room.kind==='tavern'?[3.5,5.5,7.5,9.5,11.5,13.5]:[4.5,5.5,6.5,7.5,8.5],ys=room.kind==='tavern'?[5.5,6.5,7.5]:[4.5,5.5,6.5];
+  const authored=(WORKSTATIONS[room.kind]||[]).map(([x,y])=>({x,y})).filter(p=>pass(room,p.x,p.y));
+  const candidates=[...authored,...ys.flatMap(y=>lanes.map(x=>({x,y}))).filter(p=>pass(room,p.x,p.y)&&!authored.some(a=>Math.hypot(a.x-p.x,a.y-p.y)<.5))];
+  if(!candidates.length)return slot(room,rank);
+  const start=(rank*3+phase)%candidates.length;
+  for(let offset=0;offset<candidates.length;offset++){
+   const p=candidates[(start+offset)%candidates.length];
+   if(!from)return p;
+   const d=Math.hypot(p.x-from.x,p.y-from.y),steps=Math.max(1,Math.ceil(d/.2));
+   if(Array.from({length:steps},(_,i)=>i+1).every(i=>pass(room,from.x+(p.x-from.x)*i/steps,from.y+(p.y-from.y)*i/steps)))return p;
+  }
+  return {x:from.x,y:from.y};
+ }
  function nearPortal(x,y){return Object.values(rooms).find(r=>r.portal&&Math.hypot(x-r.portal.x,y-r.portal.y)<1.45)||null}
  function draw(ctx,room,size,details={}){
   const cave=room.kind==='cave',wall=cave?'#343c3a':'#514236',floor=cave?'#676b60':'#a5845e';
@@ -59,25 +94,31 @@ function create(buildings){
   ctx.fillStyle=wall;ctx.fillRect(0,0,rw*size,rh*size);
   ctx.fillStyle=floor;ctx.fillRect(size,size,(rw-2)*size,(rh-2)*size);
   const sprites=root.KingdomInnSprites;
-  if(['tavern','upstairs','bakery','mill','home'].includes(room.kind)&&sprites?.ready){
+  if((['tavern','upstairs','bakery','mill','home'].includes(room.kind)||room.greyfordBuilding)&&sprites?.ready){
    // Complete floor and back-wall tiles. All furnishings share these source pixels.
    for(let y=1;y<rh-1;y++)for(let x=1;x<rw-1;x++)sprites.draw(ctx,(x+y)%3?'floorA':'floorB',x*size,y*size,size,size);
-   for(let x=1;x<rw-1;x++)for(let y=1;y<=(['bakery','mill','home'].includes(room.kind)?2:1);y++)sprites.draw(ctx,x%3?'wallA':'wallB',x*size,y*size,size,size);
+   for(let x=1;x<rw-1;x++)for(let y=1;y<=(['bakery','mill','home'].includes(room.kind)||room.greyfordBuilding?2:1);y++)sprites.draw(ctx,x%3?'wallA':'wallB',x*size,y*size,size,size);
    if(room.kind==='tavern')sprites.draw(ctx,'wallWindows',7*size,1.05*size,2.2*size,1.35*size);
    else if(room.kind==='home')sprites.draw(ctx,'guestWindow',8.2*size,1.06*size,1.05*size,.96*size);
    else if(room.kind==='bakery')sprites.draw(ctx,'bakeryWindow',5.5*size,1.22*size,1.22*size,1.16*size);
    else if(room.kind==='mill')sprites.draw(ctx,'bakeryWindow',5.5*size,1.22*size,1.22*size,1.16*size);
+   else if(room.greyfordBuilding)sprites.draw(ctx,'guestWindow',5.5*size,1.08*size,1.05*size,.96*size);
    else{for(const x of [3.5,11.5])sprites.draw(ctx,'guestWindow',x*size,1.02*size,1.05*size,.96*size);ctx.fillStyle='#674a35';ctx.fillRect(8*size,size*.98,size*.22,6.55*size);for(let x=1;x<rw-1;x++)if(Math.abs(x-4.5)>.6&&Math.abs(x-11.5)>.6)ctx.fillRect(x*size,7*size,size,size*.42)}
   }
   for(const light of room.lights){const x=light.x*size,y=light.y*size,radius=light.type==='hearth'?size*2.6:size*1.7;const glow=ctx.createRadialGradient(x,y,0,x,y,radius);glow.addColorStop(0,'#f5ad5140');glow.addColorStop(1,'#f5ad5100');ctx.fillStyle=glow;ctx.fillRect(x-radius,y-radius,radius*2,radius*2)}
-  if(!['tavern','upstairs','bakery','mill','home'].includes(room.kind)){ctx.fillStyle=cave?'#767b6d':'#b6956a';for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++)if((x*11+y*17)%7===0)ctx.fillRect(x*size+size*.2,y*size+size*.35,size*.22,size*.07)}
+  if(!['tavern','upstairs','bakery','mill','home'].includes(room.kind)&&!room.greyfordBuilding){ctx.fillStyle=cave?'#767b6d':'#b6956a';for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++)if((x*11+y*17)%7===0)ctx.fillRect(x*size+size*.2,y*size+size*.35,size*.22,size*.07)}
   if(room.kind==='tavern'&&sprites?.ready)sprites.draw(ctx,'innDoor',7.1*size,10.72*size,.8*size,1.06*size);
   else if(room.kind==='upstairs'){ctx.fillStyle='#523927';ctx.fillRect(7.1*size,10.8*size,.8*size,.18*size)}
   else if(room.kind==='bakery'&&sprites?.ready)sprites.draw(ctx,'bakeryDoor',5.1*size,7.8*size,.8*size,1.05*size);
+  else if(room.greyfordBuilding&&sprites?.ready)sprites.draw(ctx,'bakeryDoor',5.1*size,7.8*size,.8*size,1.05*size);
   else{ctx.fillStyle=cave?'#252d2c':'#34291f';ctx.fillRect(5*size,8*size,size,12)}
   ctx.fillStyle='#e6ce9f';ctx.font=`bold ${Math.round(size*.25)}px system-ui`;ctx.textAlign='center';ctx.fillText(room.name,rw*size/2,size*.6);
   for(const f of room.furniture){
    if(f.type==='wallShelf'&&sprites?.ready){sprites.draw(ctx,room.kind==='bakery'?'bakeryWallShelf':'cupboard',f.x*size,f.y*size,f.w*size,f.h*size);continue}
+   if(room.greyfordBuilding&&sprites?.ready){
+    const sprite={table:'table',counter:'counter',bench:'bakeryBench',sacks:'bakerySackPile',rack:'cupboard',hearth:'hearth',forge:'hearth',oven:'bakeryOvenMain'}[f.type];
+    if(sprite){sprites.draw(ctx,sprite,f.x*size,f.y*size,f.w*size,f.h*size);if(f.type==='forge')sprites.draw(ctx,'fire',(f.x+.48)*size,(f.y+.78)*size,f.w*.46*size,f.h*.3*size);continue}
+   }
    if(room.kind==='mill'&&sprites?.ready){
     if(f.type==='sacks'){sprites.draw(ctx,'bakerySackPile',f.x*size,f.y*size,f.w*size,f.h*size);continue}
     if(f.type==='table'){sprites.draw(ctx,'bakeryBench',f.x*size,f.y*size,f.w*size,f.h*size);continue}
@@ -132,7 +173,7 @@ function create(buildings){
   for(const light of room.lights)if(light.type==='wall-candle'){const x=light.x*size,y=light.y*size;if(!(room.kind==='tavern'&&sprites?.draw(ctx,'candle',x-size*.2,y-size*.43,size*.4,size*.58))){ctx.fillStyle='#4c3928';ctx.fillRect(x-7,y-2,14,5);ctx.fillStyle='#d8c696';ctx.fillRect(x-2,y-12,4,11);ctx.fillStyle='#efa74d';ctx.fillRect(x-2,y-18,4,6);ctx.fillStyle='#fff0a7';ctx.fillRect(x-1,y-16,2,3)}}
   if(!['tavern','upstairs'].includes(room.kind)){ctx.fillStyle='#e8d3a7';ctx.font=`${Math.round(size*.22)}px system-ui`;ctx.fillText('EXIT',5.5*size,7.8*size)}
  }
- return {rooms,get,pass,slot,nearPortal,draw,cave:CAVE};
+ return {rooms,get,pass,slot,workSlot,nearPortal,draw,cave:CAVE};
 }
 root.KingdomInteriors={create};
 })(window);

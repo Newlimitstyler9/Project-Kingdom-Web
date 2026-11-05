@@ -140,7 +140,8 @@ function create(saved){
  function absolute(){return (day-1)*24+hour}
  function sleepHours(p){if(p.id==='rafe')return hour>=2&&hour<9;if(p.id==='pavel')return hour>=23||hour<7;return hour>=22||hour<6}
  function asleep(p){return sleepHours(p)||energy[p.id]<=18}
- function indoorOccupants(homeId){return people.filter(p=>p.home===homeId&&asleep(p)&&agents.get(p.id)?.inside).map(p=>({...p,bedIndex:people.filter(q=>q.home===homeId).findIndex(q=>q.id===p.id),energy:energy[p.id],activity:'Sleeping in bed'}))}
+ function indoorOccupants(homeId){return people.filter(p=>p.home===homeId&&asleep(p)&&agents.get(p.id)?.inside&&agents.get(p.id)?.insideBuilding===homeId).map(p=>({...p,bedIndex:people.filter(q=>q.home===homeId).findIndex(q=>q.id===p.id),energy:energy[p.id],activity:'Sleeping in bed'}))}
+ function insidePeople(buildingId){return people.filter(p=>{const a=agents.get(p.id);return a?.inside&&a.insideBuilding===buildingId&&!asleep(p)}).map(p=>{const a=agents.get(p.id);return {...p,x:a.roomX,y:a.roomY,facing:a.facing,moving:a.moving,walkMs:a.walkMs,activity:a.activity}})}
  function record(kind,detail,extra={}){if(!events.some(e=>e.kind===kind))events.push({id:caravan.id+':'+kind,kind,detail,day,hour,...extra})}
  function learn(personId,reportId,from){if(!knowledge[personId])knowledge[personId]=[];if(!knowledge[personId].some(k=>k.reportId===reportId))knowledge[personId].push({reportId,from,at:absolute()})}
  function tick(){
@@ -179,16 +180,16 @@ function create(saved){
   if(reports.some(r=>r.arrived!==null&&time>=r.arrived+14))record("court-inquiry","Maera ordered an inquiry into the road attack and missing grain.",{sourceEvent:caravan.id+':road-attack',actors:["maera","alda"]});
  }
  function advance(hours){const count=Math.min(24*30,Math.max(0,Math.floor(hours)));for(let i=0;i<count;i++)tick();return count}
- function snapshot(){return {version:2,day,hour,grain,caravan:{...caravan},reports:reports.map(r=>({...r})),events:events.map(e=>({...e})),orders:orders.map(o=>({...o})),knowledge:Object.fromEntries(Object.entries(knowledge).map(([id,entries])=>[id,entries.map(k=>({...k}))])),met:[...met],energy:{...energy},agents:people.map(p=>{const a=agents.get(p.id);return {id:p.id,x:a.x,y:a.y,level:a.level,inside:a.inside}})}}
+ function snapshot(){return {version:2,day,hour,grain,caravan:{...caravan},reports:reports.map(r=>({...r})),events:events.map(e=>({...e})),orders:orders.map(o=>({...o})),knowledge:Object.fromEntries(Object.entries(knowledge).map(([id,entries])=>[id,entries.map(k=>({...k}))])),met:[...met],energy:{...energy},agents:people.map(p=>{const a=agents.get(p.id);return {id:p.id,x:a.x,y:a.y,level:a.level,inside:a.inside,insideBuilding:a.insideBuilding,roomX:a.roomX,roomY:a.roomY}})}}
  function introduce(id){if(!met.includes(id))met.push(id)}
  function knownReports(person){return (knowledge[person.id]||[]).map(k=>{const report=reports.find(r=>r.id===k.reportId);return report?{...report,heardFrom:k.from,heardAt:k.at}:null}).filter(Boolean)}
  let routineSeconds=0;
  const workActions={court:["Reviewing petitions","Consulting the court clerk","Meeting a visitor"],warehouse:["Checking incoming stock","Updating the store ledger","Inspecting a delivery"],smithy:["Working at the forge","Fetching iron and fuel","Checking finished work"],bakery:["Preparing bread","Tending the ovens","Setting out fresh loaves"],chapel:["Tending the chapel","Speaking with a parishioner","Cleaning the entrance"],stable:["Caring for the horses","Checking tack","Carrying feed"],weaver:["Working at the loom","Sorting cloth","Checking dyed yarn"],apothecary:["Preparing remedies","Gathering herbs","Helping a patient"],granary:["Counting grain sacks","Checking the stores","Recording a delivery"],carpenter:["Working at the bench","Fetching timber","Inspecting joinery"],tollhouse:["Collecting tolls","Checking the bridge","Writing receipts"],jail:["Keeping watch at the jail","Checking the cells","Speaking with the gate watch"],"market-inn":["Serving travelers","Fetching supplies","Greeting arrivals"]};
  const householdActions={leatherworker:["Working hides","Fetching tanning supplies","Checking finished leather"],stonemason:["Cutting stone","Sorting stone blocks","Checking masonry"]};
  function routine(p,place,phase){
-  const q=porch(place),side=phase===0?-1.3:phase===1?1.3:0;
+  const q=porch(place);
   const activity=(workActions[place]||householdActions[p.role]||["Working: "+p.role,"Gathering supplies","Checking the worksite"])[phase];
-  return {x:q.x+side,y:q.y+(phase===2?1.25:0),level:0,activity};
+  return {...q,level:0,indoors:true,building:place,phase,activity};
  }
  function schedule(p){
   if(asleep(p))return null;
@@ -198,26 +199,27 @@ function create(saved){
   if(p.id==="pavel"&&hour<18)return routine(p,"jail",phase);
   if(["orla","bren"].includes(p.id)&&["approaching","delayed","lost","arriving"].includes(caravan.status)&&caravan.progress>=2)return null;
   if(p.id==="bren")return {x:[45.5,47.5,48.5][phase],y:53.5,level:0,activity:caravan.status==="missing"?"Reporting the lost shipment":"Keeping watch by the road"};
-  if(p.id==="orla"&&caravan.status==="missing")return {...porch(p.home),level:0,indoors:true,activity:"Recovering at home"};
+  if(p.id==="orla"&&caravan.status==="missing")return {...porch(p.home),level:0,indoors:true,building:p.home,activity:"Recovering at home"};
   if(hour>=18&&hour<22&&["jorin","orla","cassian","nellis","fel"].includes(p.id)){
-   const q=porch("market-inn");return {...q,level:0,activity:"At the inn"}
+   const q=porch("market-inn");return {...q,level:0,indoors:true,building:"market-inn",activity:"At the inn"}
   }
-  if(hour>=18&&hour<22){const q=porch(p.home);return {...q,level:0,indoors:true,activity:"At home"}}
+  if(hour>=18&&hour<22){const q=porch(p.home);return {...q,level:0,indoors:true,building:p.home,activity:"At home"}}
   if(p.role==="child"){const q=porch(p.home);return {...q,x:q.x+(phase-1)*1.1,y:q.y+(phase===1?1.1:0),level:0,activity:"Playing near home"}}
   return routine(p,p.work,phase)
  }
  const agents=new Map();
  const initialTargets=targets();
  for(const [i,p] of people.entries()){
-  const place=initialTargets.get(p.id)||porch(p.home),savedAgent=Array.isArray(saved?.agents)?saved.agents.find(a=>a.id===p.id):null;
+  const place=porch(p.home),savedAgent=Array.isArray(saved?.agents)?saved.agents.find(a=>a.id===p.id):null;
+  const householdRank=people.filter(other=>other.home===p.home).findIndex(other=>other.id===p.id);
   let x=place.x,y=place.y,level=place.level||0;
   if(!pass(x,y,level,gateOpen)){x=place.x;y=place.y}
-  agents.set(p.id,{x:savedAgent&&Number.isFinite(savedAgent.x)?savedAgent.x:x,y:savedAgent&&Number.isFinite(savedAgent.y)?savedAgent.y:y,level:savedAgent?.level===1?1:level,inside:savedAgent?!!savedAgent.inside:asleep(p),away:!initialTargets.get(p.id),path:[],dodge:null,goalKey:'',facing:p.id==='ida'?'right':'down',moving:false,walkMs:0,activity:place.activity||'At home'});
+  agents.set(p.id,{x:savedAgent&&Number.isFinite(savedAgent.x)?savedAgent.x:x,y:savedAgent&&Number.isFinite(savedAgent.y)?savedAgent.y:y,level:savedAgent?.level===1?1:level,inside:savedAgent?!!savedAgent.inside:true,insideBuilding:savedAgent?.insideBuilding||(savedAgent?.inside?p.home:savedAgent?null:p.home),roomX:Number.isFinite(savedAgent?.roomX)?savedAgent.roomX:4.5+householdRank*1.5,roomY:Number.isFinite(savedAgent?.roomY)?savedAgent.roomY:7.5,away:!initialTargets.get(p.id),path:[],dodge:null,goalKey:'',facing:p.id==='ida'?'right':'down',moving:false,walkMs:0,activity:place.activity||'At home'});
  }
  function targets(){
   const taken=new Set(),out=new Map();
   for(const [i,p] of people.entries()){
-   const sleep=asleep(p),base=sleep?{...porch(p.home),level:0,activity:'Going home to sleep'}:schedule(p);
+   const sleep=asleep(p),base=sleep?{...porch(p.home),level:0,indoors:true,building:p.home,activity:'Going home to sleep'}:schedule(p);
    if(!base){out.set(p.id,null);continue}
    let picked=null;
    for(const [dx,dy] of [[0,0],[-1,0],[1,0],[0,1],[-1,1],[1,1],[-2,0],[2,0],[0,2],[-2,1],[2,1]]){
@@ -237,23 +239,30 @@ function create(saved){
   if(!previous.has(goalKey))return [];
   const path=[];let key=goalKey;while(key!==startKey){const [x,y]=key.split(',').map(Number);path.push({x:x+.5,y:y+.5});key=previous.get(key)}path.reverse();path.push({x:tx,y:ty});return path;
  }
- function step(dt){
+ function step(dt,roomSpot,roomBlocked){
   routineSeconds+=Math.max(0,dt);
   const goals=targets(),occupied=new Set();
   for(const p of people){const a=agents.get(p.id),goal=goals.get(p.id);a.moving=false;
    if(!goal){a.away=true;continue}a.away=false;
-   if(a.inside){if(goal.sleep||goal.indoors)continue;const q=porch(p.home);for(const [dx,dy] of [[0,0],[-.9,0],[.9,0],[0,.9],[-.9,.9],[.9,.9]]){const sx=q.x+dx,sy=q.y+dy;if(pass(sx,sy,0,gateOpen)&&!people.some(other=>other.id!==p.id&&(()=>{const o=agents.get(other.id);return !o.inside&&!o.away&&o.level===0&&Math.hypot(o.x-sx,o.y-sy)<.65})())){a.x=sx;a.y=sy;break}}a.inside=false;a.path=[];a.dodge=null;a.goalKey=''}
+   if(a.inside){
+    if(goal.indoors&&a.insideBuilding===goal.building){
+     a.activity=goal.sleep?'Sleeping in bed':goal.activity;
+     if(!goal.sleep&&roomSpot){const station=roomSpot(goal.building,p.id,goal.phase||0,{x:a.roomX,y:a.roomY});if(station){const dx=station.x-a.roomX,dy=station.y-a.roomY,d=Math.hypot(dx,dy);if(d>.05){const move=Math.min(d,Math.max(0,dt)*1.15),nx=a.roomX+dx/d*move,ny=a.roomY+dy/d*move;const blocked=roomBlocked?.(goal.building,nx,ny)||people.some(other=>{if(other.id===p.id)return false;const o=agents.get(other.id);return o.inside&&o.insideBuilding===goal.building&&!asleep(other)&&Math.hypot(o.roomX-nx,o.roomY-ny)<.6});if(!blocked){a.roomX=nx;a.roomY=ny;a.moving=move>.001;a.facing=Math.abs(dx)>Math.abs(dy)?dx>0?'right':'left':dy>0?'down':'up';a.walkMs+=move/1.15*1000}}}}
+     continue;
+    }
+    const q=porch(a.insideBuilding||p.home);for(const [dx,dy] of [[0,0],[-.9,0],[.9,0],[0,.9],[-.9,.9],[.9,.9]]){const sx=q.x+dx,sy=q.y+dy;if(pass(sx,sy,0,gateOpen)&&!people.some(other=>other.id!==p.id&&(()=>{const o=agents.get(other.id);return !o.inside&&!o.away&&o.level===0&&Math.hypot(o.x-sx,o.y-sy)<.65})())){a.x=sx;a.y=sy;break}}a.inside=false;a.insideBuilding=null;a.path=[];a.dodge=null;a.goalKey=''
+   }
    if(a.level!==goal.level){if(a.level===1){a.x=40.5;a.y=15.5;a.level=0}else{a.x=40.5;a.y=12.5;a.level=1}a.path=[];a.dodge=null;a.goalKey=''}
    const key=goal.x.toFixed(2)+','+goal.y.toFixed(2)+','+goal.level;if(a.goalKey!==key){a.path=route(a.x,a.y,goal.x,goal.y,goal.level,p.id);a.goalKey=key}
    let budget=Math.min(.12,Math.max(0,dt))*1.7;
    while(budget>0&&(a.path.length||a.dodge)){const target=a.dodge||a.path[0],dx=target.x-a.x,dy=target.y-a.y,d=Math.hypot(dx,dy);if(d<.05){if(a.dodge){a.dodge=null;a.path=route(a.x,a.y,goal.x,goal.y,goal.level,p.id)}else a.path.shift();continue}const move=Math.min(d,budget),nx=a.x+dx/d*move,ny=a.y+dy/d*move;if(!pass(nx,ny,a.level,true))break;const blocked=people.some(other=>other.id!==p.id&&(()=>{const o=agents.get(other.id);return !o.inside&&!o.away&&o.level===a.level&&Math.hypot(o.x-nx,o.y-ny)<.58&&Math.hypot(o.x-nx,o.y-ny)<Math.hypot(o.x-a.x,o.y-a.y)-.005})());if(blocked){const avoid=new Set(people.filter(other=>other.id!==p.id).flatMap(other=>{const o=agents.get(other.id);return !o.inside&&!o.away&&o.level===a.level?[pathKey(Math.floor(o.x),Math.floor(o.y))]:[]}));const detour=route(a.x,a.y,goal.x,goal.y,goal.level,p.id,avoid);if(detour.length&&(detour[0].x!==a.path[0]?.x||detour[0].y!==a.path[0]?.y)){a.dodge=null;a.path=detour}else if(!a.dodge){for(const [px,py] of [[-dy/d,dx/d],[dy/d,-dx/d]]){const sx=a.x+px*.85,sy=a.y+py*.85;if(pass(sx,sy,a.level,true)&&!people.some(other=>other.id!==p.id&&(()=>{const o=agents.get(other.id);return !o.inside&&!o.away&&o.level===a.level&&Math.hypot(o.x-sx,o.y-sy)<.75})())){a.dodge={x:sx,y:sy};break}}}break}a.x=nx;a.y=ny;budget-=move;a.moving=true;a.facing=Math.abs(dx)>Math.abs(dy)?dx>0?'right':'left':dy>0?'down':'up';a.walkMs+=move/1.7*1000;if(move>=d-.01){if(a.dodge){a.dodge=null;a.path=route(a.x,a.y,goal.x,goal.y,goal.level,p.id)}else a.path.shift()}}
-   if((goal.sleep||goal.indoors)&&Math.hypot(a.x-goal.x,a.y-goal.y)<.55){a.inside=true;a.path=[];a.activity=goal.sleep?'Sleeping in bed':goal.activity}else a.activity=goal.activity;
+   if(goal.indoors&&Math.hypot(a.x-goal.x,a.y-goal.y)<.55){a.inside=true;a.insideBuilding=goal.building;a.path=[];const station=roomSpot?.(goal.building,p.id,goal.phase||0);if(station){a.roomX=station.x;a.roomY=station.y}a.activity=goal.sleep?'Sleeping in bed':goal.activity}else a.activity=goal.activity;
    if(!a.inside)occupied.add(Math.round(a.x)+','+Math.round(a.y)+','+a.level);
   }
  }
  function peopleOnMap(){return people.flatMap(p=>{const a=agents.get(p.id);return a.inside||a.away?[]:[{...p,x:a.x,y:a.y,level:a.level,activity:a.activity,facing:a.facing,moving:a.moving,walkMs:a.walkMs}]})}
  function gatePassageAt(id){const g=GATES.find(g=>g.id===id);return !!g&&!gateOpen&&people.some(p=>{const a=agents.get(p.id);return a&&!a.inside&&!a.away&&Math.hypot(a.x-g.x,a.y-g.y)<2.1})}
- return {advance,step,snapshot,introduce,knownReports,schedule,peopleOnMap,indoorOccupants,gatePassageAt,get day(){return day},get hour(){return hour},get gateOpen(){return gateOpen},get caravan(){return caravan},get events(){return events},get grain(){return grain},get orders(){return orders}};
+ return {advance,step,snapshot,introduce,knownReports,schedule,peopleOnMap,insidePeople,indoorOccupants,gatePassageAt,get day(){return day},get hour(){return hour},get gateOpen(){return gateOpen},get caravan(){return caravan},get events(){return events},get grain(){return grain},get orders(){return orders}};
 }
 root.GreyfordWorld={WIDTH,HEIGHT,GATES,homes,workplaces,offices,buildings,decor,people,at,decorAt,gateAt,wallAt,wallWalkAt,roadAt,pass,house,porch,create};
 })(window);
