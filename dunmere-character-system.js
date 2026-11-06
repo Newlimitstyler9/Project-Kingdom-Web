@@ -22,6 +22,7 @@ const gearImages={};
 for(const name of ['chain-male','chain-female','plate-torso-male','plate-torso-female','plate-legs-male','plate-legs-female','plate-arms-male','plate-arms-female','gloves-male','gloves-female','plate-boots-male','plate-boots-female','kettle','armet','leather-torso-male','leather-torso-female','leather-hood','leather-boots-male','leather-boots-female']){const img=new Image();gearImages[name]=img;img.src='assets/gear/'+name+'.png?v=1'}
 const heldSprites=new Map();
 const equipmentSheet=new Image();equipmentSheet.src='assets/held-equipment.png?v=1';
+const directionalEquipment=new Image();directionalEquipment.src='assets/held-equipment-front-back.png?v=2';
 const shieldBack=new Image();shieldBack.src='assets/shield-back.png?v=1';
 const equipmentCells={pick:0,hoe:1,ironSword:2,steelSword:3,knife:4,steelDagger:5,spear:6,torch:7,ironAxe:8,steelAxe:9,steelPick:10,woodShield:11,ironShield:12,axe:13};
 // Hand anchors follow the actual LPC pixels for idle, first stride and second stride.
@@ -30,15 +31,17 @@ const equipmentCells={pick:0,hoe:1,ironSword:2,steelSword:3,knife:4,steelDagger:
 const GRIP={down:[[5,32],[5,31],[5,33]],left:[[7,31],[7,30],[6,33]],right:[[25,32],[25,31],[26,33]],up:[[27,31],[27,30],[28,32]]};
 const OFFGRIP={down:[[27,32],[27,33],[27,31]],left:[[23,32],[23,33],[24,31]],right:[[8,31],[8,32],[7,31]],up:[[5,31],[5,32],[5,30]]};
 function handAnchor(direction,frame,bodyType,offhand=false){const frames=(offhand?OFFGRIP:GRIP)[direction]||GRIP.down;const index=Number.isInteger(frame)?frame%3:0;const [x,y]=frames[index];return [x,y+(bodyType==='female'&&direction!=='up'?1:0)]}
-function heldSprite(id){
- if(heldSprites.has(id))return heldSprites.get(id);
+function heldSprite(id,direction=null){
+ const directional=(direction==='down'||direction==='up')&&directionalEquipment.complete&&directionalEquipment.naturalWidth===24*14;
+ const key=id+':'+(directional?direction:'side');
+ if(heldSprites.has(key))return heldSprites.get(key);
  const cell=equipmentCells[id];if(cell===undefined||!equipmentSheet.complete||equipmentSheet.naturalWidth!==24*14)return null;
  const c=document.createElement('canvas');c.width=24;c.height=32;
- const g=c.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(equipmentSheet,cell*24,0,24,32,0,0,24,32);
- heldSprites.set(id,c);return c;
+ const g=c.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(directional?directionalEquipment:equipmentSheet,cell*24,direction==='up'&&directional?32:0,24,32,0,0,24,32);
+ heldSprites.set(key,c);return c;
 }
 function drawHeld(ctx,id,px,py,size,direction,appearance){
- const sprite=heldSprite(id);if(!sprite)return;
+ const sprite=heldSprite(id,direction);if(!sprite)return;
  const scale=size/32,crouch=appearance.crouch===true,guard=appearance.guard===true;
  const swing=Number.isFinite(appearance.attackPhase)?Math.max(0,Math.min(1,appearance.attackPhase)):null;
  const [handX,handY0]=handAnchor(direction,appearance._frame,appearance.bodyType),handY=handY0+(crouch?4:0);
@@ -46,7 +49,8 @@ function drawHeld(ctx,id,px,py,size,direction,appearance){
  const pivotX=px-size/2+handX*scale;
  const pivotY=py+size*.12-47*scale+handY*scale;
  const upright=['axe','ironSword','steelSword','knife','steelDagger','spear','ironAxe','steelAxe','torch'].includes(id);
- const rest=id==='torch'?0:upright?.25:2.3;
+ const frontBack=direction==='down'||direction==='up';
+ const rest=frontBack?0:id==='torch'?0:upright?.25:2.3;
  let angle=rest;
  if(guard)angle=id==='torch'?0:upright?.25:.85;
  else if(swing!==null){const ease=t=>t*t*(3-2*t);if(upright)angle=rest+(id==='torch'?.2:1.3)*Math.sin(Math.PI*swing);else angle=swing<.3?2.3-1.55*ease(swing/.3):swing<.78?.75+1.55*ease((swing-.3)/.48):2.3}

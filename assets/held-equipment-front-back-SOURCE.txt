@@ -1,0 +1,6 @@
+Directional held equipment edited in Pixelorama from this game's current held-equipment.png sheet.
+The source sheet remains unchanged and is still used for the working left and right poses, bag icons, back slot, and shields.
+Rows: 0 faces down; 1 faces up. Fourteen 24 x 32 cells share the same item order as held-equipment.png. Grips stay at pixel (12, 23).
+Changes: remove the old skin-color band from the grip so the actual character hand can cover it; draw separate front and rear shading; lower and shorten the heads of pickaxes, hoes, and axes so they stay by the shoulder rather than across the face.
+Editable source: ../../art-source/held-equipment-front-back.pxo
+Generator: ../../scripts/author-greyford-pixelorama.mjs

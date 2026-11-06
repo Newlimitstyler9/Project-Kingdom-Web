@@ -1,6 +1,6 @@
 // Named, reviewed crops from source sheets. Tile coordinates use the Kenney 16 px grid with 1 px spacing.
 (function(root){"use strict";
-const sheets={furniture:'assets/inn-tavern-furniture.png',cooking:'assets/inn-tavern-cooking.png',deco:'assets/inn-tavern-deco.png',exterior:'assets/inn-medieval-exterior.png',interior:'assets/inn-medieval-interior.png',guestBed:'assets/inn-guest-bed.png?v=2',thatch:'assets/inn-thatch-roof.png',cottage:'assets/inn-cottage-wall.png',yard:'assets/inn-yard-decorations.png',doors:'assets/inn-windows-doors.png',containers:'assets/bakery-containers.png',horse:'assets/lpc-horse-brown.png?v=1'};
+const sheets={furniture:'assets/inn-tavern-furniture.png',cooking:'assets/inn-tavern-cooking.png',deco:'assets/inn-tavern-deco.png',exterior:'assets/inn-medieval-exterior.png',interior:'assets/inn-medieval-interior.png',guestBed:'assets/inn-guest-bed.png?v=2',thatch:'assets/inn-thatch-roof.png',cottage:'assets/inn-cottage-wall.png',yard:'assets/inn-yard-decorations.png',doors:'assets/inn-windows-doors.png',containers:'assets/bakery-containers.png',horse:'assets/lpc-horse-brown.png?v=1',horseGrey:'assets/lpc-horse-grey.png?v=1',horseDun:'assets/lpc-horse-dun.png?v=1'};
 const crops={
  counter:['furniture',191,320,96,54],table:['furniture',320,192,64,43],stool:['furniture',578,198,32,32],
  cupboard:['furniture',423,0,80,64],

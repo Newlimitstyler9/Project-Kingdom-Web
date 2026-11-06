@@ -1,0 +1,5 @@
+Modular Greyford roof and wall color variants derived from Kenney's Roguelike RPG Pack tiles.
+Source and license: kenney-roguelike-SOURCE.txt (CC0).
+Changes: Pixelorama MCP recolor of roof and wall tiles into moss, clay, blue slate, ochre plaster, aged timber, and limestone sets. Each tile remains 16 x 16 pixels.
+Editable source: ../../art-source/greyford-modular-building-kit.pxo
+Generator: ../../scripts/author-greyford-pixelorama.mjs

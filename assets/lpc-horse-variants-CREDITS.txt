@@ -1,0 +1,7 @@
+Grey and dun horse coats are edited from the brown LPC horse sprite sheet.
+Original artist: bluecarrot16
+Source: https://opengameart.org/content/lpc-horses
+License selected for Project Kingdom: Creative Commons Attribution 3.0
+License: https://creativecommons.org/licenses/by/3.0/
+Changes: Pixelorama MCP recolor of all animation frames; two new coat palettes. Bracken retains the unmodified brown source.
+Editable source: ../../art-source/lpc-horse-grey.pxo and ../../art-source/lpc-horse-dun.pxo

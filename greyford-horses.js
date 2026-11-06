@@ -1,8 +1,8 @@
 // Bracken is the tradeable horse; the Pell family's other two horses live in the same paddock.
 (function(root){'use strict';
 const ORIGIN={x:130,y:72};
-const INITIAL={id:'bracken',name:'Bracken',kind:'farm cob',coat:'brown',source:'Marrowfield consignment',seller:'jorin',owner:'jorin',keeper:'rinna',location:'paddock',x:90.5+ORIGIN.x,y:36.5+ORIGIN.y,facing:'left',hunger:18,thirst:15,fatigue:12,led:false,price:65,walkMs:0};
-const STABLE_HERD=[{id:'moss',name:'Moss',kind:'farm cob',coat:'brown',owner:'jorin',keeper:'rinna',location:'paddock',x:92.7+ORIGIN.x,y:33.6+ORIGIN.y,facing:'right',walkMs:0},{id:'sable',name:'Sable',kind:'farm cob',coat:'brown',owner:'jorin',keeper:'rinna',location:'paddock',x:88.8+ORIGIN.x,y:40.5+ORIGIN.y,facing:'left',walkMs:0}];
+const INITIAL={id:'bracken',name:'Bracken',kind:'farm cob',breed:'farm cob',coat:'brown',scale:1,runSpeed:3.5,carryKg:160,source:'Marrowfield consignment',seller:'jorin',owner:'jorin',keeper:'rinna',location:'paddock',x:90.5+ORIGIN.x,y:36.5+ORIGIN.y,facing:'left',hunger:18,thirst:15,fatigue:12,led:false,price:65,walkMs:0};
+const STABLE_HERD=[{id:'moss',name:'Moss',kind:'moor pony',breed:'moor pony',coat:'grey',scale:.87,runSpeed:3.1,carryKg:80,owner:'jorin',keeper:'rinna',location:'paddock',x:92.7+ORIGIN.x,y:33.6+ORIGIN.y,facing:'right',walkMs:0},{id:'sable',name:'Sable',kind:'road palfrey',breed:'road palfrey',coat:'dun',scale:1.02,runSpeed:4.2,carryKg:110,owner:'jorin',keeper:'rinna',location:'paddock',x:88.8+ORIGIN.x,y:40.5+ORIGIN.y,facing:'left',walkMs:0}];
 const ROUTES={
  bracken:[[90.5,36.5,'grazing',3],[88.8,36.2,'running',1],[90.5,36.5,'grazing',2]],
  moss:[[92.7,33.6,'grazing',3],[92.7,34.9,'running',1],[92.7,33.9,'walking',2]],
@@ -27,7 +27,7 @@ function create(purse,bag){
   const route=ROUTES[h.id],next=route[(h.routeIndex+1)%route.length],tx=next[0]+ORIGIN.x,ty=next[1]+ORIGIN.y;
   const dx=tx-h.x,dy=ty-h.y,d=Math.hypot(dx,dy);
   if(d<.12){h.routeIndex=(h.routeIndex+1)%route.length;h.activity=next[2];h.pause=next[3];return false}
-  const speed=next[2]==='running'?3.5:1.15,move=Math.min(d,dt*speed),nx=h.x+dx/d*move,ny=h.y+dy/d*move;
+  const speed=next[2]==='running'?h.runSpeed||3.5:1.15,move=Math.min(d,dt*speed),nx=h.x+dx/d*move,ny=h.y+dy/d*move;
   const localX=nx-ORIGIN.x,localY=ny-ORIGIN.y;
   // Horse sprites are wider than their feet: keep the whole animal inside the rails and off both troughs.
   if(localX<88.7||localX>92.9||localY<33.4||localY>41.5||localX<91&&localY<34.7||localX>89.5&&localY>39.2)return false;

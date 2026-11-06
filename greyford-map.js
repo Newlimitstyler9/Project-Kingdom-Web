@@ -3,25 +3,26 @@
 const castle=new Image();castle.src="assets/greyford-stone-pieces.png?v=2";
 const sheet=new Image();sheet.src="assets/kenney-roguelike-sheet.png";
 const paddockFence=new Image();paddockFence.src="assets/greyford-paddock-fence.png?v=1";
-const styles={court:['stone','slate'],warehouse:['timber','brown'],smithy:['stone','slate'],jail:['stone','slate'],bakery:['plaster','light'],chapel:['stone','slate'],stable:['plaster','brown'],weaver:['timber','light'],apothecary:['plaster','light'],granary:['timber','brown'],carpenter:['timber','brown'],tollhouse:['stone','slate']};
-const homeStyles={'vell-house':['stone','slate'],'pell-house':['timber','brown'],'reed-house':['plaster','light'],'forge-house':['timber','brown'],'clerk-house':['plaster','light'],'guard-barracks':['stone','slate'],'market-inn':['timber','brown'],'south-croft':['plaster','brown'],'tanner-house':['timber','brown'],'mason-house':['stone','slate'],'fen-house':['plaster','light'],'dyer-house':['timber','light'],'bridge-row-a':['plaster','brown'],'bridge-row-b':['timber','brown'],'east-row-a':['plaster','light'],'east-row-b':['timber','brown'],'south-croft-two':['plaster','brown'],'south-croft-three':['plaster','light']};
+const kit=new Image();kit.src="assets/greyford-modular-building-kit.png?v=1";
+const visuals=root.GreyfordBuildingVisuals;
 const {walls:wallTiles,roofs:roofTiles,windows,doors}=root.KingdomAssetRegistry.buildingTiles;
 function tile(ctx,col,row,x,y,size){if(sheet.complete&&sheet.naturalWidth)ctx.drawImage(sheet,col*17,row*17,16,16,Math.round(x*size),Math.round(y*size),size+1,size+1)}
+function kitTile(ctx,col,row,x,y,size){if(kit.complete&&kit.naturalWidth)ctx.drawImage(kit,col*16,row*16,16,16,Math.round(x*size),Math.round(y*size),size+1,size+1)}
 function fence(ctx,sprite,x,y,size){if(paddockFence.complete&&paddockFence.naturalWidth)ctx.drawImage(paddockFence,sprite*16,0,16,16,Math.round(x*size),Math.round(y*size),size+1,size+1)}
 function drawPaddockFence(ctx,map,size,front=false){const p=map.PADDOCK;if(front){for(let x=p.x+1;x<p.x+p.w-1;x++)fence(ctx,0,x,p.y+p.h-1,size);fence(ctx,5,p.x,p.y+p.h-1,size);fence(ctx,6,p.x+p.w-1,p.y+p.h-1,size);return}for(let y=p.y+1;y<p.y+p.h-1;y++){if(y!==p.gateY)fence(ctx,1,p.x,y,size);fence(ctx,2,p.x+p.w-1,y,size)}for(let x=p.x+1;x<p.x+p.w-1;x++)fence(ctx,0,x,p.y,size);fence(ctx,3,p.x,p.y,size);fence(ctx,4,p.x+p.w-1,p.y,size)}
 function drawBuilding(ctx,b,size,alpha=1){
  if(!sheet.complete||!sheet.naturalWidth)return;
- const [wallKind,roofKind]=styles[b.type]||homeStyles[b.id]||['plaster','brown'],wall=wallTiles[wallKind],roof=roofTiles[roofKind],door=Math.floor(b.w/2);
+ const [wallKind,roofKind]=visuals.byType[b.type]||visuals.byBuilding[b.id]||['plaster','brown'],wall=wallTiles[wallKind],roof=roofTiles[roofKind],customWall=visuals.wallGroups[wallKind],customRoof=visuals.roofRows[roofKind],windowKind=visuals.wallWindows[wallKind]||wallKind,door=Math.floor(b.w/2);
  ctx.save();ctx.globalAlpha=alpha;ctx.imageSmoothingEnabled=false;
- for(let y=0;y<b.h;y++)for(let x=0;x<b.w;x++)tile(ctx,wall[x===0?0:x===b.w-1?2:1],15,b.x+x,b.y+y,size);
+ for(let y=0;y<b.h;y++)for(let x=0;x<b.w;x++){const pos=x===0?0:x===b.w-1?2:1;if(customWall!==undefined)kitTile(ctx,customWall*3+pos,3,b.x+x,b.y+y,size);else tile(ctx,wall[pos],15,b.x+x,b.y+y,size)}
  for(let x=0;x<b.w;x++){
   const pos=x===0?0:x===b.w-1?2:1;
-  for(let y=0;y<3;y++){const [col,row]=roof[y*3+pos];tile(ctx,col,row,b.x+x,b.y-1+y,size)}
+  for(let y=0;y<3;y++){if(customRoof!==undefined)kitTile(ctx,y*3+pos,customRoof,b.x+x,b.y-1+y,size);else{const [col,row]=roof[y*3+pos];tile(ctx,col,row,b.x+x,b.y-1+y,size)}}
   if(x>0&&x<b.w-1&&x!==door&&(x===1||x===b.w-2||b.w>=8&&x===door-2)&&!['warehouse','granary','jail'].includes(b.type)){
-   tile(ctx,...windows[wallKind],b.x+x,b.y+b.h-2,size);
-   if(b.h>=6)tile(ctx,...windows[wallKind],b.x+x,b.y+2,size);
+   tile(ctx,...windows[windowKind],b.x+x,b.y+b.h-2,size);
+   if(b.h>=6)tile(ctx,...windows[windowKind],b.x+x,b.y+2,size);
   }
-  if(x!==door)tile(ctx,wall[1],16,b.x+x,b.y+b.h-1,size);
+  if(x!==door){if(customWall!==undefined)kitTile(ctx,customWall*3+1,4,b.x+x,b.y+b.h-1,size);else tile(ctx,wall[1],16,b.x+x,b.y+b.h-1,size)}
  }
  tile(ctx,...(b.type==='court'||b.type==='chapel'?doors.stone:doors.wood),b.x+door,b.y+b.h-1,size);
  ctx.restore();
@@ -83,7 +84,7 @@ function draw(ctx,sim,player,vw,vh,size,character,options={}){
  if(root.KingdomInnSprites?.ready){
   for(const prop of map.decor)root.KingdomInnSprites.draw(ctx,prop.sprite,prop.x*size,prop.y*size,prop.w*size,prop.h*size);
  }
- for(const h of options.horses||[]){root.KingdomInnSprites.drawHorse(ctx,h.facing,Math.floor(h.walkMs/170)%4,(h.x-1.6)*size,(h.y-2.4)*size,3.2*size,3.2*size)}
+ for(const h of options.horses||[]){const scale=h.scale||1;root.KingdomInnSprites.drawHorse(ctx,h.facing,Math.floor(h.walkMs/170)%4,(h.x-1.6*scale)*size,(h.y-3.2*scale+.8)*size,3.2*scale*size,3.2*scale*size,h.coat)}
  const list=sim.peopleOnMap();
  for(const a of list.filter(a=>a.level===0)){drawPerson(ctx,a,size,player,character);coverBehindBuilding(ctx,a,size)}
  if(options.drawPlayer!==false){character(ctx,player.x,player.y,size,player.facing,player.moving,player.walkMs,player.appearance);coverBehindBuilding(ctx,player,size)}
@@ -115,5 +116,5 @@ function drawPerson(ctx,a,size,player,character){
   root.KingdomArt.outlinedText(ctx,a.name,a.x*size,(a.y-1.1)*size);
  }
 }
-root.GreyfordMap={draw,get ready(){return castle.complete&&!!castle.naturalWidth&&sheet.complete&&!!sheet.naturalWidth&&paddockFence.complete&&!!paddockFence.naturalWidth}};
+root.GreyfordMap={draw,get ready(){return castle.complete&&!!castle.naturalWidth&&sheet.complete&&!!sheet.naturalWidth&&paddockFence.complete&&!!paddockFence.naturalWidth&&kit.complete&&!!kit.naturalWidth}};
 })(window);

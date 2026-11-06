@@ -373,6 +373,26 @@
       "sourceRecord": "greyford-lpc-castle-CREDITS.txt"
     },
     {
+      "path": "greyford-modular-building-kit.png",
+      "category": "Buildings and world structures",
+      "size": [
+        144,
+        80
+      ],
+      "referenced": true,
+      "sourceRecord": "greyford-modular-building-kit-SOURCE.txt"
+    },
+    {
+      "path": "greyford-paddock-fence.png",
+      "category": "Buildings and world structures",
+      "size": [
+        112,
+        16
+      ],
+      "referenced": true,
+      "sourceRecord": "greyford-paddock-fence-SOURCE.txt"
+    },
+    {
       "path": "greyford-stone-pieces.png",
       "category": "Buildings and world structures",
       "size": [
@@ -381,6 +401,16 @@
       ],
       "referenced": true,
       "sourceRecord": null
+    },
+    {
+      "path": "held-equipment-front-back.png",
+      "category": "Animals and equipment atlases",
+      "size": [
+        336,
+        64
+      ],
+      "referenced": true,
+      "sourceRecord": "held-equipment-front-back-SOURCE.txt"
     },
     {
       "path": "held-equipment.png",
@@ -651,6 +681,26 @@
       ],
       "referenced": true,
       "sourceRecord": "lpc-horse-brown-CREDITS.txt"
+    },
+    {
+      "path": "lpc-horse-dun.png",
+      "category": "Animals and equipment atlases",
+      "size": [
+        512,
+        2560
+      ],
+      "referenced": true,
+      "sourceRecord": "lpc-horse-variants-CREDITS.txt"
+    },
+    {
+      "path": "lpc-horse-grey.png",
+      "category": "Animals and equipment atlases",
+      "size": [
+        512,
+        2560
+      ],
+      "referenced": true,
+      "sourceRecord": "lpc-horse-variants-CREDITS.txt"
     },
     {
       "path": "player-male-v1.svg",
