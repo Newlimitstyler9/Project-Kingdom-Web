@@ -11,6 +11,15 @@ const PEOPLE=Object.freeze([
 ].map(([name,role,bodyType="male"],row)=>Object.freeze({name,role,bodyType,row})));
 const images={};let failed=false;
 const tinted=new Map(),tintedGear=new Map(),crouchCache=new Map();
+const SKIN_COLORS={fair:['f9d5ba','e4a47c','cc8665','99423c','faece7'],warm:['f3c89f','d99467','bb704c','85413b','fff0d9'],tan:['d8a777','b97850','92553d','693a32','f2c7a1'],brown:['ad7655','874f3c','663c30','492d2c','d9a17d'],deep:['80513d','663d32','4c302a','35252a','ac7558']};
+const HAIR_COLORS={brown:['463125','37271d','563d2d','241913','6b4c38'],black:['302b2a','242122','423839','1c1a1d','554a48'],auburn:['693b2c','512c25','804b32','342021','a0643e'],blond:['a17b4e','795e3d','bd975e','504332','d6b777'],silver:['858482','636767','a5a4a0','44494a','c7c2b6']};
+const BOOT_COLORS={brown:['60432e','422f25','825c3c','9f744c'],dark:['454344','303032','606064','777276'],tan:['97724f','73563c','b58c62','d2ac7b']};
+function recolored(part,kind,choice){const key=part+':'+kind+':'+choice;if(tinted.has(key))return tinted.get(key);const original=images[part],canvas=document.createElement('canvas');canvas.width=original.width;canvas.height=original.height;const g=canvas.getContext('2d',{willReadFrequently:true});g.drawImage(original,0,0);const pixels=g.getImageData(0,0,canvas.width,canvas.height),data=pixels.data;
+ const src=kind==='skin'?['f9d5ba','e4a47c','cc8665','99423c','faece7']:kind==='hair'?['463125','37271d','563d2d','241913','6b4c38']:['60432e','422f25','825c3c','9f744c'];
+ const dst=(kind==='skin'?SKIN_COLORS:kind==='hair'?HAIR_COLORS:BOOT_COLORS)[choice]||src;
+ const replace=new Map(src.map((color,i)=>[parseInt(color,16),parseInt(dst[i],16)]));
+ for(let i=0;i<data.length;i+=4){if(!data[i+3])continue;const rgb=(data[i]<<16)|(data[i+1]<<8)|data[i+2],next=replace.get(rgb);if(next===undefined)continue;data[i]=next>>16;data[i+1]=(next>>8)&255;data[i+2]=next&255}
+ g.putImageData(pixels,0,0);tinted.set(key,canvas);return canvas}
 for(const part of [...PARTS.map(layer=>`resident-v1-${layer}`),...["male","female"].flatMap(body=>PLAYER_PARTS.map(layer=>`player-v2-${body}-${layer}`))]){
  const img=new Image();images[part]=img;
  const resident=part.startsWith("resident-v1-");
@@ -105,7 +114,7 @@ function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
  const drawHeight=Math.round(48*scale),destX=Math.round(px-size/2),destY=Math.round(shadowY-drawHeight+scale);
  if(!appearance._noShadow){ctx.fillStyle="#23352c88";ctx.beginPath();ctx.ellipse(px,shadowY,size*.22,size*.07,0,0,Math.PI*2);ctx.fill()}
  if(crouch){
-  const key=JSON.stringify([id,pose.frame,underwear,appearance.bodyType,appearance.hair,appearance.torso,appearance.legs,appearance.torsoTint,appearance.legTint,appearance.gear]);
+  const key=JSON.stringify([id,pose.frame,underwear,appearance.bodyType,appearance.hair,appearance.hairStyle,appearance.hairColor,appearance.skinTone,appearance.bootColor,appearance.torso,appearance.legs,appearance.torsoTint,appearance.legTint,appearance.gear]);
   const stable=!Number.isFinite(appearance.attackPhase)&&Object.values(gearImages).every(img=>img.complete);
   let bent=stable?crouchCache.get(key):null;
   if(!bent){
@@ -141,9 +150,11 @@ function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
  if(id===12&&appearance.handItem&&(direction==='up'||direction==='right'))drawHeld(ctx,appearance.handItem,px,py,size,direction,equippedView);
  if(id===12){
   const body=appearance.bodyType==="female"?"female":"male";
+  const hairBody=appearance.hairStyle==='tied'?'female':appearance.hairStyle==='short'?'male':body,hairVisible=appearance.hair!==false&&appearance.hairStyle!=='bald';
   const layer=part=>draw(`player-v2-${body}-${part}`,0);
-  if(!underwear&&appearance.hair!==false)layer("hair-back");
-  layer("base");layer("head");
+  const custom=(part,kind,choice)=>{const key=`player-v2-${part}`,source=choice===(kind==='skin'?'fair':'brown')?images[key]:recolored(key,kind,choice);ctx.drawImage(source,pose.frame*32,0,32,48,destX,destY,Math.round(size),drawHeight)};
+  if(!underwear&&hairVisible)custom(hairBody+'-hair-back','hair',appearance.hairColor||'brown');
+  custom(body+'-base','skin',appearance.skinTone||'fair');custom(body+'-head','skin',appearance.skinTone||'fair');
   if(underwear){layer("underwear");if(attackLean)ctx.restore();return true}
   if(appearance.legs!==false)draw(`player-v2-${body}-legs`,0,appearance.legTint||null);
   const gear=appearance.gear||{},steel='#c0e2ed',hide='#b68c63';
@@ -152,12 +163,12 @@ function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
   if(gear.torso==='leatherJerkin')drawGear('leather-torso-'+body);
   if(gear.torso==='chainHauberk')drawGear('chain-'+body);
   if(gear.torso==='plateCuirass'||gear.torso==='steelCuirass'){const tint=gear.torso==='steelCuirass'?steel:null;drawGear('plate-torso-'+body,tint);drawGear('plate-arms-'+body,tint)}
-  layer("feet");
+  custom(body+'-feet','boots',appearance.bootColor||'brown');
   if(gear.feet==='leatherBoots')drawGear('leather-boots-'+body,hide);
   if(gear.feet==='ironBoots'||gear.feet==='steelBoots')drawGear('plate-boots-'+body,gear.feet==='steelBoots'?steel:null);
   if(gear.hands==='leatherGloves')drawGear('gloves-'+body,hide);
   if(gear.hands==='ironGauntlets'||gear.hands==='steelGauntlets')drawGear('gloves-'+body,gear.hands==='steelGauntlets'?steel:null);
-  if(appearance.hair!==false&&!['plateHelm','steelHelm','leatherHood'].includes(gear.head))layer("hair-front");
+  if(hairVisible&&!['plateHelm','steelHelm','leatherHood'].includes(gear.head))custom(hairBody+'-hair-front','hair',appearance.hairColor||'brown');
   if(gear.head==='leatherHood')drawGear('leather-hood',hide);
   if(gear.head==='ironKettleHelm')drawGear('kettle');
   if(gear.head==='plateHelm'||gear.head==='steelHelm')drawGear('armet',gear.head==='steelHelm'?steel:null);
@@ -166,7 +177,7 @@ function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
   if(appearance.offhandItem&&direction!=='up')drawOffhand(ctx,appearance.offhandItem,px,py,size,direction,equippedView);
   // Only the fingers cross the grip. Redrawing the whole forearm here hides
   // the blade and torch shaft, especially in the side-facing frames.
-  const redrawGripArm=offhand=>{const [hx,hy]=handAnchor(direction,pose.frame,body,offhand);ctx.save();ctx.beginPath();ctx.rect(Math.round(destX+(hx-2)*scale),Math.round(destY+(hy-2)*scale),Math.round(4*scale),Math.round(5*scale));ctx.clip();layer('base');if(gear.hands==='leatherGloves')drawGear('gloves-'+body,hide);if(gear.hands==='ironGauntlets'||gear.hands==='steelGauntlets')drawGear('gloves-'+body,gear.hands==='steelGauntlets'?steel:null);ctx.restore()};
+  const redrawGripArm=offhand=>{const [hx,hy]=handAnchor(direction,pose.frame,body,offhand);ctx.save();ctx.beginPath();ctx.rect(Math.round(destX+(hx-2)*scale),Math.round(destY+(hy-2)*scale),Math.round(4*scale),Math.round(5*scale));ctx.clip();custom(body+'-base','skin',appearance.skinTone||'fair');if(gear.hands==='leatherGloves')drawGear('gloves-'+body,hide);if(gear.hands==='ironGauntlets'||gear.hands==='steelGauntlets')drawGear('gloves-'+body,gear.hands==='steelGauntlets'?steel:null);ctx.restore()};
   if(appearance.handItem&&direction!=='up')redrawGripArm(false);
   if(attackLean)ctx.restore();
   return true;
