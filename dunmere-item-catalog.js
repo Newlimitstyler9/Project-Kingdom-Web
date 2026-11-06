@@ -26,6 +26,11 @@ const worldGoods={
  vegetables:{name:"Vegetables",type:"food",stack:20,weight:.4,nutrition:18,shelfLife:9},
  beans:{name:"Beans",type:"food",stack:20,weight:.2,nutrition:28,shelfLife:30},
  eggs:{name:"Eggs",type:"food",stack:12,weight:.1,nutrition:20,shelfLife:5},
+ milk:{name:"Fresh milk",type:"food",stack:10,weight:1,nutrition:25,shelfLife:2},
+ rawBeef:{name:"Raw beef",type:"food",stack:10,weight:.6,nutrition:0,shelfLife:2},
+ rawPork:{name:"Raw pork",type:"food",stack:10,weight:.6,nutrition:0,shelfLife:2},
+ rawChicken:{name:"Raw chicken",type:"food",stack:10,weight:.4,nutrition:0,shelfLife:2},
+ wool:{name:"Sheep wool",type:"material",stack:20,weight:.3},
  fish:{name:"Fresh fish",type:"food",stack:10,weight:.5,nutrition:30,shelfLife:3},
  preserves:{name:"Dried vegetables",type:"food",stack:10,weight:.4,nutrition:25,shelfLife:90}
 };

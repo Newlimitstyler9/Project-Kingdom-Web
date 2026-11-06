@@ -88,12 +88,14 @@ function draw(ctx,sim,player,vw,vh,size,character,options={}){
  if(root.KingdomInnSprites?.ready){
   for(const prop of map.decor)root.KingdomInnSprites.draw(ctx,prop.sprite,prop.x*size,prop.y*size,prop.w*size,prop.h*size);
  }
+ root.KingdomFauna?.drawPens(ctx,size,false,options.originX||0,options.originY||0,p=>p.owner==='greyford');
  for(const h of options.horses||[]){const scale=h.scale||1;root.KingdomInnSprites.drawHorse(ctx,h.facing,Math.floor(h.walkMs/170)%4,(h.x-1.6*scale)*size,(h.y-3.2*scale+.8)*size,3.2*scale*size,3.2*scale*size,h.coat)}
  for(const animal of options.fauna||[])root.KingdomFauna?.draw(ctx,animal,size);
  const list=sim.peopleOnMap();
  for(const a of list.filter(a=>a.level===0)){drawPerson(ctx,a,size,player,character,sim);coverBehindBuilding(ctx,a,size)}
  if(options.drawPlayer!==false){character(ctx,player.x,player.y,size,player.facing,player.moving,player.walkMs,player.appearance);coverBehindBuilding(ctx,player,size)}
  drawPaddockFence(ctx,map,size,true);
+ root.KingdomFauna?.drawPens(ctx,size,true,options.originX||0,options.originY||0,p=>p.owner==='greyford');
  // When the player is behind a wall, its raised stone lip must cover the sprite.
  if(options.drawPlayer!==false&&player.level===0&&castle.complete&&castle.naturalWidth){
   const wallRow=player.y<14&&player.y>=9?12:player.y<59&&player.y>=54?57:-1;

@@ -131,7 +131,7 @@ function buildFootpaths(){
 }
 buildFootpaths();
 function wallWalkAt(x,y){return y>=12&&y<14&&x>=18&&x<=76||y>=57&&y<59&&x>=18&&x<=76||x>=18&&x<20&&y>=12&&y<=58||x>=75&&x<77&&y>=12&&y<=58}
-function pass(x,y,level=0,gatesOpen=true){if(x<0||y<0||x>=WIDTH||y>=HEIGHT)return false;if(level===1)return wallWalkAt(Math.floor(x),Math.floor(y));const northLip=y>=11&&y<12&&x>=18&&x<77&&!(x>=46&&x<49);if(northLip||wallAt(Math.floor(x),Math.floor(y))||paddockFenceAt(x,y)||at(x,y)||decorAt(x,y))return false;const g=gateAt(x,y);return !g||gatesOpen||g.axis==='vertical'||g.id==="south"&&y>59}
+function pass(x,y,level=0,gatesOpen=true){if(x<0||y<0||x>=WIDTH||y>=HEIGHT)return false;if(level===1)return wallWalkAt(Math.floor(x),Math.floor(y));const northLip=y>=11&&y<12&&x>=18&&x<77&&!(x>=46&&x<49);if(northLip||wallAt(Math.floor(x),Math.floor(y))||paddockFenceAt(x,y)||root.KingdomFauna?.fenceAt(x+130,y+72)||at(x,y)||decorAt(x,y))return false;const g=gateAt(x,y);return !g||gatesOpen||g.axis==='vertical'||g.id==="south"&&y>59}
 function house(id){return buildings.find(b=>b.id===id)}
 function porch(id){const b=house(id);if(!b)return {x:47.5,y:35.5};return {x:b.x+b.w/2,y:b.y+b.h+.9}}
 function seeded(n){let x=(n^0x6b884e1)>>>0;x^=x<<13;x^=x>>>17;x^=x<<5;return x>>>0}
