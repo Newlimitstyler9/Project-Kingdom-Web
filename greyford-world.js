@@ -134,8 +134,8 @@ function house(id){return buildings.find(b=>b.id===id)}
 function porch(id){const b=house(id);if(!b)return {x:47.5,y:35.5};return {x:b.x+b.w/2,y:b.y+b.h+.9}}
 function seeded(n){let x=(n^0x6b884e1)>>>0;x^=x<<13;x^=x>>>17;x^=x<<5;return x>>>0}
 function create(saved){
- let day=1,hour=6,grain=9,caravan={id:"marrow-grain-1",driver:"Orla Reed",escort:"Bren Tor",cargo:12,status:"approaching",progress:0},reports=[],events=[],met=[],gateOpen=true,orders=[],knowledge={},energy=Object.fromEntries(people.map(p=>[p.id,80]));
- if(saved&&(saved.version===1||saved.version===2)){day=Math.max(1,saved.day|0);hour=Math.min(23,Math.max(0,saved.hour|0));grain=Math.max(0,saved.grain|0);if(saved.caravan?.id===caravan.id)caravan={...caravan,...saved.caravan};reports=Array.isArray(saved.reports)?saved.reports.slice(0,30):[];events=Array.isArray(saved.events)?saved.events.slice(0,30):[];met=Array.isArray(saved.met)?saved.met.filter(id=>people.some(p=>p.id===id)):[];orders=Array.isArray(saved.orders)?saved.orders.slice(0,20):[];if(saved.knowledge&&typeof saved.knowledge==='object')for(const p of people){const entries=Array.isArray(saved.knowledge[p.id])?saved.knowledge[p.id].filter(k=>reports.some(r=>r.id===k.reportId)).slice(0,12).map(k=>({...k})):[];if(entries.length)knowledge[p.id]=entries}if(saved.energy&&typeof saved.energy==='object')for(const p of people)if(Number.isFinite(saved.energy[p.id]))energy[p.id]=Math.max(0,Math.min(100,saved.energy[p.id]))}
+ let day=1,hour=6,grain=9,caravan={id:"marrow-grain-1",driver:"Orla Reed",escort:"Bren Tor",cargo:12,status:"approaching",progress:0},reports=[],events=[],met=[],bonds={},gateOpen=true,orders=[],knowledge={},energy=Object.fromEntries(people.map(p=>[p.id,80]));
+ if(saved&&(saved.version===1||saved.version===2||saved.version===3)){day=Math.max(1,saved.day|0);hour=Math.min(23,Math.max(0,saved.hour|0));grain=Math.max(0,saved.grain|0);if(saved.caravan?.id===caravan.id)caravan={...caravan,...saved.caravan};reports=Array.isArray(saved.reports)?saved.reports.slice(0,30):[];events=Array.isArray(saved.events)?saved.events.slice(0,30):[];met=Array.isArray(saved.met)?saved.met.filter(id=>people.some(p=>p.id===id)):[];orders=Array.isArray(saved.orders)?saved.orders.slice(0,20):[];if(saved.knowledge&&typeof saved.knowledge==='object')for(const p of people){const entries=Array.isArray(saved.knowledge[p.id])?saved.knowledge[p.id].filter(k=>reports.some(r=>r.id===k.reportId)).slice(0,12).map(k=>({...k})):[];if(entries.length)knowledge[p.id]=entries}if(saved.energy&&typeof saved.energy==='object')for(const p of people)if(Number.isFinite(saved.energy[p.id]))energy[p.id]=Math.max(0,Math.min(100,saved.energy[p.id]));if(saved.bonds&&typeof saved.bonds==='object')for(const p of people){const b=saved.bonds[p.id];if(!b||typeof b!=='object')continue;bonds[p.id]={familiarity:Math.max(0,Math.min(100,b.familiarity|0)),trust:Math.max(-100,Math.min(100,b.trust|0)),lastTalkDay:Math.max(0,b.lastTalkDay|0),lastPersonalDay:Math.max(0,b.lastPersonalDay|0),lastApologyDay:Math.max(0,b.lastApologyDay|0),chatCount:Math.max(0,Math.min(4,b.chatCount|0)),heard:Array.isArray(b.heard)?b.heard.filter(x=>typeof x==='string').slice(0,40):[]}}}
  if(saved?.version===1){
   const attack=events.find(e=>e.kind==="road-attack");
   if(attack){
@@ -162,7 +162,7 @@ function create(saved){
   const detail=identified?source+' saw the traveler take '+root.KingdomItemCatalog.defs[theft.id].name.toLowerCase()+' from the Ash Smithy stock chest.':'The Ash family discovered '+root.KingdomItemCatalog.defs[theft.id].name.toLowerCase()+' missing from the stock chest. No one knows who took it.';
   events.push({id,kind:'smithy-theft',detail,day,hour,place:'Ash Smithy',actors:witnesses,itemUid:theft.uid,identified});
   reports.push({id,eventId:id,kind:'smithy-theft',source,place:'Ash Smithy',occurredAt:theft.at,arrived:absolute()+(identified?1:2),detail,identified,itemUid:theft.uid});
-  for(const witness of witnesses)learn(witness,id,'witnessed');
+  for(const witness of witnesses){learn(witness,id,'witnessed');bond(witness).trust=Math.max(-100,bond(witness).trust-4)}
   if(!identified){learn('brann',id,'discovered');learn('sella',id,'brann')}
   return true;
  }
@@ -176,7 +176,7 @@ function create(saved){
   const detail=witnesses.length?source+' saw the traveler take '+item+' from '+building.name+'.':owner+' found '+item+' missing from '+building.name+'. The thief is unknown.';
   events.push({id,kind:'property-theft',detail,day,hour,place:building.name,actors:witnesses,itemUid:theft.uid,identified:witnesses.length>0});
   reports.push({id,eventId:id,kind:'property-theft',source,place:building.name,occurredAt:theft.at,arrived:absolute()+(witnesses.length?1:2),detail,identified:witnesses.length>0,itemUid:theft.uid});
-  for(const witness of witnesses)learn(witness,id,'witnessed');
+  for(const witness of witnesses){learn(witness,id,'witnessed');bond(witness).trust=Math.max(-100,bond(witness).trust-4)}
   if(!witnesses.length)for(const person of people.filter(p=>p.home===theft.building||p.work===theft.building))learn(person.id,id,'discovered');
   return true;
  }
@@ -220,8 +220,16 @@ function create(saved){
   if(reports.some(r=>r.kind!=='smithy-theft'&&r.kind!=='property-theft'&&r.arrived!==null&&time>=r.arrived+14))record("court-inquiry","Maera ordered an inquiry into the road attack and missing grain.",{sourceEvent:caravan.id+':road-attack',actors:["maera","alda"]});
  }
  function advance(hours){const count=Math.min(24*30,Math.max(0,Math.floor(hours)));for(let i=0;i<count;i++)tick();return count}
- function snapshot(){return {version:2,day,hour,grain,caravan:{...caravan},reports:reports.map(r=>({...r})),events:events.map(e=>({...e})),orders:orders.map(o=>({...o})),knowledge:Object.fromEntries(Object.entries(knowledge).map(([id,entries])=>[id,entries.map(k=>({...k}))])),met:[...met],energy:{...energy},agents:people.map(p=>{const a=agents.get(p.id);return {id:p.id,x:a.x,y:a.y,level:a.level,inside:a.inside,insideBuilding:a.insideBuilding,roomX:a.roomX,roomY:a.roomY}})}}
- function introduce(id){if(!met.includes(id))met.push(id)}
+ function snapshot(){return {version:3,day,hour,grain,caravan:{...caravan},reports:reports.map(r=>({...r})),events:events.map(e=>({...e})),orders:orders.map(o=>({...o})),knowledge:Object.fromEntries(Object.entries(knowledge).map(([id,entries])=>[id,entries.map(k=>({...k}))])),met:[...met],bonds:Object.fromEntries(Object.entries(bonds).map(([id,b])=>[id,{...b,heard:[...b.heard]}])),energy:{...energy},agents:people.map(p=>{const a=agents.get(p.id);return {id:p.id,x:a.x,y:a.y,level:a.level,inside:a.inside,insideBuilding:a.insideBuilding,roomX:a.roomX,roomY:a.roomY}})}}
+ function bond(id){if(!people.some(p=>p.id===id))throw Error('Unknown Greyford resident');return bonds[id]||(bonds[id]={familiarity:0,trust:0,lastTalkDay:0,lastPersonalDay:0,lastApologyDay:0,chatCount:0,heard:[]})}
+ function standing(id){if(!met.includes(id))return 'Stranger';const b=bond(id);return b.trust<=-4?'Rival':b.trust<0?'Wary':b.trust>=12&&b.familiarity>=12?'Close friend':b.trust>=5&&b.familiarity>=6?'Friend':'Acquaintance'}
+ function introduce(id){if(!people.some(p=>p.id===id))return false;if(!met.includes(id)){met.push(id);bond(id).familiarity=1;return true}return false}
+ function heard(id,topic){return bond(id).heard.includes(topic)}
+ function hear(id,topic){if(!met.includes(id)||heard(id,topic))return false;const b=bond(id);b.heard.push(topic);if(b.heard.length>40)b.heard.shift();return true}
+ function socialize(id,topic){if(!met.includes(id))return {ok:false,reason:'unmet'};const b=bond(id);if(topic==='opinion')return {ok:true,standing:standing(id),bond:{...b}};if(topic==='chat'){if(b.chatCount>=4)return {ok:false,reason:'exhausted',standing:standing(id)};if(b.lastTalkDay===day)return {ok:false,reason:'repeat',standing:standing(id)};const stage=b.chatCount++;b.lastTalkDay=day;b.familiarity=Math.min(100,b.familiarity+1);b.trust=Math.min(100,b.trust+1);return {ok:true,stage,standing:standing(id),bond:{...b}}}
+ if(topic==='personal'){if(b.familiarity<2)return {ok:false,reason:'unfamiliar',standing:standing(id)};if(heard(id,'personal'))return {ok:false,reason:'exhausted',standing:standing(id)};hear(id,'personal');b.lastPersonalDay=day;b.familiarity=Math.min(100,b.familiarity+1);b.trust=Math.min(100,b.trust+1);return {ok:true,standing:standing(id),bond:{...b}}}
+ if(topic==='apologize'){if(b.trust>=0)return {ok:false,reason:'no-offense',standing:standing(id)};if(b.lastApologyDay===day)return {ok:false,reason:'repeat',standing:standing(id)};b.lastApologyDay=day;b.trust=Math.min(0,b.trust+1);return {ok:true,standing:standing(id),bond:{...b}}}
+ return {ok:false,reason:'unknown'}}
  function knows(id){return met.includes(id)}
  function knownReports(person){return (knowledge[person.id]||[]).map(k=>{const report=reports.find(r=>r.id===k.reportId);return report?{...report,heardFrom:k.from,heardAt:k.at}:null}).filter(Boolean)}
  let routineSeconds=0;
@@ -304,7 +312,7 @@ function create(saved){
  }
  function peopleOnMap(){return people.flatMap(p=>{const a=agents.get(p.id);return a.inside||a.away?[]:[{...p,x:a.x,y:a.y,level:a.level,activity:a.activity,facing:a.facing,moving:a.moving,walkMs:a.walkMs}]})}
  function gatePassageAt(id){const g=GATES.find(g=>g.id===id);return !!g&&!gateOpen&&people.some(p=>{const a=agents.get(p.id);return a&&!a.inside&&!a.away&&Math.hypot(a.x-g.x,a.y-g.y)<2.1})}
- return {advance,step,snapshot,introduce,knows,knownReports,reportSmithyTheft,reportPropertyTheft,schedule,peopleOnMap,insidePeople,indoorOccupants,gatePassageAt,get day(){return day},get hour(){return hour},get gateOpen(){return gateOpen},get caravan(){return caravan},get events(){return events},get grain(){return grain},get orders(){return orders}};
+ return {advance,step,snapshot,introduce,knows,bond,standing,socialize,heard,hear,knownReports,reportSmithyTheft,reportPropertyTheft,schedule,peopleOnMap,insidePeople,indoorOccupants,gatePassageAt,get day(){return day},get hour(){return hour},get gateOpen(){return gateOpen},get caravan(){return caravan},get events(){return events},get grain(){return grain},get orders(){return orders}};
 }
 root.GreyfordWorld={WIDTH,HEIGHT,GATES,PADDOCK,homes,workplaces,offices,buildings,decor,people,outfit,at,decorAt,gateAt,wallAt,paddockFenceAt,inPaddock,wallWalkAt,roadAt,pass,house,porch,create};
 })(window);
