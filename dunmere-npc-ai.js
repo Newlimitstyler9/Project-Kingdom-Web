@@ -37,7 +37,7 @@ const routine=Object.freeze([
   {start:22,end:24,kind:"sleep"}
 ]);
 function period(hour){return routine.find(row=>row.start<=hour&&hour<row.end)?.kind||"sleep"}
-function seasonFor(day){return ["Spring","Summer","Autumn","Winter"][Math.floor(((day-1)%360)/90)]}
+function seasonFor(day){return root.KingdomCalendar?.seasonFor(day)||["Spring","Summer","Autumn","Winter"][Math.floor(((day-1)%20)/5)]}
 function makePriorities(role){return {...(defaultPriorities[role]||{})}}
 function eligible(job,day){const season=seasonFor(day);return !job.season||(job.season==="winter"?season==="Winter":season!=="Winter")}
 function choose(residents,day,hour,places,excludedIds=[]){

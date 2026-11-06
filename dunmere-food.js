@@ -2,6 +2,7 @@
 (function(global){"use strict";
 const catalog=global.KingdomItemCatalog;
 const production=global.KingdomCraft?.production;
+const calendar=global.KingdomCalendar||{date:day=>({monthIndex:Math.floor(((day-1)%20)/5),day:((day-1)%5)+1}),seasonFor:day=>["Spring","Summer","Autumn","Winter"][Math.floor(((day-1)%20)/5)]};
 if(!catalog||!production)throw Error('Item and recipe catalogs must load before village food');
 const types=Object.fromEntries(Object.entries(catalog.defs).filter(([,def])=>def.type==='food'&&def.shelfLife).map(([id,def])=>[id,{nutrition:def.nutrition,life:def.shelfLife}]));
 function create(world,seed=874){
@@ -13,11 +14,11 @@ function create(world,seed=874){
  const add=(item,n)=>{publicStock[item]=(publicStock[item]||0)+n};
  function update(dayNumber){
   day=dayNumber;
-  const season=Math.floor(((day-1)%360)/90),winter=season===3,harvest=season===2;
+  const season=calendar.date(day).monthIndex,winter=season===3,harvest=season===2;
   // Explicit cultivation with seasonal productivity and soil condition.
   for(const p of plots){const yieldPerTile=p.crop==="grain"?2:1,seasonFactor=winter?0:harvest?2:1;
    if(day%2===0&&seasonFactor>0&&p.condition>25){const quantity=logistics&&p.crop==="grain"?Math.max(1,Math.floor(p.area*yieldPerTile*seasonFactor*.12)):p.area*yieldPerTile*seasonFactor;if(logistics&&p.crop==="grain")logistics.harvest(quantity);else add(p.crop,quantity);harvested+=quantity;p.condition=Math.max(25,p.condition-1)}
-   if(day%30===0)p.condition=Math.min(90,p.condition+8);
+   if(calendar.date(day).monthIndex===3&&calendar.date(day).day===5)p.condition=Math.min(90,p.condition+8);
   }
   // The village well refills a bounded clean-water store each day.
   publicStock.wellWater=Math.min(80,publicStock.wellWater+12);
@@ -48,9 +49,9 @@ function create(world,seed=874){
    r.hunger=Math.min(100,Math.max(0,r.hunger+(nutrition<25?28:-35)));if(nutrition<25){h.hungryDays++;missed++;if(h.hungryDays===1)events.push("Day "+day+": "+r.name+" could not obtain enough food.")}
    else h.hungryDays=0;
   }
-  if(day%30===0)events.push("Day "+day+": food stores "+Object.entries(publicStock).filter(([k])=>types[k]).map(([k,v])=>k+" "+v).join(", "));
+  if(calendar.date(day).day===5)events.push("Day "+day+": food stores "+Object.entries(publicStock).filter(([k])=>types[k]).map(([k,v])=>k+" "+v).join(", "));
  }
- function snapshot(){return {day,season:["Spring","Summer","Autumn","Winter"][Math.floor(((day-1)%360)/90)],stocks:{...publicStock},plots:plots.map(x=>({...x})),households:stores.map(h=>({owner:h.owner,hungryDays:h.hungryDays,food:{...h.food}})),missedMeals:missed,spoiled,harvested,consumed,imports,events:events.slice(-30)}}
+ function snapshot(){return {day,season:calendar.seasonFor(day),stocks:{...publicStock},plots:plots.map(x=>({...x})),households:stores.map(h=>({owner:h.owner,hungryDays:h.hungryDays,food:{...h.food}})),missedMeals:missed,spoiled,harvested,consumed,imports,events:events.slice(-30)}}
  function save(){return {version:1,day,missed,spoiled,harvested,consumed,imports,stocks:{...publicStock},plots:plots.map(p=>({...p})),households:stores.map(h=>({owner:h.owner,hungryDays:h.hungryDays,food:{...h.food}})),events:[...events]}}
 function restore(data){if(!data||data.version!==1||!Array.isArray(data.plots)||data.plots.length!==plots.length||!Array.isArray(data.households)||data.households.length!==stores.length||!data.stocks)return false;
 for(const key of Object.keys(publicStock))if(key!=="wellWater"&&(!Number.isInteger(data.stocks[key])||data.stocks[key]<0))return false;

@@ -1,6 +1,6 @@
 // Dunmere social state: authored history, directed ties, and source-tracked knowledge.
 (function(global){"use strict";
-const people=[
+const basePeople=[
  {name:"Aldric",age:38,household:"forge",kin:[6],traits:["reserved","dutiful"],goal:"Keep the forge supplied"},
  {name:"Marta",age:49,household:"westfield",kin:[9,11],traits:["patient","stubborn"],goal:"Keep the farm solvent"},
  {name:"Oswin",age:45,household:"market",kin:[],traits:["shrewd","cautious"],goal:"Keep his trade routes open"},
@@ -22,6 +22,7 @@ const initialFacts=[
 ];
 const clone=x=>JSON.parse(JSON.stringify(x));
 function create(world){
+ const people=basePeople.map((p,i)=>({...p,age:world.residents[i].age,birthday:world.residents[i].birthday,spouse:world.residents[i].spouse??null}));
  const facts=clone(initialFacts);
  const knowledge=people.map((_,id)=>facts.filter(f=>f.knownBy.includes(id)).map(f=>({fact:f.id,source:"experienced",from:null,day:0,confidence:100})));
  const ties=people.map((p,i)=>people.map((q,j)=>({trust:i===j?100:p.kin.includes(j)?48:p.household===q.household?32:10,affection:i===j?100:p.kin.includes(j)?50:p.household===q.household?24:0,grievance:0})));
@@ -45,7 +46,7 @@ function create(world){
   for(const [x,y] of [[a,b],[b,a]]){ties[x][y].affection=Math.min(100,ties[x][y].affection+1);ties[x][y].trust=Math.min(100,ties[x][y].trust+1)}
   const event={day,hour,place,a,b,type,subject,shared};encounters.push(event);history.unshift(event);history.length=Math.min(history.length,100);return event;
  }
- function step(hasArrived=()=>true){const {day,hour}=world.snapshot();encounters=[];const eligible=world.residents.filter(r=>r.activity!=="Sleeping"&&!r.activity.startsWith("Traveling")&&hasArrived(r,r.place));
+ function step(hasArrived=()=>true){const {day,hour}=world.snapshot();for(let i=0;i<people.length;i++)people[i].age=world.residents[i].age;encounters=[];const eligible=world.residents.filter(r=>r.activity!=="Sleeping"&&!r.activity.startsWith("Traveling")&&hasArrived(r,r.place));
   const occupied=new Set();for(const a of eligible){if(occupied.has(a.id))continue;const candidates=eligible.filter(b=>b.id>a.id&&!occupied.has(b.id)&&b.place===a.place&&(!proximityCheck||proximityCheck(a.id,b.id,a.place))&&!history.some(e=>e.day===day&&e.a===a.id&&e.b===b.id)&&(a.place==="inn"||a.place==="green"||a.home===b.home&&hour>=18&&hour<=21||a.activity==="Working"&&b.activity==="Working"&&a.work===b.work&&a.work===a.place));
    candidates.sort((b,c)=>(ties[a.id][c.id].affection+ties[c.id][a.id].affection)-(ties[a.id][b.id].affection+ties[b.id][a.id].affection)||b.id-c.id);
    if(!candidates.length)continue;const b=candidates[0];const event=conversation(a.id,b.id,a.place,day,hour);if(event){occupied.add(a.id);occupied.add(b.id)}}return encounters;

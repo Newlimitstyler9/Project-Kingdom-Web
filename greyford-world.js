@@ -156,8 +156,8 @@ function create(saved){
  function absolute(){return (day-1)*24+hour}
  function sleepHours(p){if(p.id==='rafe')return hour>=2&&hour<9;if(p.id==='pavel')return hour>=23||hour<7;return hour>=22||hour<6}
  function asleep(p){return sleepHours(p)||energy[p.id]<=18}
- function indoorOccupants(homeId){return people.filter(p=>p.home===homeId&&asleep(p)&&agents.get(p.id)?.inside&&agents.get(p.id)?.insideBuilding===homeId).map(p=>({...p,bedIndex:people.filter(q=>q.home===homeId).findIndex(q=>q.id===p.id),energy:energy[p.id],activity:'Sleeping in bed'}))}
- function insidePeople(buildingId){return people.filter(p=>{const a=agents.get(p.id);return a?.inside&&a.insideBuilding===buildingId&&!asleep(p)}).map(p=>{const a=agents.get(p.id);return {...p,x:a.roomX,y:a.roomY,facing:a.facing,moving:a.moving,walkMs:a.walkMs,activity:a.activity}})}
+ function indoorOccupants(homeId){return people.filter(p=>population.person(p.id)?.alive&&population.person(p.id)?.home===homeId&&asleep(p)&&agents.get(p.id)?.inside&&agents.get(p.id)?.insideBuilding===homeId).map(p=>({...p,...population.person(p.id),bedIndex:people.filter(q=>q.home===homeId).findIndex(q=>q.id===p.id),energy:energy[p.id],activity:'Sleeping in bed'}))}
+ function insidePeople(buildingId){return people.filter(p=>{const a=agents.get(p.id);return population.person(p.id)?.alive&&a?.inside&&a.insideBuilding===buildingId&&!asleep(p)}).map(p=>{const a=agents.get(p.id);return {...p,...population.person(p.id),x:a.roomX,y:a.roomY,facing:a.facing,moving:a.moving,walkMs:a.walkMs,activity:a.activity}})}
  function record(kind,detail,extra={}){if(!events.some(e=>e.kind===kind))events.push({id:caravan.id+':'+kind,kind,detail,day,hour,...extra})}
  function learn(personId,reportId,from){if(!knowledge[personId])knowledge[personId]=[];if(!knowledge[personId].some(k=>k.reportId===reportId))knowledge[personId].push({reportId,from,at:absolute()})}
  function reportSmithyTheft(theft){
@@ -186,7 +186,7 @@ function create(saved){
   return true;
  }
  function tick(){
-  hour++;if(hour===24){hour=0;day++}
+  hour++;if(hour===24){hour=0;day++;population.advanceDay(day)}
   // Needs advance on the world clock even when no rendered agent is loaded.
   for(const p of people)energy[p.id]=Math.max(0,Math.min(100,energy[p.id]+(sleepHours(p)?15:-3)));
   const time=absolute();gateOpen=hour>=6&&hour<22;
@@ -273,7 +273,8 @@ function create(saved){
  }
  function targets(){
   const taken=new Set(),out=new Map();
-  for(const [i,p] of people.entries()){
+  for(const [i,seed] of people.entries()){const p={...seed,...population.person(seed.id)};
+   if(!p.alive||p.location!=='greyford'){out.set(p.id,null);continue}
    const sleep=asleep(p),base=sleep?{...porch(p.home),level:0,indoors:true,building:p.home,activity:'Going home to sleep'}:schedule(p);
    if(!base){out.set(p.id,null);continue}
    let picked=null;
@@ -297,7 +298,7 @@ function create(saved){
  function step(dt,roomSpot,roomBlocked,outsideBlocked){
   routineSeconds+=Math.max(0,dt);
   const goals=targets(),occupied=new Set();
-  for(const p of people){const a=agents.get(p.id),goal=goals.get(p.id);a.moving=false;
+  for(const seed of people){const p={...seed,...population.person(seed.id)},a=agents.get(p.id),goal=goals.get(p.id);a.moving=false;
    if(!goal){a.away=true;continue}a.away=false;
    if(a.inside){
     if(goal.indoors&&a.insideBuilding===goal.building){
@@ -315,7 +316,7 @@ function create(saved){
    if(!a.inside)occupied.add(Math.round(a.x)+','+Math.round(a.y)+','+a.level);
   }
  }
- function peopleOnMap(){return people.flatMap(p=>{const a=agents.get(p.id);return a.inside||a.away?[]:[{...p,x:a.x,y:a.y,level:a.level,activity:a.activity,facing:a.facing,moving:a.moving,walkMs:a.walkMs}]})}
+ function peopleOnMap(){return people.flatMap(p=>{const a=agents.get(p.id),life=population.person(p.id);return !life?.alive||life.location!=='greyford'||a.inside||a.away?[]:[{...p,...life,x:a.x,y:a.y,level:a.level,activity:a.activity,facing:a.facing,moving:a.moving,walkMs:a.walkMs}]})}
  function gatePassageAt(id){const g=GATES.find(g=>g.id===id);return !!g&&!gateOpen&&people.some(p=>{const a=agents.get(p.id);return a&&!a.inside&&!a.away&&Math.hypot(a.x-g.x,a.y-g.y)<2.1})}
  return {advance,step,snapshot,population,childRemark,introduce,knows,bond,standing,socialize,heard,hear,knownReports,reportSmithyTheft,reportPropertyTheft,schedule,peopleOnMap,insidePeople,indoorOccupants,gatePassageAt,get day(){return day},get hour(){return hour},get gateOpen(){return gateOpen},get caravan(){return caravan},get events(){return events},get grain(){return grain},get orders(){return orders}};
 }
