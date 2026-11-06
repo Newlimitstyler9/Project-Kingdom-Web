@@ -1,0 +1,1 @@
+Edited from Kenney Roguelike/RPG Pack fence tiles 45 and 47, row 23. Contains horizontal, west, east, northwest, northeast, southwest, southeast 16x16 sprites. Original Kenney CC0 license applies; see kenney-roguelike-LICENSE.txt.

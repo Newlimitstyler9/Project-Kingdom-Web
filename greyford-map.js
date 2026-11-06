@@ -2,12 +2,13 @@
 (function(root){"use strict";
 const castle=new Image();castle.src="assets/greyford-stone-pieces.png?v=2";
 const sheet=new Image();sheet.src="assets/kenney-roguelike-sheet.png";
-const styles={court:['stone','slate'],warehouse:['timber','brown'],smithy:['stone','slate'],jail:['stone','slate'],bakery:['plaster','light'],chapel:['stone','slate'],stable:['timber','brown'],weaver:['timber','light'],apothecary:['plaster','light'],granary:['timber','brown'],carpenter:['timber','brown'],tollhouse:['stone','slate']};
+const paddockFence=new Image();paddockFence.src="assets/greyford-paddock-fence.png?v=1";
+const styles={court:['stone','slate'],warehouse:['timber','brown'],smithy:['stone','slate'],jail:['stone','slate'],bakery:['plaster','light'],chapel:['stone','slate'],stable:['plaster','brown'],weaver:['timber','light'],apothecary:['plaster','light'],granary:['timber','brown'],carpenter:['timber','brown'],tollhouse:['stone','slate']};
 const homeStyles={'vell-house':['stone','slate'],'pell-house':['timber','brown'],'reed-house':['plaster','light'],'forge-house':['timber','brown'],'clerk-house':['plaster','light'],'guard-barracks':['stone','slate'],'market-inn':['timber','brown'],'south-croft':['plaster','brown'],'tanner-house':['timber','brown'],'mason-house':['stone','slate'],'fen-house':['plaster','light'],'dyer-house':['timber','light'],'bridge-row-a':['plaster','brown'],'bridge-row-b':['timber','brown'],'east-row-a':['plaster','light'],'east-row-b':['timber','brown'],'south-croft-two':['plaster','brown'],'south-croft-three':['plaster','light']};
 const {walls:wallTiles,roofs:roofTiles,windows,doors}=root.KingdomAssetRegistry.buildingTiles;
 function tile(ctx,col,row,x,y,size){if(sheet.complete&&sheet.naturalWidth)ctx.drawImage(sheet,col*17,row*17,16,16,Math.round(x*size),Math.round(y*size),size+1,size+1)}
-function fence(ctx,x,y,size,vertical=false){if(!sheet.complete||!sheet.naturalWidth)return;if(!vertical){tile(ctx,47,23,x,y,size);return}ctx.save();ctx.translate(Math.round((x+.5)*size),Math.round((y+.5)*size));ctx.rotate(Math.PI/2);ctx.drawImage(sheet,52*17,23*17,16,16,-size/2,-size*.17,size+1,size*.34);ctx.restore();if(y%3===0)ctx.drawImage(sheet,45*17+4,23*17,8,8,Math.round((x+.35)*size),Math.round((y+.35)*size),size*.3,size*.3)}
-function drawPaddockFence(ctx,map,size,front=false){const p=map.PADDOCK;if(front){for(let x=p.x;x<p.x+p.w;x++)fence(ctx,x,p.y+p.h-1,size);return}ctx.save();ctx.beginPath();ctx.rect(p.x*size,(p.y+.4)*size,p.w*size,(p.h-.8)*size);ctx.clip();for(let y=p.y;y<p.y+p.h;y++){if(y!==p.gateY)fence(ctx,p.x,y,size,true);fence(ctx,p.x+p.w-1,y,size,true)}ctx.restore();for(let x=p.x;x<p.x+p.w;x++)fence(ctx,x,p.y,size)}
+function fence(ctx,sprite,x,y,size){if(paddockFence.complete&&paddockFence.naturalWidth)ctx.drawImage(paddockFence,sprite*16,0,16,16,Math.round(x*size),Math.round(y*size),size+1,size+1)}
+function drawPaddockFence(ctx,map,size,front=false){const p=map.PADDOCK;if(front){for(let x=p.x+1;x<p.x+p.w-1;x++)fence(ctx,0,x,p.y+p.h-1,size);fence(ctx,5,p.x,p.y+p.h-1,size);fence(ctx,6,p.x+p.w-1,p.y+p.h-1,size);return}for(let y=p.y+1;y<p.y+p.h-1;y++){if(y!==p.gateY)fence(ctx,1,p.x,y,size);fence(ctx,2,p.x+p.w-1,y,size)}for(let x=p.x+1;x<p.x+p.w-1;x++)fence(ctx,0,x,p.y,size);fence(ctx,3,p.x,p.y,size);fence(ctx,4,p.x+p.w-1,p.y,size)}
 function drawBuilding(ctx,b,size,alpha=1){
  if(!sheet.complete||!sheet.naturalWidth)return;
  const [wallKind,roofKind]=styles[b.type]||homeStyles[b.id]||['plaster','brown'],wall=wallTiles[wallKind],roof=roofTiles[roofKind],door=Math.floor(b.w/2);
@@ -16,7 +17,7 @@ function drawBuilding(ctx,b,size,alpha=1){
  for(let x=0;x<b.w;x++){
   const pos=x===0?0:x===b.w-1?2:1;
   for(let y=0;y<3;y++){const [col,row]=roof[y*3+pos];tile(ctx,col,row,b.x+x,b.y-1+y,size)}
-  if(x>0&&x<b.w-1&&x!==door&&(x===1||x===b.w-2||b.w>=8&&x===door-2)&&!['warehouse','stable','granary','jail'].includes(b.type)){
+  if(x>0&&x<b.w-1&&x!==door&&(x===1||x===b.w-2||b.w>=8&&x===door-2)&&!['warehouse','granary','jail'].includes(b.type)){
    tile(ctx,...windows[wallKind],b.x+x,b.y+b.h-2,size);
    if(b.h>=6)tile(ctx,...windows[wallKind],b.x+x,b.y+2,size);
   }
@@ -25,6 +26,7 @@ function drawBuilding(ctx,b,size,alpha=1){
  tile(ctx,...(b.type==='court'||b.type==='chapel'?doors.stone:doors.wood),b.x+door,b.y+b.h-1,size);
  ctx.restore();
 }
+function coverBehindBuilding(ctx,entity,size){for(const b of root.GreyfordWorld.buildings){if(entity.x<b.x-.5||entity.x>b.x+b.w+.5||entity.y<b.y-1.2||entity.y>=b.y+b.h-.1)continue;ctx.save();ctx.beginPath();ctx.rect((entity.x-1.05)*size,(entity.y-2.4)*size,2.1*size,2.55*size);ctx.clip();drawBuilding(ctx,b,size);ctx.restore()}}
 function draw(ctx,sim,player,vw,vh,size,character,options={}){
  const map=root.GreyfordWorld,W=map.WIDTH,H=map.HEIGHT;
  const ox=options.originX||0,oy=options.originY||0;
@@ -53,6 +55,7 @@ function draw(ctx,sim,player,vw,vh,size,character,options={}){
    ctx.restore();
   }
   for(const g of map.GATES){
+   if(g.axis==='vertical')continue;
    const gx=(g.x+.5)*size,gy=g.y*size;
    ctx.save();ctx.globalAlpha=wallAlpha(g.x,g.y);
    // The timber leaves are clipped to the arch and sit behind its stone face.
@@ -80,10 +83,10 @@ function draw(ctx,sim,player,vw,vh,size,character,options={}){
  if(root.KingdomInnSprites?.ready){
   for(const prop of map.decor)root.KingdomInnSprites.draw(ctx,prop.sprite,prop.x*size,prop.y*size,prop.w*size,prop.h*size);
  }
- if(options.horse){const h=options.horse;root.KingdomInnSprites.drawHorse(ctx,h.facing,Math.floor(h.walkMs/170)%4,(h.x-1.6)*size,(h.y-2.4)*size,3.2*size,3.2*size)}
+ for(const h of options.horses||[]){root.KingdomInnSprites.drawHorse(ctx,h.facing,Math.floor(h.walkMs/170)%4,(h.x-1.6)*size,(h.y-2.4)*size,3.2*size,3.2*size)}
  const list=sim.peopleOnMap();
- for(const a of list.filter(a=>a.level===0))drawPerson(ctx,a,size,player,character);
- if(options.drawPlayer!==false)character(ctx,player.x,player.y,size,player.facing,player.moving,player.walkMs,player.appearance);
+ for(const a of list.filter(a=>a.level===0)){drawPerson(ctx,a,size,player,character);coverBehindBuilding(ctx,a,size)}
+ if(options.drawPlayer!==false){character(ctx,player.x,player.y,size,player.facing,player.moving,player.walkMs,player.appearance);coverBehindBuilding(ctx,player,size)}
  drawPaddockFence(ctx,map,size,true);
  // When the player is behind a wall, its raised stone lip must cover the sprite.
  if(options.drawPlayer!==false&&player.level===0&&castle.complete&&castle.naturalWidth){
@@ -95,7 +98,6 @@ function draw(ctx,sim,player,vw,vh,size,character,options={}){
    ctx.drawImage(castle,32,0,32,24,x*size,wallRow*size-size*.72,size+1,size*.9);ctx.restore();
   }
  }
- for(const b of map.buildings)if(player.x>=b.x-.2&&player.x<b.x+b.w+.2&&player.y>=b.y-1&&player.y<b.y+b.h)drawBuilding(ctx,b,size,.52);
  for(const a of list.filter(a=>a.level===1))drawPerson(ctx,a,size,player,character);
  if(player.level===1){
   ctx.fillStyle="#e8d09d";ctx.textAlign="center";ctx.font="bold 10px system-ui";ctx.fillText("WALL WALK",player.x*size,(player.y-1.2)*size);
@@ -113,5 +115,5 @@ function drawPerson(ctx,a,size,player,character){
   root.KingdomArt.outlinedText(ctx,a.name,a.x*size,(a.y-1.1)*size);
  }
 }
-root.GreyfordMap={draw,get ready(){return castle.complete&&!!castle.naturalWidth&&sheet.complete&&!!sheet.naturalWidth}};
+root.GreyfordMap={draw,get ready(){return castle.complete&&!!castle.naturalWidth&&sheet.complete&&!!sheet.naturalWidth&&paddockFence.complete&&!!paddockFence.naturalWidth}};
 })(window);
