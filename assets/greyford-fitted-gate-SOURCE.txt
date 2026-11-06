@@ -1,0 +1,1 @@
+Pixelorama-authored fitted timber leaves for the Greyford north and south stone arches. The mask follows the transparent opening of greyford-stone-pieces.png, whose stone source and credits are recorded in greyford-lpc-castle-CREDITS.txt. Editable source: ../../art-source/greyford-fitted-gate.pxo. Rebuild with node scripts/author-greyford-gate-pixelorama.mjs.

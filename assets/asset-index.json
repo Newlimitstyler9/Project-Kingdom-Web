@@ -363,6 +363,16 @@
       "sourceRecord": "gear/CREDITS.csv"
     },
     {
+      "path": "greyford-fitted-gate.png",
+      "category": "Buildings and world structures",
+      "size": [
+        96,
+        64
+      ],
+      "referenced": true,
+      "sourceRecord": "greyford-fitted-gate-SOURCE.txt"
+    },
+    {
       "path": "greyford-lpc-castle.png",
       "category": "Source tile sheets",
       "size": [

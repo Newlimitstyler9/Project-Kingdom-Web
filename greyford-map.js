@@ -1,6 +1,7 @@
 // Greyford is authored on the same 32 px game grid as Brooklands.
 (function(root){"use strict";
 const castle=new Image();castle.src="assets/greyford-stone-pieces.png?v=2";
+const fittedGate=new Image();fittedGate.src="assets/greyford-fitted-gate.png?v=1";
 const sheet=new Image();sheet.src="assets/kenney-roguelike-sheet.png";
 const paddockFence=new Image();paddockFence.src="assets/greyford-paddock-fence.png?v=1";
 const kit=new Image();kit.src="assets/greyford-modular-building-kit.png?v=1";
@@ -56,17 +57,20 @@ function draw(ctx,sim,player,vw,vh,size,character,options={}){
    ctx.restore();
   }
   for(const g of map.GATES){
-   if(g.axis==='vertical')continue;
+   if(g.axis==='vertical'){
+    // From above, an east/west passage is a break in the stone wall, not a door face.
+    const sx=g.id==='bridge'?18:75,sy=g.y-1;
+    ctx.save();ctx.fillStyle='#282b30';ctx.globalAlpha=.26;
+    ctx.fillRect(sx*size,sy*size,size*.09,size*2);
+    ctx.fillRect((sx+1.91)*size,sy*size,size*.09,size*2);
+    ctx.restore();
+    continue;
+   }
    const gx=(g.x+.5)*size,gy=g.y*size;
    ctx.save();ctx.globalAlpha=wallAlpha(g.x,g.y);
-   // The timber leaves are clipped to the arch and sit behind its stone face.
-   if(!sim.gateOpen&&!sim.gatePassageAt(g.id)){
-    ctx.save();ctx.beginPath();ctx.moveTo(gx-size*1.11,gy+size*.98);ctx.lineTo(gx-size*1.11,gy-size*.18);ctx.quadraticCurveTo(gx,gy-size*.85,gx+size*1.11,gy-size*.18);ctx.lineTo(gx+size*1.11,gy+size*.98);ctx.closePath();ctx.clip();
-    ctx.fillStyle='#5d3d2b';ctx.fillRect(gx-size*1.12,gy-size*.85,size*2.24,size*1.85);
-    for(let i=0;i<8;i++){const x=gx-size*1.08+i*size*.28;ctx.fillStyle=i%2?'#7a5237':'#8e6240';ctx.fillRect(x,gy-size*.85,size*.25,size*1.85);ctx.fillStyle='#3d302a';ctx.fillRect(x+size*.22,gy-size*.85,size*.035,size*1.85)}
-    ctx.fillStyle='#363337';for(const dy of [-.15,.55])ctx.fillRect(gx-size*1.12,gy+dy*size,size*2.24,size*.12);
-    ctx.fillStyle='#271f1c';ctx.fillRect(gx-size*.025,gy-size*.5,size*.05,size*1.5);ctx.restore();
-   }
+   // Pixel-edited timber leaves use the stone arch's exact transparent mask.
+   if(!sim.gateOpen&&!sim.gatePassageAt(g.id)&&fittedGate.complete&&fittedGate.naturalWidth)
+    ctx.drawImage(fittedGate,gx-size*1.5,gy-size,size*3,size*2);
    ctx.drawImage(castle,0,32,96,64,gx-size*1.5,gy-size,size*3,size*2);
    ctx.restore();
   }
@@ -116,5 +120,5 @@ function drawPerson(ctx,a,size,player,character){
   root.KingdomArt.outlinedText(ctx,a.name,a.x*size,(a.y-1.1)*size);
  }
 }
-root.GreyfordMap={draw,get ready(){return castle.complete&&!!castle.naturalWidth&&sheet.complete&&!!sheet.naturalWidth&&paddockFence.complete&&!!paddockFence.naturalWidth&&kit.complete&&!!kit.naturalWidth}};
+root.GreyfordMap={draw,get ready(){return castle.complete&&!!castle.naturalWidth&&fittedGate.complete&&!!fittedGate.naturalWidth&&sheet.complete&&!!sheet.naturalWidth&&paddockFence.complete&&!!paddockFence.naturalWidth&&kit.complete&&!!kit.naturalWidth}};
 })(window);
