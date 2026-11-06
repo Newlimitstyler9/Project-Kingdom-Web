@@ -1,7 +1,7 @@
 // Player identity and starting attributes. Only validated palette keys reach the renderer.
 (function(root){'use strict';
 const options=Object.freeze({
- body:['male','female'],hair:['short','tied','bob','curly','braid','bald'],
+ body:['male','female'],hair:['short','buzzcut','high-and-tight','bedhead','tied','bob','curly','braid','bald'],
  skin:['fair','warm','tan','brown','deep'],
  hairColor:['black','brown','auburn','blond','silver'],
  shirt:['cream','sage','blue','rust','plum'],

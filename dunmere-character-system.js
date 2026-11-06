@@ -20,7 +20,7 @@ function recolored(part,kind,choice){const key=part+':'+kind+':'+choice;if(tinte
  const replace=new Map(src.map((color,i)=>[parseInt(color,16),parseInt(dst[i],16)]));
  for(let i=0;i<data.length;i+=4){if(!data[i+3])continue;const rgb=(data[i]<<16)|(data[i+1]<<8)|data[i+2],next=replace.get(rgb);if(next===undefined)continue;data[i]=next>>16;data[i+1]=(next>>8)&255;data[i+2]=next&255}
  g.putImageData(pixels,0,0);tinted.set(key,canvas);return canvas}
-for(const part of [...PARTS.map(layer=>`resident-v1-${layer}`),...["male","female"].flatMap(body=>PLAYER_PARTS.map(layer=>`player-v2-${body}-${layer}`)),...["bob","curly","braid"].flatMap(style=>["back","front"].map(layer=>`player-v2-hair-${style}-${layer}`))]){
+for(const part of [...PARTS.map(layer=>`resident-v1-${layer}`),...["male","female"].flatMap(body=>PLAYER_PARTS.map(layer=>`player-v2-${body}-${layer}`)),...["buzzcut","high-and-tight","bedhead","bob","curly","braid"].flatMap(style=>["back","front"].map(layer=>`player-v2-hair-${style}-${layer}`))]){
  const img=new Image();images[part]=img;
  const resident=part.startsWith("resident-v1-");
  img.onload=()=>{if(img.naturalWidth!==384||img.naturalHeight!==(resident?576:48))failed=true};
@@ -165,7 +165,7 @@ function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
  if(id===12){
   const body=appearance.bodyType==="female"?"female":"male";
   const hairStyle=appearance.hairStyle,hairBody=hairStyle==='tied'?'female':hairStyle==='short'?'male':body,hairVisible=appearance.hair!==false&&hairStyle!=='bald';
-  const hairPart=layer=>['bob','curly','braid'].includes(hairStyle)?`hair-${hairStyle}-${layer}`:`${hairBody}-hair-${layer}`;
+  const hairPart=layer=>['buzzcut','high-and-tight','bedhead','bob','curly','braid'].includes(hairStyle)?`hair-${hairStyle}-${layer}`:`${hairBody}-hair-${layer}`;
   const layer=part=>draw(`player-v2-${body}-${part}`,0);
   const custom=(part,kind,choice)=>{const key=`player-v2-${part}`,source=choice===(kind==='skin'?'fair':'brown')?images[key]:recolored(key,kind,choice);ctx.drawImage(source,pose.frame*32,0,32,48,destX,destY,Math.round(size),drawHeight)};
   if(!underwear&&hairVisible)custom(hairPart('back'),'hair',appearance.hairColor||'brown');
