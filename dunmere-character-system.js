@@ -22,7 +22,7 @@ const gearImages={};
 for(const name of ['chain-male','chain-female','plate-torso-male','plate-torso-female','plate-legs-male','plate-legs-female','plate-arms-male','plate-arms-female','gloves-male','gloves-female','plate-boots-male','plate-boots-female','kettle','armet','leather-torso-male','leather-torso-female','leather-hood','leather-boots-male','leather-boots-female']){const img=new Image();gearImages[name]=img;img.src='assets/gear/'+name+'.png?v=1'}
 const heldSprites=new Map();
 const equipmentSheet=new Image();equipmentSheet.src='assets/held-equipment.png?v=1';
-const directionalEquipment=new Image();directionalEquipment.src='assets/held-equipment-front-back.png?v=2';
+const directionalEquipment=new Image();directionalEquipment.src='assets/held-equipment-front-back.png?v=3';
 const shieldBack=new Image();shieldBack.src='assets/shield-back.png?v=1';
 const equipmentCells={pick:0,hoe:1,ironSword:2,steelSword:3,knife:4,steelDagger:5,spear:6,torch:7,ironAxe:8,steelAxe:9,steelPick:10,woodShield:11,ironShield:12,axe:13};
 // Hand anchors follow the actual LPC pixels for idle, first stride and second stride.
@@ -71,6 +71,14 @@ function drawOffhand(ctx,id,px,py,size,direction,appearance){
   ctx.drawImage(shieldBack,cell*8,0,8,28,Math.round(x-5*scale),Math.round(y-15*scale),Math.round(8*scale),Math.round(28*scale));
   return;
  }
+ if(direction==='left'||direction==='right'){
+  if(!shieldBack.complete||shieldBack.naturalWidth!==16)return;
+  const cell=id==='ironShield'?1:0;
+  ctx.save();ctx.imageSmoothingEnabled=false;ctx.translate(Math.round(x-(direction==='right'?1*scale:0)),Math.round(y));
+  if(direction==='right')ctx.scale(-1,1);
+  ctx.drawImage(shieldBack,cell*8,0,8,28,Math.round(-4*scale),Math.round((-14-(guard?4:0))*scale),Math.round(8*scale),Math.round(28*scale));
+  ctx.restore();return;
+ }
  ctx.save();ctx.imageSmoothingEnabled=false;ctx.translate(Math.round(x),Math.round(y));
  if(direction==='right')ctx.scale(-1,1);
  ctx.drawImage(sprite,Math.round(-10*scale),Math.round((-12-(guard?4:0))*scale),Math.round(20*scale),Math.round(27*scale));ctx.restore();
@@ -113,9 +121,10 @@ function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
   }
   if(appearance.backItem&&direction!=='up')drawBack(ctx,appearance.backItem,px,py,size,direction,equippedView);
   if(appearance.offhandItem&&(direction==='up'||direction==='right'))drawOffhand(ctx,appearance.offhandItem,px,py,size,direction,equippedView);
+  if(appearance.handItem&&direction==='up')drawHeld(ctx,appearance.handItem,px,py,size,direction,equippedView);
   ctx.imageSmoothingEnabled=false;ctx.drawImage(bent,0,1,32,48,destX,destY,size,drawHeight);
   if(appearance.backItem&&direction==='up')drawBack(ctx,appearance.backItem,px,py,size,direction,equippedView);
-  if(appearance.handItem)drawHeld(ctx,appearance.handItem,px,py,size,direction,equippedView);
+  if(appearance.handItem&&direction!=='up')drawHeld(ctx,appearance.handItem,px,py,size,direction,equippedView);
   if(appearance.offhandItem&&direction!=='up'&&direction!=='right')drawOffhand(ctx,appearance.offhandItem,px,py,size,direction,equippedView);
   if(appearance.handItem){const [hx,hy]=handAnchor(direction,pose.frame,appearance.bodyType);ctx.save();ctx.beginPath();ctx.rect(Math.round(destX+(hx-2)*scale),Math.round(destY+(hy+2)*scale),Math.round(4*scale),Math.round(4*scale));ctx.clip();ctx.drawImage(bent,0,1,32,48,destX,destY,size,drawHeight);ctx.restore()}
   return true;
@@ -127,6 +136,7 @@ function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
  const draw=(part,row,tint=null)=>{const source=tint?clothingSheet(part,tint):images[part];ctx.drawImage(source,pose.frame*32,row*48,32,48,destX,destY,Math.round(size),drawHeight)};
  if(id===12&&appearance.backItem&&direction!=='up')drawBack(ctx,appearance.backItem,px,py,size,direction,equippedView);
  if(id===12&&appearance.offhandItem&&(direction==='up'||direction==='right'))drawOffhand(ctx,appearance.offhandItem,px,py,size,direction,equippedView);
+ if(id===12&&appearance.handItem&&direction==='up')drawHeld(ctx,appearance.handItem,px,py,size,direction,equippedView);
  if(id===12){
   const body=appearance.bodyType==="female"?"female":"male";
   const layer=part=>draw(`player-v2-${body}-${part}`,0);
@@ -150,12 +160,12 @@ function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
   if(gear.head==='ironKettleHelm')drawGear('kettle');
   if(gear.head==='plateHelm'||gear.head==='steelHelm')drawGear('armet',gear.head==='steelHelm'?steel:null);
   if(appearance.backItem&&direction==='up')drawBack(ctx,appearance.backItem,px,py,size,direction,equippedView);
-  if(appearance.handItem)drawHeld(ctx,appearance.handItem,px,py,size,direction,equippedView);
+  if(appearance.handItem&&direction!=='up')drawHeld(ctx,appearance.handItem,px,py,size,direction,equippedView);
   if(appearance.offhandItem&&direction!=='up'&&direction!=='right')drawOffhand(ctx,appearance.offhandItem,px,py,size,direction,equippedView);
   // Only the fingers cross the grip. Redrawing the whole forearm here hides
   // the blade and torch shaft, especially in the side-facing frames.
   const redrawGripArm=offhand=>{const [hx,hy]=handAnchor(direction,pose.frame,body,offhand);ctx.save();ctx.beginPath();ctx.rect(Math.round(destX+(hx-2)*scale),Math.round(destY+(hy-2)*scale),Math.round(4*scale),Math.round(5*scale));ctx.clip();layer('base');if(gear.hands==='leatherGloves')drawGear('gloves-'+body,hide);if(gear.hands==='ironGauntlets'||gear.hands==='steelGauntlets')drawGear('gloves-'+body,gear.hands==='steelGauntlets'?steel:null);ctx.restore()};
-  if(appearance.handItem)redrawGripArm(false);
+  if(appearance.handItem&&direction!=='up')redrawGripArm(false);
   if(attackLean)ctx.restore();
   return true;
  }
