@@ -107,6 +107,12 @@ function ready(){return !failed&&Object.entries(images).every(([part,img])=>img.
 function clothingSheet(part,tint){const key=part+':'+tint;if(tinted.has(key))return tinted.get(key);const original=images[part],canvas=document.createElement('canvas');canvas.width=original.width;canvas.height=original.height;const g=canvas.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(original,0,0);g.globalCompositeOperation='multiply';g.fillStyle=tint;g.fillRect(0,0,canvas.width,canvas.height);g.globalCompositeOperation='destination-in';g.drawImage(original,0,0);tinted.set(key,canvas);return canvas}
 function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
  if(!ready()||!Number.isInteger(id)||id<0||id>=PEOPLE.length)return false;
+ const lifeScale=appearance.lifeScale;
+ if(Number.isFinite(lifeScale)&&lifeScale>0&&lifeScale<1){
+  ctx.save();ctx.translate(x*size,y*size);ctx.scale(lifeScale,lifeScale);ctx.translate(-x*size,-y*size);
+  const drawn=render(ctx,id,x,y,size,direction,moving,walkTimeMs,{...appearance,lifeScale:1});
+  ctx.restore();return drawn;
+ }
  const pose=KingdomPlayerFrames.select(direction,moving,walkTimeMs+(id===12?0:id*47));
  const equippedView={...appearance,_frame:pose.frame};
  const scale=size/32,px=Math.round(x*size),py=Math.round(y*size);

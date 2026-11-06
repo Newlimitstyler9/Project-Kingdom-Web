@@ -114,7 +114,7 @@ function draw(ctx,sim,player,vw,vh,size,character,options={}){
  return [camX,camY];
 }
 function drawPerson(ctx,a,size,player,character,sim){
- character(ctx,a.x,a.y,size,a.facing||"down",a.moving,a.walkMs,{bodyType:a.sex,sprite:a.sprite,...root.GreyfordWorld.outfit(a)});
+ character(ctx,a.x,a.y,size,a.facing||"down",a.moving,a.walkMs,{bodyType:a.sex,sprite:a.sprite,lifeScale:root.GreyfordWorld.lifeScale(a.age),...root.GreyfordWorld.outfit(a)});
  if(sim.knows(a.id)&&Math.hypot(a.x-player.x,a.y-player.y)<7){
   ctx.textAlign="center";ctx.font="bold 10px system-ui";ctx.lineWidth=3;ctx.strokeStyle="#26372d";ctx.fillStyle="#f4e5c3";
   root.KingdomArt.outlinedText(ctx,a.name,a.x*size,(a.y-1.1)*size);
