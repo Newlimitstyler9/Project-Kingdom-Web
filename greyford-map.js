@@ -6,6 +6,8 @@ const styles={court:['stone','slate'],warehouse:['timber','brown'],smithy:['ston
 const homeStyles={'vell-house':['stone','slate'],'pell-house':['timber','brown'],'reed-house':['plaster','light'],'forge-house':['timber','brown'],'clerk-house':['plaster','light'],'guard-barracks':['stone','slate'],'market-inn':['timber','brown'],'south-croft':['plaster','brown'],'tanner-house':['timber','brown'],'mason-house':['stone','slate'],'fen-house':['plaster','light'],'dyer-house':['timber','light'],'bridge-row-a':['plaster','brown'],'bridge-row-b':['timber','brown'],'east-row-a':['plaster','light'],'east-row-b':['timber','brown'],'south-croft-two':['plaster','brown'],'south-croft-three':['plaster','light']};
 const {walls:wallTiles,roofs:roofTiles,windows,doors}=root.KingdomAssetRegistry.buildingTiles;
 function tile(ctx,col,row,x,y,size){if(sheet.complete&&sheet.naturalWidth)ctx.drawImage(sheet,col*17,row*17,16,16,Math.round(x*size),Math.round(y*size),size+1,size+1)}
+function fence(ctx,x,y,size,vertical=false){if(!sheet.complete||!sheet.naturalWidth)return;if(!vertical){tile(ctx,47,23,x,y,size);return}ctx.save();ctx.translate(Math.round((x+.5)*size),Math.round((y+.5)*size));ctx.rotate(Math.PI/2);ctx.drawImage(sheet,47*17,23*17,16,16,-size/2,-size/2,size+1,size+1);ctx.restore()}
+function drawPaddockFence(ctx,map,size,front=false){const p=map.PADDOCK;if(front){for(let x=p.x;x<p.x+p.w;x++)fence(ctx,x,p.y+p.h-1,size);return}for(let x=p.x;x<p.x+p.w;x++)fence(ctx,x,p.y,size);for(let y=p.y+1;y<p.y+p.h-1;y++){if(y!==p.gateY)fence(ctx,p.x,y,size,true);fence(ctx,p.x+p.w-1,y,size,true)}}
 function drawBuilding(ctx,b,size,alpha=1){
  if(!sheet.complete||!sheet.naturalWidth)return;
  const [wallKind,roofKind]=styles[b.type]||homeStyles[b.id]||['plaster','brown'],wall=wallTiles[wallKind],roof=roofTiles[roofKind],door=Math.floor(b.w/2);
@@ -40,6 +42,7 @@ function draw(ctx,sim,player,vw,vh,size,character,options={}){
   if(x>=6&&x<15&&y>=38&&y<57&&(x+y)%5===0)root.KingdomArt.plant(ctx,"grass",x,y,size);
  }
  for(const b of map.buildings)drawBuilding(ctx,b,size);
+ drawPaddockFence(ctx,map,size);
  if(castle.complete&&castle.naturalWidth){
   for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++)if(map.wallAt(x,y)){
    ctx.save();ctx.globalAlpha=wallAlpha(x,y);
@@ -81,6 +84,7 @@ function draw(ctx,sim,player,vw,vh,size,character,options={}){
  const list=sim.peopleOnMap();
  for(const a of list.filter(a=>a.level===0))drawPerson(ctx,a,size,player,character);
  if(options.drawPlayer!==false)character(ctx,player.x,player.y,size,player.facing,player.moving,player.walkMs,player.appearance);
+ drawPaddockFence(ctx,map,size,true);
  // When the player is behind a wall, its raised stone lip must cover the sprite.
  if(options.drawPlayer!==false&&player.level===0&&castle.complete&&castle.naturalWidth){
   const wallRow=player.y<14&&player.y>=9?12:player.y<59&&player.y>=54?57:-1;

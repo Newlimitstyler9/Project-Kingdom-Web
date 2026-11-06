@@ -34,7 +34,7 @@ const categories={
  surface:['floorA','floorB','wallA','wallB','wallWindows']
 };
 const exterior=new Set(['innRoof','innWall','innShingle','innDoor','innWindow','innGableRoof','innTimber','bakeryRoof','bakeryDoor','yardCart','yardTrough','yardLogs','innSign','farmWagon','marketStallGold','marketStallBlue']);
-const both=new Set(['fire','barrel','bread','bakerySack','bakerySackPile','carriedSack','sconce']);
+const both=new Set(['fire','barrel','bread','bakerySack','bakerySackPile','carriedSack','sconce','yardWaterTrough']);
 const entries=Object.fromEntries(Object.entries(crops).map(([id,crop])=>{
  const category=Object.keys(categories).find(key=>categories[key].includes(id));
  if(!category)throw Error('Uncategorized sprite: '+id);

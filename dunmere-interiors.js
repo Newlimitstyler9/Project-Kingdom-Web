@@ -14,7 +14,7 @@ const FURNITURE={
  warehouse:[['sacks',2,2.6,2,1.2],['rack',8,2.3,2,1],['table',8,6,2,1]],
  smithy:[['forge',2,2,2,2],['anvil',8,3,1.5,1],['chest',8.1,6.05,1.7,.95],['table',2,6,2.5,1]],
  chapel:[['hearth',2,1.4,2,1.5],['bench',2,4,2,1],['bench',8,4,2,1]],
- stable:[['sacks',2,2.6,2,1.2],['trough',2.3,6,2.2,.8],['rack',8,2.3,2,1],['table',8,6,2,1],['chest',8.6,7.1,1.35,.85]],
+ stable:[['sacks',2,2.6,2,1.2],['rack',8,2.3,2,1],['table',8,6,2,1],['chest',8.6,7.1,1.35,.85]],
  apothecary:[['wallShelf',1.4,1.15,2.5,.7],['table',2,3,2,1],['bed',8,2,2,2],['chest',8.6,6.9,1.35,.85]],
  granary:[['sacks',2,2.6,2,1.2],['sacks',8,2.6,2,1.2],['table',8,6,2,1]],
  carpenter:[['rack',2,2.3,2,1],['table',8,3,2,1],['table',2,6,2,1]],
@@ -156,7 +156,6 @@ function create(buildings){
     if(f.type==='table'){sprites.draw(ctx,'table',f.x*size,f.y*size,1.45*size,.85*size);continue}
     if(f.type==='chest'){sprites.draw(ctx,'guestChest',f.x*size,f.y*size,f.w*size,f.h*size);continue}
    }
-   if(room.kind==='stable'&&f.type==='trough'&&sprites?.ready){sprites.draw(ctx,'yardWaterTrough',f.x*size,f.y*size,f.w*size,f.h*size);continue}
    furniture(ctx,f,size);
   }
   if(room.greyfordBuilding==='smithy'&&details.smithy){

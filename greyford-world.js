@@ -27,7 +27,7 @@ const workplaces=[
  {id:"jail",name:"Gate Jail",x:68,y:47,w:6,h:5,type:"jail"},
  {id:"bakery",name:"Bridge Bakery",x:39,y:39,w:5,h:5,type:"bakery"},
  {id:"chapel",name:"Old Stone Chapel",x:67,y:26,w:6,h:5,type:"chapel"},
- {id:"stable",name:"Pell Stables",x:21,y:49,w:7,h:5,type:"stable"},
+ {id:"stable",name:"Pell Stables",x:79,y:29,w:7,h:5,type:"stable"},
  {id:"weaver",name:"Dyer and Weaver",x:62,y:45,w:5,h:5,type:"weaver"},
  {id:"apothecary",name:"Fen Remedies",x:39,y:27,w:5,h:5,type:"apothecary"},
  {id:"granary",name:"Public Granary",x:29,y:51,w:7,h:5,type:"granary"},
@@ -48,7 +48,9 @@ const decor=[
  {sprite:"yardCart",x:18,y:63,w:2,h:2},
  {sprite:"yardLogs",x:70,y:42,w:2,h:2},
  {sprite:"yardTrough",x:67,y:42,w:2,h:2},
- {sprite:"bakerySackPile",x:36,y:52,w:2,h:2}
+ {sprite:"bakerySackPile",x:36,y:52,w:2,h:2},
+ {sprite:"yardTrough",x:89,y:32,w:2,h:1},
+ {sprite:"yardWaterTrough",x:91,y:40,w:2,h:1}
 ];
 const people=[
  {id:"maera",name:"Duchess Maera Vell",age:42,sex:"female",home:"vell-house",work:"court",role:"march judge",status:"noble",sprite:3,kin:["elin"],x:61,y:34},
@@ -87,6 +89,9 @@ const GATES=[
  {id:"bridge",x:18,y:35,axis:"vertical",name:"Bridge gate"}
 ];
 const WIDTH=96,HEIGHT=76;
+const PADDOCK={x:87,y:30,w:8,h:14,gateX:87,gateY:35};
+function paddockFenceAt(x,y){const px=Math.floor(x),py=Math.floor(y);if(px<PADDOCK.x||px>=PADDOCK.x+PADDOCK.w||py<PADDOCK.y||py>=PADDOCK.y+PADDOCK.h)return false;if(px===PADDOCK.gateX&&py===PADDOCK.gateY)return false;return px===PADDOCK.x||px===PADDOCK.x+PADDOCK.w-1||py===PADDOCK.y||py===PADDOCK.y+PADDOCK.h-1}
+function inPaddock(x,y){return x>PADDOCK.x&&x<PADDOCK.x+PADDOCK.w-1&&y>PADDOCK.y&&y<PADDOCK.y+PADDOCK.h-1}
 function artBounds(b){return {left:b.x,right:b.x+b.w,top:b.y,bottom:b.y+b.h}}
 function at(x,y){return buildings.find(b=>{const r=artBounds(b);return x>=r.left&&x<r.right&&y>=r.top&&y<r.bottom})}
 function decorAt(x,y){return decor.find(p=>x>=p.x&&x<p.x+p.w&&y>=p.y&&y<p.y+p.h)}
@@ -94,11 +99,11 @@ function gateAt(x,y){return GATES.find(g=>g.axis==='horizontal'?x>=g.x-1&&x<g.x+
 function wallAt(x,y){const north=y>=12&&y<14&&x>=18&&x<=76,south=y>=57&&y<59&&x>=18&&x<=76,west=x>=18&&x<20&&y>=12&&y<=58,east=x>=75&&x<77&&y>=12&&y<=58;if(!(north||south||west||east))return false;return !GATES.some(g=>g.axis==="horizontal"?Math.abs(y-g.y)<2&&Math.abs(x-g.x)<2:Math.abs(x-g.x)<2&&y>=g.y-1&&y<g.y+1)}
 const lanes=[[[27.5,25.5],[66.5,25.5]],[[32.5,44.5],[50.5,44.5]],[[60.5,48.5],[61.5,53.5],[67.5,53.5]]];
 function segmentDistance(x,y,a,b){const dx=b[0]-a[0],dy=b[1]-a[1],t=Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy||1)));return Math.hypot(x-a[0]-t*dx,y-a[1]-t*dy)}
-function mainRoadAt(x,y){return Math.abs(x-47.5)<1.7||Math.abs(y-35)<1.5&&x>=17&&x<=79||Math.abs(y-48)<1.2&&x>=28&&x<=61}
+function mainRoadAt(x,y){return Math.abs(x-47.5)<1.7||Math.abs(y-35)<1.5&&x>=17&&x<=87.8||Math.abs(y-48)<1.2&&x>=28&&x<=61}
 function laneAt(x,y){return lanes.some(lane=>lane.some((point,i)=>i&&segmentDistance(x,y,lane[i-1],point)<.63))}
 function pathKey(x,y){return x+','+y}
 const footpaths=new Set();
-function roadAt(x,y){if(at(x,y)||decorAt(x,y)||wallAt(Math.floor(x),Math.floor(y)))return false;return mainRoadAt(x,y)||laneAt(x,y)||footpaths.has(pathKey(Math.floor(x),Math.floor(y)))}
+function roadAt(x,y){if(at(x,y)||decorAt(x,y)||paddockFenceAt(x,y)||wallAt(Math.floor(x),Math.floor(y)))return false;return mainRoadAt(x,y)||laneAt(x,y)||footpaths.has(pathKey(Math.floor(x),Math.floor(y)))}
 function buildFootpaths(){
  for(const b of buildings){
   const start={x:Math.floor(b.x+b.w/2),y:b.y+b.h},queue=[start],seen=new Set([pathKey(start.x,start.y)]),previous=new Map();let goal=null;
@@ -118,7 +123,7 @@ function buildFootpaths(){
 }
 buildFootpaths();
 function wallWalkAt(x,y){return y>=12&&y<14&&x>=18&&x<=76||y>=57&&y<59&&x>=18&&x<=76||x>=18&&x<20&&y>=12&&y<=58||x>=75&&x<77&&y>=12&&y<=58}
-function pass(x,y,level=0,gatesOpen=true){if(x<0||y<0||x>=WIDTH||y>=HEIGHT)return false;if(level===1)return wallWalkAt(Math.floor(x),Math.floor(y));const northLip=y>=11&&y<12&&x>=18&&x<77&&!(x>=46&&x<49);if(northLip||wallAt(Math.floor(x),Math.floor(y))||at(x,y)||decorAt(x,y))return false;const g=gateAt(x,y);return !g||gatesOpen||g.id==="south"&&y>59}
+function pass(x,y,level=0,gatesOpen=true){if(x<0||y<0||x>=WIDTH||y>=HEIGHT)return false;if(level===1)return wallWalkAt(Math.floor(x),Math.floor(y));const northLip=y>=11&&y<12&&x>=18&&x<77&&!(x>=46&&x<49);if(northLip||wallAt(Math.floor(x),Math.floor(y))||paddockFenceAt(x,y)||at(x,y)||decorAt(x,y))return false;const g=gateAt(x,y);return !g||gatesOpen||g.id==="south"&&y>59}
 function house(id){return buildings.find(b=>b.id===id)}
 function porch(id){const b=house(id);if(!b)return {x:47.5,y:35.5};return {x:b.x+b.w/2,y:b.y+b.h+.9}}
 function seeded(n){let x=(n^0x6b884e1)>>>0;x^=x<<13;x^=x>>>17;x^=x<<5;return x>>>0}
@@ -213,7 +218,7 @@ function create(saved){
  function introduce(id){if(!met.includes(id))met.push(id)}
  function knownReports(person){return (knowledge[person.id]||[]).map(k=>{const report=reports.find(r=>r.id===k.reportId);return report?{...report,heardFrom:k.from,heardAt:k.at}:null}).filter(Boolean)}
  let routineSeconds=0;
- const workActions={court:["Reviewing petitions","Consulting the court clerk","Meeting a visitor"],warehouse:["Checking incoming stock","Updating the store ledger","Inspecting a delivery"],smithy:["Working at the forge","Fetching iron and fuel","Checking finished work"],bakery:["Preparing bread","Tending the ovens","Setting out fresh loaves"],chapel:["Tending the chapel","Speaking with a parishioner","Cleaning the entrance"],stable:["Caring for the horses","Checking tack","Carrying feed"],weaver:["Working at the loom","Sorting cloth","Checking dyed yarn"],apothecary:["Preparing remedies","Gathering herbs","Helping a patient"],granary:["Counting grain sacks","Checking the stores","Recording a delivery"],carpenter:["Working at the bench","Fetching timber","Inspecting joinery"],tollhouse:["Collecting tolls","Checking the bridge","Writing receipts"],jail:["Keeping watch at the jail","Checking the cells","Speaking with the gate watch"],"market-inn":["Serving travelers","Fetching supplies","Greeting arrivals"]};
+ const workActions={court:["Reviewing petitions","Consulting the court clerk","Meeting a visitor"],warehouse:["Checking incoming stock","Updating the store ledger","Inspecting a delivery"],smithy:["Working at the forge","Fetching iron and fuel","Checking finished work"],bakery:["Preparing bread","Tending the ovens","Setting out fresh loaves"],chapel:["Tending the chapel","Speaking with a parishioner","Cleaning the entrance"],stable:["Reviewing horse records","Checking tack","Discussing a sale"],weaver:["Working at the loom","Sorting cloth","Checking dyed yarn"],apothecary:["Preparing remedies","Gathering herbs","Helping a patient"],granary:["Counting grain sacks","Checking the stores","Recording a delivery"],carpenter:["Working at the bench","Fetching timber","Inspecting joinery"],tollhouse:["Collecting tolls","Checking the bridge","Writing receipts"],jail:["Keeping watch at the jail","Checking the cells","Speaking with the gate watch"],"market-inn":["Serving travelers","Fetching supplies","Greeting arrivals"]};
  const householdActions={leatherworker:["Working hides","Fetching tanning supplies","Checking finished leather"],stonemason:["Cutting stone","Sorting stone blocks","Checking masonry"]};
  function routine(p,place,phase){
   const q=porch(place);
@@ -234,6 +239,7 @@ function create(saved){
   }
   if(hour>=18&&hour<22){const q=porch(p.home);return {...q,level:0,indoors:true,building:p.home,activity:"At home"}}
   if(p.role==="child"){const q=porch(p.home);return {...q,x:q.x+(phase-1)*1.1,y:q.y+(phase===1?1.1:0),level:0,activity:"Playing near home"}}
+  if(p.id==='rinna')return {x:[89.5,90.5,88.5][phase],y:[35.5,39.5,33.5][phase],level:0,activity:["Checking Bracken in the paddock","Filling the water trough","Bringing hay to the field"][phase]};
   return routine(p,p.work,phase)
  }
  const agents=new Map();
@@ -293,5 +299,5 @@ function create(saved){
  function gatePassageAt(id){const g=GATES.find(g=>g.id===id);return !!g&&!gateOpen&&people.some(p=>{const a=agents.get(p.id);return a&&!a.inside&&!a.away&&Math.hypot(a.x-g.x,a.y-g.y)<2.1})}
  return {advance,step,snapshot,introduce,knownReports,reportSmithyTheft,reportPropertyTheft,schedule,peopleOnMap,insidePeople,indoorOccupants,gatePassageAt,get day(){return day},get hour(){return hour},get gateOpen(){return gateOpen},get caravan(){return caravan},get events(){return events},get grain(){return grain},get orders(){return orders}};
 }
-root.GreyfordWorld={WIDTH,HEIGHT,GATES,homes,workplaces,offices,buildings,decor,people,at,decorAt,gateAt,wallAt,wallWalkAt,roadAt,pass,house,porch,create};
+root.GreyfordWorld={WIDTH,HEIGHT,GATES,PADDOCK,homes,workplaces,offices,buildings,decor,people,at,decorAt,gateAt,wallAt,paddockFenceAt,inPaddock,wallWalkAt,roadAt,pass,house,porch,create};
 })(window);
