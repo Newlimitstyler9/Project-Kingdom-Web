@@ -1063,6 +1063,16 @@
       "sourceRecord": null
     },
     {
+      "path": "shield-rear.png",
+      "category": "Animals and equipment atlases",
+      "size": [
+        48,
+        32
+      ],
+      "referenced": true,
+      "sourceRecord": "shield-rear-SOURCE.txt"
+    },
+    {
       "path": "village-oak-v1.png",
       "category": "Trees and landscape",
       "size": [

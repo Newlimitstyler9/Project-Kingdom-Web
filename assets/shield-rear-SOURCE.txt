@@ -1,0 +1,1 @@
+Original wood and iron shield rear views authored through Pixelorama for Project Kingdom. Editable source: ../../art-source/shield-rear.pxo. Rebuild with node scripts/author-shield-rear-pixelorama.mjs. The wood and iron palettes match the existing held-equipment.png shields, built by ../../scripts/build-held-equipment.py.
