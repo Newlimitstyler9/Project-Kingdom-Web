@@ -20,7 +20,7 @@ function recolored(part,kind,choice){const key=part+':'+kind+':'+choice;if(tinte
  const replace=new Map(src.map((color,i)=>[parseInt(color,16),parseInt(dst[i],16)]));
  for(let i=0;i<data.length;i+=4){if(!data[i+3])continue;const rgb=(data[i]<<16)|(data[i+1]<<8)|data[i+2],next=replace.get(rgb);if(next===undefined)continue;data[i]=next>>16;data[i+1]=(next>>8)&255;data[i+2]=next&255}
  g.putImageData(pixels,0,0);tinted.set(key,canvas);return canvas}
-for(const part of [...PARTS.map(layer=>`resident-v1-${layer}`),...["male","female"].flatMap(body=>PLAYER_PARTS.map(layer=>`player-v2-${body}-${layer}`))]){
+for(const part of [...PARTS.map(layer=>`resident-v1-${layer}`),...["male","female"].flatMap(body=>PLAYER_PARTS.map(layer=>`player-v2-${body}-${layer}`)),...["bob","curly","braid"].flatMap(style=>["back","front"].map(layer=>`player-v2-hair-${style}-${layer}`))]){
  const img=new Image();images[part]=img;
  const resident=part.startsWith("resident-v1-");
  img.onload=()=>{if(img.naturalWidth!==384||img.naturalHeight!==(resident?576:48))failed=true};
@@ -104,7 +104,15 @@ function drawBack(ctx,id,px,py,size,direction,appearance){
  ctx.restore();
 }
 function ready(){return !failed&&Object.entries(images).every(([part,img])=>img.complete&&img.naturalWidth===384&&img.naturalHeight===(part.startsWith("resident-v1-")?576:48))}
-function clothingSheet(part,tint){const key=part+':'+tint;if(tinted.has(key))return tinted.get(key);const original=images[part],canvas=document.createElement('canvas');canvas.width=original.width;canvas.height=original.height;const g=canvas.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(original,0,0);g.globalCompositeOperation='multiply';g.fillStyle=tint;g.fillRect(0,0,canvas.width,canvas.height);g.globalCompositeOperation='destination-in';g.drawImage(original,0,0);tinted.set(key,canvas);return canvas}
+function clothingSheet(part,tint){const key=part+':'+tint;if(tinted.has(key))return tinted.get(key);const original=images[part],canvas=document.createElement('canvas');canvas.width=original.width;canvas.height=original.height;const g=canvas.getContext('2d',{willReadFrequently:true});g.imageSmoothingEnabled=false;g.drawImage(original,0,0);
+ if(part.startsWith('player-v2-')&&/^#[\da-f]{6}$/i.test(tint)){
+  const target=[1,3,5].map(i=>parseInt(tint.slice(i,i+2),16)),torso=part.endsWith('-torso');
+  const ramp=torso?new Map([[0x4d4a5d,.42],[0x958080,.62],[0xc4b59f,.82],[0xe5e6c7,1],[0xffffff,1.17]]):new Map([[0x3c312c,.42],[0x5b4738,.62],[0x7d6346,.82],[0x9f7f58,1],[0xb69367,1.17]]);
+  const pixels=g.getImageData(0,0,canvas.width,canvas.height),data=pixels.data;
+  for(let i=0;i<data.length;i+=4){if(!data[i+3])continue;const color=(data[i]<<16)|(data[i+1]<<8)|data[i+2],factor=ramp.get(color);if(!factor)continue;for(let c=0;c<3;c++)data[i+c]=Math.min(255,Math.round(target[c]*factor))}
+  g.putImageData(pixels,0,0);
+ }else{g.globalCompositeOperation='multiply';g.fillStyle=tint;g.fillRect(0,0,canvas.width,canvas.height);g.globalCompositeOperation='destination-in';g.drawImage(original,0,0)}
+ tinted.set(key,canvas);return canvas}
 function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
  if(!ready()||!Number.isInteger(id)||id<0||id>=PEOPLE.length)return false;
  const lifeScale=appearance.lifeScale;
@@ -156,10 +164,11 @@ function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
  if(id===12&&appearance.handItem&&(direction==='up'||direction==='right'))drawHeld(ctx,appearance.handItem,px,py,size,direction,equippedView);
  if(id===12){
   const body=appearance.bodyType==="female"?"female":"male";
-  const hairBody=appearance.hairStyle==='tied'?'female':appearance.hairStyle==='short'?'male':body,hairVisible=appearance.hair!==false&&appearance.hairStyle!=='bald';
+  const hairStyle=appearance.hairStyle,hairBody=hairStyle==='tied'?'female':hairStyle==='short'?'male':body,hairVisible=appearance.hair!==false&&hairStyle!=='bald';
+  const hairPart=layer=>['bob','curly','braid'].includes(hairStyle)?`hair-${hairStyle}-${layer}`:`${hairBody}-hair-${layer}`;
   const layer=part=>draw(`player-v2-${body}-${part}`,0);
   const custom=(part,kind,choice)=>{const key=`player-v2-${part}`,source=choice===(kind==='skin'?'fair':'brown')?images[key]:recolored(key,kind,choice);ctx.drawImage(source,pose.frame*32,0,32,48,destX,destY,Math.round(size),drawHeight)};
-  if(!underwear&&hairVisible)custom(hairBody+'-hair-back','hair',appearance.hairColor||'brown');
+  if(!underwear&&hairVisible)custom(hairPart('back'),'hair',appearance.hairColor||'brown');
   custom(body+'-base','skin',appearance.skinTone||'fair');custom(body+'-head','skin',appearance.skinTone||'fair');
   if(underwear){layer("underwear");if(attackLean)ctx.restore();return true}
   if(appearance.legs!==false)draw(`player-v2-${body}-legs`,0,appearance.legTint||null);
@@ -174,7 +183,7 @@ function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
   if(gear.feet==='ironBoots'||gear.feet==='steelBoots')drawGear('plate-boots-'+body,gear.feet==='steelBoots'?steel:null);
   if(gear.hands==='leatherGloves')drawGear('gloves-'+body,hide);
   if(gear.hands==='ironGauntlets'||gear.hands==='steelGauntlets')drawGear('gloves-'+body,gear.hands==='steelGauntlets'?steel:null);
-  if(hairVisible&&!['plateHelm','steelHelm','leatherHood'].includes(gear.head))custom(hairBody+'-hair-front','hair',appearance.hairColor||'brown');
+  if(hairVisible&&!['plateHelm','steelHelm','leatherHood'].includes(gear.head))custom(hairPart('front'),'hair',appearance.hairColor||'brown');
   if(gear.head==='leatherHood')drawGear('leather-hood',hide);
   if(gear.head==='ironKettleHelm')drawGear('kettle');
   if(gear.head==='plateHelm'||gear.head==='steelHelm')drawGear('armet',gear.head==='steelHelm'?steel:null);

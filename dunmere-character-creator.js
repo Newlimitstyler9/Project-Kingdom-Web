@@ -1,7 +1,7 @@
 // Player identity and starting attributes. Only validated palette keys reach the renderer.
 (function(root){'use strict';
 const options=Object.freeze({
- body:['male','female'],hair:['short','tied','bald'],
+ body:['male','female'],hair:['short','tied','bob','curly','braid','bald'],
  skin:['fair','warm','tan','brown','deep'],
  hairColor:['black','brown','auburn','blond','silver'],
  shirt:['cream','sage','blue','rust','plum'],
@@ -9,7 +9,7 @@ const options=Object.freeze({
  boots:['brown','dark','tan']
 });
 const labels={might:'Might',endurance:'Endurance',agility:'Agility'};
-const colors={shirt:{cream:'#e5e6c7',sage:'#9ebc85',blue:'#88a9c3',rust:'#bd8067',plum:'#a48bab'},pants:{brown:'#8b7057',charcoal:'#61636b',olive:'#7e835b',navy:'#606f8d',umber:'#a77955'}};
+const colors={shirt:{cream:'#e5e6c7',sage:'#9ebc85',blue:'#88a9c3',rust:'#ad4c37',plum:'#a48bab'},pants:{brown:'#8b7057',charcoal:'#61636b',olive:'#7e835b',navy:'#606f8d',umber:'#a77955'}};
 const defaults={version:1,created:false,name:'Wanderer',body:'male',hair:'short',skin:'fair',hairColor:'brown',shirt:'cream',pants:'brown',boots:'brown',stats:{might:1,endurance:1,agility:1}};
 function cleanName(value){return String(value||'').trim().replace(/\s+/g,' ').slice(0,24)||'Wanderer'}
 function create(saved){let state=JSON.parse(JSON.stringify(defaults));if(saved)restore(saved);
