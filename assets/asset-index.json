@@ -403,6 +403,16 @@
       "sourceRecord": "greyford-paddock-fence-SOURCE.txt"
     },
     {
+      "path": "greyford-rank-trim.png",
+      "category": "Character layers and legacy poses",
+      "size": [
+        384,
+        144
+      ],
+      "referenced": true,
+      "sourceRecord": "greyford-rank-trim-SOURCE.txt"
+    },
+    {
       "path": "greyford-stone-pieces.png",
       "category": "Buildings and world structures",
       "size": [

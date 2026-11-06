@@ -90,7 +90,7 @@ function draw(ctx,sim,player,vw,vh,size,character,options={}){
  }
  for(const h of options.horses||[]){const scale=h.scale||1;root.KingdomInnSprites.drawHorse(ctx,h.facing,Math.floor(h.walkMs/170)%4,(h.x-1.6*scale)*size,(h.y-3.2*scale+.8)*size,3.2*scale*size,3.2*scale*size,h.coat)}
  const list=sim.peopleOnMap();
- for(const a of list.filter(a=>a.level===0)){drawPerson(ctx,a,size,player,character);coverBehindBuilding(ctx,a,size)}
+ for(const a of list.filter(a=>a.level===0)){drawPerson(ctx,a,size,player,character,sim);coverBehindBuilding(ctx,a,size)}
  if(options.drawPlayer!==false){character(ctx,player.x,player.y,size,player.facing,player.moving,player.walkMs,player.appearance);coverBehindBuilding(ctx,player,size)}
  drawPaddockFence(ctx,map,size,true);
  // When the player is behind a wall, its raised stone lip must cover the sprite.
@@ -103,7 +103,7 @@ function draw(ctx,sim,player,vw,vh,size,character,options={}){
    ctx.drawImage(castle,32,0,32,24,x*size,wallRow*size-size*.72,size+1,size*.9);ctx.restore();
   }
  }
- for(const a of list.filter(a=>a.level===1))drawPerson(ctx,a,size,player,character);
+ for(const a of list.filter(a=>a.level===1))drawPerson(ctx,a,size,player,character,sim);
  if(player.level===1){
   ctx.fillStyle="#e8d09d";ctx.textAlign="center";ctx.font="bold 10px system-ui";ctx.fillText("WALL WALK",player.x*size,(player.y-1.2)*size);
  }
@@ -113,9 +113,9 @@ function draw(ctx,sim,player,vw,vh,size,character,options={}){
  ctx.restore();
  return [camX,camY];
 }
-function drawPerson(ctx,a,size,player,character){
- character(ctx,a.x,a.y,size,a.facing||"down",a.moving,a.walkMs,{bodyType:a.sex,sprite:a.sprite});
- if(Math.hypot(a.x-player.x,a.y-player.y)<7){
+function drawPerson(ctx,a,size,player,character,sim){
+ character(ctx,a.x,a.y,size,a.facing||"down",a.moving,a.walkMs,{bodyType:a.sex,sprite:a.sprite,...root.GreyfordWorld.outfit(a)});
+ if(sim.knows(a.id)&&Math.hypot(a.x-player.x,a.y-player.y)<7){
   ctx.textAlign="center";ctx.font="bold 10px system-ui";ctx.lineWidth=3;ctx.strokeStyle="#26372d";ctx.fillStyle="#f4e5c3";
   root.KingdomArt.outlinedText(ctx,a.name,a.x*size,(a.y-1.1)*size);
  }

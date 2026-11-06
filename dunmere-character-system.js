@@ -25,6 +25,7 @@ const equipmentSheet=new Image();equipmentSheet.src='assets/held-equipment.png?v
 const directionalEquipment=new Image();directionalEquipment.src='assets/held-equipment-front-back.png?v=3';
 const shieldBack=new Image();shieldBack.src='assets/shield-back.png?v=1';
 const shieldRear=new Image();shieldRear.src='assets/shield-rear.png?v=1';
+const rankTrim=new Image();rankTrim.src='assets/greyford-rank-trim.png?v=1';
 const equipmentCells={pick:0,hoe:1,ironSword:2,steelSword:3,knife:4,steelDagger:5,spear:6,torch:7,ironAxe:8,steelAxe:9,steelPick:10,woodShield:11,ironShield:12,axe:13};
 // Hand anchors follow the actual LPC pixels for idle, first stride and second stride.
 // The right hand is viewer-left when facing down, viewer-right when facing up.
@@ -174,8 +175,8 @@ function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
  if(!underwear&&appearance.hair!==false&&PEOPLE[id].bodyType==="female")layer("hair-back");
  layer("base");layer("head");
  if(!underwear){
-  if(appearance.legs!==false)layer("legs");
-  if(appearance.torso!==false)layer("torso");
+  if(appearance.legs!==false)draw('resident-v1-legs',id,appearance.legTint||null);
+  if(appearance.torso!==false){draw('resident-v1-torso',id,appearance.torsoTint||null);const rank={noble:0,officer:1,merchant:2}[appearance.rankTrim];if(rank!==undefined&&rankTrim.complete&&rankTrim.naturalWidth===384)ctx.drawImage(rankTrim,pose.frame*32,rank*48,32,48,destX,destY,Math.round(size),drawHeight)}
   layer("feet");
   if(appearance.hair!==false)layer("hair-front");
  }

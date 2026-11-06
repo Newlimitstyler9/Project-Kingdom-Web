@@ -1,0 +1,1 @@
+Original Project Kingdom pixel art authored with Pixelorama from the game's existing 32x48 character proportions. Twelve 32x48 frames per row: noble, town officer, and merchant. Editable source: art-source/greyford-rank-trim.pxo. Rebuild script: scripts/author-greyford-rank-trim-pixelorama.mjs. No third-party artwork is embedded.

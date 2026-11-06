@@ -54,15 +54,15 @@ const decor=[
 ];
 const people=[
  {id:"maera",name:"Duchess Maera Vell",age:42,sex:"female",home:"vell-house",work:"court",role:"march judge",status:"noble",sprite:3,kin:["elin"],x:61,y:34},
- {id:"elin",name:"Elin Vell",age:17,sex:"female",home:"vell-house",work:"court",role:"court apprentice",sprite:10,kin:["maera"],x:59,y:33},
- {id:"jorin",name:"Jorin Pell",age:39,sex:"male",home:"pell-house",work:"stable",role:"horse trader",sprite:2,spouse:"mira",kin:["mira","tavin"],x:33,y:34},
- {id:"mira",name:"Mira Pell",age:36,sex:"female",home:"pell-house",work:"warehouse",role:"merchant",sprite:6,spouse:"jorin",kin:["jorin","tavin"],x:36,y:34},
+ {id:"elin",name:"Elin Vell",age:17,sex:"female",home:"vell-house",work:"court",role:"court apprentice",status:"noble-house",sprite:10,kin:["maera"],x:59,y:33},
+ {id:"jorin",name:"Jorin Pell",age:39,sex:"male",home:"pell-house",work:"stable",role:"horse trader",status:"merchant",sprite:2,spouse:"mira",kin:["mira","tavin"],x:33,y:34},
+ {id:"mira",name:"Mira Pell",age:36,sex:"female",home:"pell-house",work:"warehouse",role:"merchant",status:"merchant",sprite:6,spouse:"jorin",kin:["jorin","tavin"],x:36,y:34},
  {id:"tavin",name:"Tavin Pell",age:12,sex:"male",home:"pell-house",work:"pell-house",role:"child",sprite:11,kin:["jorin","mira"],x:29,y:25},
  {id:"orla",name:"Orla Reed",age:31,sex:"female",home:"reed-house",work:"warehouse",role:"carter",sprite:1,kin:["nia"],x:29,y:48},
  {id:"nia",name:"Nia Reed",age:9,sex:"female",home:"reed-house",work:"reed-house",role:"child",sprite:8,kin:["orla"],x:27,y:48},
  {id:"brann",name:"Brann Ash",age:45,sex:"male",home:"forge-house",work:"smithy",role:"smith",sprite:0,spouse:"sella",kin:["sella"],x:66,y:42},
  {id:"sella",name:"Sella Ash",age:43,sex:"female",home:"forge-house",work:"smithy",role:"forge bookkeeper",sprite:5,spouse:"brann",kin:["brann"],x:65,y:43},
- {id:"cassian",name:"Cassian Hale",age:28,sex:"male",home:"clerk-house",work:"court",role:"toll clerk",sprite:9,kin:[],x:40,y:26},
+ {id:"cassian",name:"Cassian Hale",age:28,sex:"male",home:"clerk-house",work:"court",role:"toll clerk",status:"town officer",sprite:9,kin:[],x:40,y:26},
  {id:"alda",name:"Alda Fen",age:33,sex:"female",home:"clerk-house",work:"court",role:"provisioning steward",status:"town officer",sprite:10,kin:[],x:40,y:27},
  {id:"rafe",name:"Rafe Durn",age:34,sex:"male",home:"guard-barracks",work:"south-gate",role:"gate guard",sprite:7,kin:[],x:47,y:55},
  {id:"ida",name:"Ida Fen",age:26,sex:"female",home:"guard-barracks",work:"north-wall",role:"wall guard",sprite:3,kin:[],x:35,y:12},
@@ -90,6 +90,12 @@ const GATES=[
 ];
 const WIDTH=96,HEIGHT=76;
 const PADDOCK={x:87,y:30,w:8,h:14,gateX:87,gateY:35};
+function outfit(person){
+ if(person.status==='noble'||person.status==='noble-house')return {torsoTint:'#dfb9d5',legTint:'#9b86ac',rankTrim:'noble'};
+ if(person.status==='town officer')return {torsoTint:'#a5c5dc',legTint:'#8297ac',rankTrim:'officer'};
+ if(person.status==='merchant')return {torsoTint:'#e1c49c',legTint:'#a38669',rankTrim:'merchant'};
+ return {};
+}
 function paddockFenceAt(x,y){const px=Math.floor(x),py=Math.floor(y);if(px<PADDOCK.x||px>=PADDOCK.x+PADDOCK.w||py<PADDOCK.y||py>=PADDOCK.y+PADDOCK.h)return false;if(py===PADDOCK.y||py===PADDOCK.y+PADDOCK.h-1)return true;if(px===PADDOCK.gateX&&py===PADDOCK.gateY)return false;return px===PADDOCK.x&&Math.abs(x-(px+.1))<.13||px===PADDOCK.x+PADDOCK.w-1&&Math.abs(x-(px+.9))<.13}
 function inPaddock(x,y){return x>PADDOCK.x&&x<PADDOCK.x+PADDOCK.w-1&&y>PADDOCK.y&&y<PADDOCK.y+PADDOCK.h-1}
 function artBounds(b){return {left:b.x,right:b.x+b.w,top:b.y,bottom:b.y+b.h}}
@@ -216,6 +222,7 @@ function create(saved){
  function advance(hours){const count=Math.min(24*30,Math.max(0,Math.floor(hours)));for(let i=0;i<count;i++)tick();return count}
  function snapshot(){return {version:2,day,hour,grain,caravan:{...caravan},reports:reports.map(r=>({...r})),events:events.map(e=>({...e})),orders:orders.map(o=>({...o})),knowledge:Object.fromEntries(Object.entries(knowledge).map(([id,entries])=>[id,entries.map(k=>({...k}))])),met:[...met],energy:{...energy},agents:people.map(p=>{const a=agents.get(p.id);return {id:p.id,x:a.x,y:a.y,level:a.level,inside:a.inside,insideBuilding:a.insideBuilding,roomX:a.roomX,roomY:a.roomY}})}}
  function introduce(id){if(!met.includes(id))met.push(id)}
+ function knows(id){return met.includes(id)}
  function knownReports(person){return (knowledge[person.id]||[]).map(k=>{const report=reports.find(r=>r.id===k.reportId);return report?{...report,heardFrom:k.from,heardAt:k.at}:null}).filter(Boolean)}
  let routineSeconds=0;
  const workActions={court:["Reviewing petitions","Consulting the court clerk","Meeting a visitor"],warehouse:["Checking incoming stock","Updating the store ledger","Inspecting a delivery"],smithy:["Working at the forge","Fetching iron and fuel","Checking finished work"],bakery:["Preparing bread","Tending the ovens","Setting out fresh loaves"],chapel:["Tending the chapel","Speaking with a parishioner","Cleaning the entrance"],stable:["Reviewing horse records","Checking tack","Discussing a sale"],weaver:["Working at the loom","Sorting cloth","Checking dyed yarn"],apothecary:["Preparing remedies","Gathering herbs","Helping a patient"],granary:["Counting grain sacks","Checking the stores","Recording a delivery"],carpenter:["Working at the bench","Fetching timber","Inspecting joinery"],tollhouse:["Collecting tolls","Checking the bridge","Writing receipts"],jail:["Keeping watch at the jail","Checking the cells","Speaking with the gate watch"],"market-inn":["Serving travelers","Fetching supplies","Greeting arrivals"]};
@@ -297,7 +304,7 @@ function create(saved){
  }
  function peopleOnMap(){return people.flatMap(p=>{const a=agents.get(p.id);return a.inside||a.away?[]:[{...p,x:a.x,y:a.y,level:a.level,activity:a.activity,facing:a.facing,moving:a.moving,walkMs:a.walkMs}]})}
  function gatePassageAt(id){const g=GATES.find(g=>g.id===id);return !!g&&!gateOpen&&people.some(p=>{const a=agents.get(p.id);return a&&!a.inside&&!a.away&&Math.hypot(a.x-g.x,a.y-g.y)<2.1})}
- return {advance,step,snapshot,introduce,knownReports,reportSmithyTheft,reportPropertyTheft,schedule,peopleOnMap,insidePeople,indoorOccupants,gatePassageAt,get day(){return day},get hour(){return hour},get gateOpen(){return gateOpen},get caravan(){return caravan},get events(){return events},get grain(){return grain},get orders(){return orders}};
+ return {advance,step,snapshot,introduce,knows,knownReports,reportSmithyTheft,reportPropertyTheft,schedule,peopleOnMap,insidePeople,indoorOccupants,gatePassageAt,get day(){return day},get hour(){return hour},get gateOpen(){return gateOpen},get caravan(){return caravan},get events(){return events},get grain(){return grain},get orders(){return orders}};
 }
-root.GreyfordWorld={WIDTH,HEIGHT,GATES,PADDOCK,homes,workplaces,offices,buildings,decor,people,at,decorAt,gateAt,wallAt,paddockFenceAt,inPaddock,wallWalkAt,roadAt,pass,house,porch,create};
+root.GreyfordWorld={WIDTH,HEIGHT,GATES,PADDOCK,homes,workplaces,offices,buildings,decor,people,outfit,at,decorAt,gateAt,wallAt,paddockFenceAt,inPaddock,wallWalkAt,roadAt,pass,house,porch,create};
 })(window);
