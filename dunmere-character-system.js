@@ -50,7 +50,8 @@ function drawHeld(ctx,id,px,py,size,direction,appearance){
  const pivotY=py+size*.12-47*scale+handY*scale;
  const upright=['axe','ironSword','steelSword','knife','steelDagger','spear','ironAxe','steelAxe','torch'].includes(id);
  const frontBack=direction==='down'||direction==='up';
- const rest=frontBack?0:id==='torch'?0:upright?.25:2.3;
+ const groundTool=['axe','ironAxe','steelAxe','pick','hoe','steelPick'].includes(id);
+ const rest=frontBack&&groundTool?2.3:frontBack?0:id==='torch'?0:upright?.25:2.3;
  let angle=rest;
  if(guard)angle=id==='torch'?0:upright?.25:.85;
  else if(swing!==null){const ease=t=>t*t*(3-2*t);if(upright)angle=rest+(id==='torch'?.2:1.3)*Math.sin(Math.PI*swing);else angle=swing<.3?2.3-1.55*ease(swing/.3):swing<.78?.75+1.55*ease((swing-.3)/.48):2.3}
