@@ -90,7 +90,7 @@ const GATES=[
 ];
 const WIDTH=96,HEIGHT=76;
 const PADDOCK={x:87,y:30,w:8,h:14,gateX:87,gateY:35};
-function paddockFenceAt(x,y){const px=Math.floor(x),py=Math.floor(y);if(px<PADDOCK.x||px>=PADDOCK.x+PADDOCK.w||py<PADDOCK.y||py>=PADDOCK.y+PADDOCK.h)return false;if(px===PADDOCK.gateX&&py===PADDOCK.gateY)return false;return px===PADDOCK.x||px===PADDOCK.x+PADDOCK.w-1||py===PADDOCK.y||py===PADDOCK.y+PADDOCK.h-1}
+function paddockFenceAt(x,y){const px=Math.floor(x),py=Math.floor(y);if(px<PADDOCK.x||px>=PADDOCK.x+PADDOCK.w||py<PADDOCK.y||py>=PADDOCK.y+PADDOCK.h)return false;if(py===PADDOCK.y||py===PADDOCK.y+PADDOCK.h-1)return true;if(px===PADDOCK.gateX&&py===PADDOCK.gateY)return false;return (px===PADDOCK.x||px===PADDOCK.x+PADDOCK.w-1)&&Math.abs(x-(px+.5))<.36}
 function inPaddock(x,y){return x>PADDOCK.x&&x<PADDOCK.x+PADDOCK.w-1&&y>PADDOCK.y&&y<PADDOCK.y+PADDOCK.h-1}
 function artBounds(b){return {left:b.x,right:b.x+b.w,top:b.y,bottom:b.y+b.h}}
 function at(x,y){return buildings.find(b=>{const r=artBounds(b);return x>=r.left&&x<r.right&&y>=r.top&&y<r.bottom})}
