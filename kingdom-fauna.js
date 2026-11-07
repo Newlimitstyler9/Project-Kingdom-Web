@@ -5,7 +5,22 @@ const ROWS={cow:{up:0,left:1,down:2,right:3},sheep:{up:0,left:1,down:2,right:3},
 const DISPLAY={cow:[2,2],sheep:[1.5,1.5],pig:[1.5,1.5],chicken:[.85,.85],dog:[1.1,1.1],cat:[.85,.85],deer:[1.25,1.25],rabbit:[.8,.8]};
 const SOURCES={cow:'cow-walk.png',sheep:'sheep-walk.png',pig:'pig-walk.png',chicken:'chicken-walk.png',dog:'cat-dog.png',cat:'cat-dog.png',deer:'deer-walk.png',rabbit:'rabbit-walk.png'};
 const images={};
-for(const [kind,file] of Object.entries(SOURCES)){if(images[kind])continue;const image=new Image();image.src='assets/fauna/'+file;images[kind]=image}
+const opaqueFrames={};
+function measureFrames(kind,image){
+ const [w,h,columns]=BOUNDS[kind],canvas=document.createElement('canvas');canvas.width=image.naturalWidth;canvas.height=image.naturalHeight;
+ const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(image,0,0);
+ const {data,width}=ctx.getImageData(0,0,canvas.width,canvas.height),frames=[];
+ let span=1;
+ for(let row=0;row<4;row++)for(let frame=0;frame<columns;frame++){
+  const left=(kind==='cat'?3*w:0)+frame*w,top=(kind==='dog'?4*h:0)+row*h;
+  let minX=w,minY=h,maxX=-1,maxY=-1;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(data[((top+y)*width+left+x)*4+3]>0){minX=Math.min(minX,x);minY=Math.min(minY,y);maxX=Math.max(maxX,x);maxY=Math.max(maxY,y)}
+  const bounds=maxX<0?{x:0,y:0,w,h}:{x:minX,y:minY,w:maxX-minX+1,h:maxY-minY+1};
+  frames[row*columns+frame]=bounds;span=Math.max(span,bounds.w,bounds.h);
+ }
+ opaqueFrames[kind]={frames,span};
+}
+for(const [kind,file] of Object.entries(SOURCES)){const image=new Image();image.onload=()=>measureFrames(kind,image);image.src='assets/fauna/'+file;images[kind]=image}
 const fenceImage=new Image();fenceImage.src='assets/greyford-paddock-fence.png?v=1';
 // Coordinates are world tiles. A pen has a walkable gate on its west side.
 const pens={westfield:{x:58,y:82,w:20,h:11,gateY:87,capacity:12,owner:'westfield'},dunmereHens:{x:45,y:35,w:7,h:6,gateY:38,capacity:7,owner:'dunmere'},greyfordHens:{x:151,y:121,w:7,h:7,gateY:124,capacity:7,owner:'greyford'}};
@@ -68,7 +83,10 @@ function create(saved,pass=()=>true){const animals=seeds.map(([id,kind,x,y,radiu
  return {step,list,near,advanceDay,slaughter,stock,takeStock,snapshot,restore};
 }
 function draw(ctx,animal,size){const image=images[animal.kind];if(!image?.complete||!image.naturalWidth)return false;const [w,h,columns]=BOUNDS[animal.kind],row=ROWS[animal.kind][animal.facing]??0,frame=animal.moving?Math.floor(animal.walkMs/180)%columns:0,[drawW,drawH]=DISPLAY[animal.kind],sourceX=animal.kind==='cat'?3*w:0,sourceY=animal.kind==='dog'?4*h:0;
- const baby=animal.ageDays<6?.55:animal.ageDays<12?.72:1,width=drawW*size*baby,height=drawH*size*baby,x=animal.x*size-width/2,y=animal.y*size-height*.84;ctx.drawImage(image,sourceX+frame*w,sourceY+row*h,w,h,x,y,width,height);return true}
+ const bounds=opaqueFrames[animal.kind]?.frames[row*columns+frame]||{x:0,y:0,w,h};
+ const span=opaqueFrames[animal.kind]?.span||Math.max(w,h),baby=animal.ageDays<6?.55:animal.ageDays<12?.72:1;
+ const scale=Math.min(drawW,drawH)*size*baby/span,width=bounds.w*scale,height=bounds.h*scale,x=animal.x*size-width/2,y=animal.y*size-height*.84;
+ ctx.imageSmoothingEnabled=false;ctx.drawImage(image,sourceX+frame*w+bounds.x,sourceY+row*h+bounds.y,bounds.w,bounds.h,x,y,width,height);return true}
 function drawPens(ctx,size,front=false,offsetX=0,offsetY=0,filter=()=>true){if(!fenceImage.complete||!fenceImage.naturalWidth)return;const tile=(sprite,x,y)=>ctx.drawImage(fenceImage,sprite*16,0,16,16,Math.round((x-offsetX)*size),Math.round((y-offsetY)*size),size+1,size+1);for(const pen of Object.values(pens)){if(!filter(pen))continue;if(front){for(let x=pen.x+1;x<pen.x+pen.w-1;x++)tile(0,x,pen.y+pen.h-1);tile(5,pen.x,pen.y+pen.h-1);tile(6,pen.x+pen.w-1,pen.y+pen.h-1);continue}for(let y=pen.y+1;y<pen.y+pen.h-1;y++){if(y!==pen.gateY)tile(1,pen.x,y);tile(2,pen.x+pen.w-1,y)}for(let x=pen.x+1;x<pen.x+pen.w-1;x++)tile(0,x,pen.y);tile(3,pen.x,pen.y);tile(4,pen.x+pen.w-1,pen.y)}}
 root.KingdomFauna={create,draw,drawPens,fenceAt,insidePen,pens,images,seeds};
 })(typeof window!=='undefined'?window:globalThis);

@@ -1,0 +1,16 @@
+Livestock goods, 8 cells of 16 × 16 pixels. The editable Pixelorama source is
+art-source/livestock-goods.pxo; regenerate with
+node scripts/author-livestock-goods-pixelorama.mjs.
+
+Egg: food/egg_whole_brown.png from 16x16 Food by ARoachIFoundOnMyPillow,
+https://opengameart.org/content/16x16-food (CC0).
+Raw beef: food/steak_raw.png from the same pack (CC0).
+Raw chicken: food/chicken_drumstick_raw.png from the same pack (CC0).
+Milk: item_bucket_narrow_milk.png from 16x16 RPG Items (DB32) by
+ARoachIFoundOnMyPillow,
+https://opengameart.org/content/16x16-rpg-items-db32 (CC0).
+Raw pork: food_meat_raw.png from the same pack (CC0).
+Wool, hide, and leather: original Project Kingdom pixels authored in Pixelorama.
+
+Original source PNGs for the five imported cells are in
+docs/art-source/pixelorama/livestock-source/.

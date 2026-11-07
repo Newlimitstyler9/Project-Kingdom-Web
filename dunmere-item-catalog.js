@@ -97,8 +97,8 @@ const gear={
  ironBoots:{name:'Iron sabatons',type:'armor',slot:'feet',set:'plateGuard',tier:4,weight:2.3,defense:2,visual:'plate-boots',art:gearArt.boots,palette:['#00000000','#3d4649','#849294','#c9d0ce']},
  plateCuirass:{name:'Iron plate cuirass',type:'armor',slot:'torso',set:'plateGuard',tier:4,weight:6.5,defense:6,visual:'plate-torso',art:gearArt.tunic,palette:['#00000000','#3d4649','#849294','#c9d0ce']},
  plateHelm:{name:'Iron armet',type:'armor',slot:'head',set:'plateGuard',tier:4,weight:2.8,defense:3,visual:'armet',art:gearArt.helmet,palette:['#00000000','#3d4649','#849294','#c9d0ce']},
- hide:{name:'Animal hide',type:'material',stack:10,weight:1,art:gearArt.tunic,palette:['#00000000','#3b2b21','#836047','#b58a61']},
- leather:{name:'Tanned leather',type:'material',stack:20,weight:.5,art:gearArt.tunic,palette:['#00000000','#33271f','#765037','#b18452']},
+ hide:{name:'Animal hide',type:'material',stack:10,weight:1},
+ leather:{name:'Tanned leather',type:'material',stack:20,weight:.5},
  steelBillet:{name:'Steel billet',type:'material',stack:20,weight:.7,art:gearArt.ingot,palette:['#00000000','#263e4a','#779fac','#d5e8e9']},
  leatherHood:{name:'Leather hood',type:'armor',slot:'head',set:'leatherScout',tier:2,weight:.6,defense:1,visual:'leather-hood',art:gearArt.helmet,palette:['#00000000','#362a20','#76523a','#b58b59']},
  leatherJerkin:{name:'Leather jerkin',type:'armor',slot:'torso',set:'leatherScout',tier:2,weight:2.2,defense:3,visual:'leather-torso',art:gearArt.tunic,palette:['#00000000','#362a20','#76523a','#b58b59']},
@@ -122,10 +122,12 @@ const gear={
  ironAxe:{name:'Iron axe',type:'weapon',slot:'hand',tier:2,weight:1.9,attack:4,art:gearArt.axe,palette:['#00000000','#5b402d','#8e9695','#d3d5cc']}
 };
 for(const [id,def] of Object.entries(gear))defs[id]={stack:1,phase:'playable',...def};
+// Cells in the editable Pixelorama livestock-goods atlas, shared by pen stock and bag icons.
+['eggs','milk','wool','rawBeef','rawPork','rawChicken','hide','leather'].forEach((id,iconCell)=>{defs[id].iconCell=iconCell});
 for(const [id,art] of [['knife',gearArt.dagger],['spear',gearArt.spear]])defs[id]={...defs[id],portable:true,phase:'playable',art,palette:['#00000000','#503d2d','#858c84','#d6d4ba']};
 defs.knife.name='Stone dagger';defs.knife.attack=2;defs.knife.tier=1;defs.spear.attack=3;defs.spear.tier=1;
 for(const definition of Object.values(defs))if(!definition.phase)definition.phase="playable";
-function validate(){for(const [id,definition] of Object.entries(defs)){if(!/^[a-z][A-Za-z0-9]*$/.test(id)||!definition.name||!definition.type||!Number.isInteger(definition.stack)||definition.stack<1||!Number.isFinite(definition.weight)||definition.weight<0)return false;if(definition.phase==="playable"&&(!Array.isArray(definition.art)||!Array.isArray(definition.palette)))return false}return true}
+function validate(){for(const [id,definition] of Object.entries(defs)){if(!/^[a-z][A-Za-z0-9]*$/.test(id)||!definition.name||!definition.type||!Number.isInteger(definition.stack)||definition.stack<1||!Number.isFinite(definition.weight)||definition.weight<0)return false;if(definition.phase==="playable"&&!(Array.isArray(definition.art)&&Array.isArray(definition.palette))&&!Number.isInteger(definition.iconCell))return false}return true}
 const worldStockStart={grain:350,flour:40,wellWater:80,bread:45,vegetables:120,beans:200,eggs:18,fish:8,preserves:180,seed:20,wood:60};
 if(!validate()||Object.keys(worldStockStart).some(id=>!defs[id]))throw Error("Invalid item catalog");
 root.KingdomItemCatalog={defs,worldStockStart,validate,get:id=>defs[id]||null,ids:()=>Object.keys(defs)};
