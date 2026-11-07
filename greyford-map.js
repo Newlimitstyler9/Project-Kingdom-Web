@@ -38,10 +38,10 @@ function draw(ctx,sim,player,vw,vh,size,character,options={}){
  const wallAlpha=(x,y)=>{if(player.level!==0||player.y>=y+1.2)return 1;const distance=Math.hypot(player.x-(x+.5),player.y-(y+.5));return 1-.65*Math.max(0,1-distance/4)};
  if(!options.embedded){ctx.fillStyle="#687e55";ctx.fillRect(0,0,vw,vh)}ctx.save();ctx.translate(options.embedded?Math.round(ox*size):Math.round(ox*size-camX),options.embedded?Math.round(oy*size):Math.round(oy*size-camY));ctx.beginPath();ctx.rect(0,0,W*size,H*size);ctx.clip();ctx.imageSmoothingEnabled=false;
  for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++){
-  const nearRiver=x<13,bridge=y>=33&&y<=37&&x<20;
-  if(nearRiver&&!bridge){root.KingdomArt.water(ctx,x,y,size);continue}
-  if(nearRiver&&bridge){ctx.fillStyle='#49372d';ctx.fillRect(x*size,y*size,size+1,size+1);ctx.fillStyle=(y%2?'#866747':'#997653');ctx.fillRect(x*size,y*size+size*.08,size+1,size*.78);ctx.fillStyle='#c1a176';ctx.fillRect(x*size,y*size+size*.12,size+1,size*.08);ctx.fillStyle='#584638';ctx.fillRect(x*size,y*size+size*.82,size+1,size*.08);continue}
-  root.KingdomArt.terrain(ctx,x,y,size,map.roadAt(x+.5,y+.5)||bridge,(rx,ry)=>map.roadAt(rx+.5,ry+.5));
+  const nearRiver=map.riverAt(x+.5,y+.5),bridge=map.bridgeAt(x+.5,y+.5);
+  if(bridge){ctx.fillStyle='#49372d';ctx.fillRect(x*size,y*size,size+1,size+1);ctx.fillStyle=(y%2?'#866747':'#997653');ctx.fillRect(x*size,y*size+size*.08,size+1,size*.78);ctx.fillStyle='#c1a176';ctx.fillRect(x*size,y*size+size*.12,size+1,size*.08);ctx.fillStyle='#584638';ctx.fillRect(x*size,y*size+size*.82,size+1,size*.08);continue}
+  if(nearRiver){root.KingdomArt.water(ctx,x,y,size);continue}
+  root.KingdomArt.terrain(ctx,x,y,size,map.roadAt(x+.5,y+.5)||bridge,(rx,ry)=>rx<0&&ry>=34&&ry<=35||map.roadAt(rx+.5,ry+.5));
   if(x>=20&&x<76&&y>=14&&y<57&&!map.roadAt(x+.5,y+.5)&&(x*11+y*17)%31===0)root.KingdomArt.plant(ctx,"grass",x,y,size);
   if(x>=6&&x<15&&y>=38&&y<57&&(x+y)%5===0)root.KingdomArt.plant(ctx,"grass",x,y,size);
  }
@@ -123,5 +123,5 @@ function drawPerson(ctx,a,size,player,character,sim){
   root.KingdomArt.outlinedText(ctx,a.name,a.x*size,(a.y-1.1)*size);
  }
 }
-root.GreyfordMap={draw,get ready(){return castle.complete&&!!castle.naturalWidth&&fittedGate.complete&&!!fittedGate.naturalWidth&&sheet.complete&&!!sheet.naturalWidth&&paddockFence.complete&&!!paddockFence.naturalWidth&&kit.complete&&!!kit.naturalWidth}};
+root.GreyfordMap={draw,drawBuilding,get ready(){return castle.complete&&!!castle.naturalWidth&&fittedGate.complete&&!!fittedGate.naturalWidth&&sheet.complete&&!!sheet.naturalWidth&&paddockFence.complete&&!!paddockFence.naturalWidth&&kit.complete&&!!kit.naturalWidth}};
 })(window);

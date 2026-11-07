@@ -98,9 +98,23 @@ function drawBack(ctx,id,px,py,size,direction,appearance){
  const sprite=heldSprite(id);if(!sprite)return;
  const scale=size/32,up=direction==='up',crouch=appearance.crouch===true;
  const x=px-size/2+(up?17:direction==='down'?17:19)*scale,y=py+size*.12-47*scale+(crouch?31:28)*scale;
- ctx.save();ctx.imageSmoothingEnabled=false;ctx.translate(Math.round(x),Math.round(y));ctx.rotate(direction==='right'?-.9:.9);
+ ctx.save();ctx.imageSmoothingEnabled=false;ctx.translate(Math.round(x),Math.round(y));ctx.rotate(Math.PI+(direction==='right'?-.9:.9));
  if(id==='axe'){if(direction!=='right')ctx.scale(-1,1);ctx.drawImage(sprite,Math.round(-12*scale),Math.round(-17*scale),Math.round(20*scale),Math.round(25*scale))}
  else ctx.drawImage(sprite,Math.round(-12*scale),Math.round(-17*scale),Math.round(24*scale),Math.round(32*scale));
+ ctx.restore();
+}
+function drawStowedShield(ctx,id,px,py,size,direction,appearance){
+ const scale=size/32,crouch=appearance.crouch===true;
+ ctx.save();ctx.imageSmoothingEnabled=false;
+ if(direction==='left'||direction==='right'){
+  if(shieldBack.complete&&shieldBack.naturalWidth===16){
+   const cell=id==='ironShield'?1:0,x=px+(direction==='left'?4:-4)*scale,y=py-(crouch?13:17)*scale;
+   ctx.drawImage(shieldBack,cell*8,0,8,28,Math.round(x-3*scale),Math.round(y-12*scale),Math.round(6*scale),Math.round(23*scale));
+  }
+ }else{
+  const sprite=heldSprite(id);
+  if(sprite)ctx.drawImage(sprite,Math.round(px-11*scale),Math.round(py-(crouch?23:28)*scale),Math.round(22*scale),Math.round(29*scale));
+ }
  ctx.restore();
 }
 function ready(){return !failed&&Object.entries(images).every(([part,img])=>img.complete&&img.naturalWidth===384&&img.naturalHeight===(part.startsWith("resident-v1-")?576:48))}
@@ -146,10 +160,12 @@ function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
    }
    if(stable){if(crouchCache.size>120)crouchCache.clear();crouchCache.set(key,bent)}
   }
+  if(appearance.stowedShield&&direction!=='up')drawStowedShield(ctx,appearance.stowedShield,px,py,size,direction,equippedView);
   if(appearance.backItem&&direction!=='up')drawBack(ctx,appearance.backItem,px,py,size,direction,equippedView);
   if(appearance.offhandItem&&(direction==='up'||direction==='right'))drawOffhand(ctx,appearance.offhandItem,px,py,size,direction,equippedView);
   if(appearance.handItem&&direction==='up')drawHeld(ctx,appearance.handItem,px,py,size,direction,equippedView);
   ctx.imageSmoothingEnabled=false;ctx.drawImage(bent,0,1,32,48,destX,destY,size,drawHeight);
+  if(appearance.stowedShield&&direction==='up')drawStowedShield(ctx,appearance.stowedShield,px,py,size,direction,equippedView);
   if(appearance.backItem&&direction==='up')drawBack(ctx,appearance.backItem,px,py,size,direction,equippedView);
   if(appearance.handItem&&direction!=='up')drawHeld(ctx,appearance.handItem,px,py,size,direction,equippedView);
   if(appearance.offhandItem&&direction!=='up'&&direction!=='right')drawOffhand(ctx,appearance.offhandItem,px,py,size,direction,equippedView);
@@ -161,6 +177,7 @@ function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
  ctx.imageSmoothingEnabled=false;
  const drawGear=(name,tint=null)=>{const original=gearImages[name];if(!original?.complete||original.naturalWidth!==576||original.naturalHeight!==256)return;let img=original;if(tint){const key=name+':'+tint;if(!tintedGear.has(key)){const canvas=document.createElement('canvas');canvas.width=576;canvas.height=256;const g=canvas.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(original,0,0);g.globalCompositeOperation='multiply';g.fillStyle=tint;g.fillRect(0,0,576,256);g.globalCompositeOperation='destination-in';g.drawImage(original,0,0);tintedGear.set(key,canvas)}img=tintedGear.get(key)}const frame=pose.frame,row=[2,1,3,0][Math.floor(frame/3)],col=[0,2,6][frame%3];ctx.drawImage(img,col*64+16,row*64+12,32,52,destX,destY,Math.round(size),drawHeight)};
  const draw=(part,row,tint=null)=>{const source=tint?clothingSheet(part,tint):images[part];ctx.drawImage(source,pose.frame*32,row*48,32,48,destX,destY,Math.round(size),drawHeight)};
+ if(id===12&&appearance.stowedShield&&direction!=='up')drawStowedShield(ctx,appearance.stowedShield,px,py,size,direction,equippedView);
  if(id===12&&appearance.backItem&&direction!=='up')drawBack(ctx,appearance.backItem,px,py,size,direction,equippedView);
  if(id===12&&appearance.offhandItem&&(direction==='up'||direction==='right'))drawOffhand(ctx,appearance.offhandItem,px,py,size,direction,equippedView);
  if(id===12&&appearance.handItem&&direction==='up')drawHeld(ctx,appearance.handItem,px,py,size,direction,equippedView);
@@ -189,6 +206,7 @@ function render(ctx,id,x,y,size,direction,moving,walkTimeMs,appearance={}){
   if(gear.head==='leatherHood')drawGear('leather-hood',hide);
   if(gear.head==='ironKettleHelm')drawGear('kettle');
   if(gear.head==='plateHelm'||gear.head==='steelHelm')drawGear('armet',gear.head==='steelHelm'?steel:null);
+  if(appearance.stowedShield&&direction==='up')drawStowedShield(ctx,appearance.stowedShield,px,py,size,direction,equippedView);
   if(appearance.backItem&&direction==='up')drawBack(ctx,appearance.backItem,px,py,size,direction,equippedView);
   if(appearance.handItem&&direction!=='up')drawHeld(ctx,appearance.handItem,px,py,size,direction,equippedView);
   if(appearance.offhandItem&&direction!=='up'&&direction!=='right')drawOffhand(ctx,appearance.offhandItem,px,py,size,direction,equippedView);

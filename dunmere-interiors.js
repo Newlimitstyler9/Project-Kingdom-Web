@@ -80,10 +80,11 @@ const WORKSTATIONS={
 function create(buildings){
  const upstairs={id:'inn-upstairs',name:'Hearth & Hound · guest rooms',kind:'upstairs',portal:null};
  const greyfordUpstairs={id:'greyford-inn-upstairs',name:'The Bridge Lantern · upper floor',kind:'upstairs',portal:null};
- const rooms=Object.fromEntries([...buildings.map(b=>[b.id,{id:b.id,name:b.name,kind:b.kind,portal:{x:b.doorX+.5,y:b.doorY+.5},greyfordBuilding:b.greyfordBuilding||null,beds:b.beds||0}]),[CAVE.id,CAVE],...(buildings.some(b=>b.id==='inn')?[[upstairs.id,upstairs]]:[]),...(buildings.some(b=>b.id==='greyford-market-inn')?[[greyfordUpstairs.id,greyfordUpstairs]]:[])].map(([id,room])=>[id,{...room,width:['tavern','upstairs'].includes(room.kind)?INN_W:W,height:['tavern','upstairs'].includes(room.kind)?INN_H:H,furniture:[...(room.greyfordBuilding&&room.kind==='home'?greyfordHomeFurniture(room.beds):FURNITURE[room.kind]||FURNITURE.home),...(room.greyfordBuilding&&room.kind==='bakery'?[['chest',8.45,5.45,1.45,1]]:[])].map(([type,x,y,w,h])=>({type,x,y,w,h})),lights:room.kind==='tavern'?[{x:3.7,y:1.7,type:'wall-candle'},{x:9.4,y:1.7,type:'wall-candle'},{x:12.7,y:2.45,type:'hearth'}]:room.kind==='upstairs'?[{x:6.5,y:1.7,type:'wall-candle'},{x:14.5,y:1.7,type:'wall-candle'}]:[]}]));
+ const marrowUpstairs={id:'marrow-inn-upstairs',name:'The Threshing Rest · upper floor',kind:'upstairs',portal:null};
+ const rooms=Object.fromEntries([...buildings.map(b=>[b.id,{id:b.id,name:b.name,kind:b.kind,portal:{x:b.doorX+.5,y:b.doorY+.5},greyfordBuilding:b.greyfordBuilding||null,beds:b.beds||0}]),[CAVE.id,CAVE],...(buildings.some(b=>b.id==='inn')?[[upstairs.id,upstairs]]:[]),...(buildings.some(b=>b.id==='greyford-market-inn')?[[greyfordUpstairs.id,greyfordUpstairs]]:[]),...(buildings.some(b=>b.id==='marrow-inn')?[[marrowUpstairs.id,marrowUpstairs]]:[])].map(([id,room])=>[id,{...room,width:['tavern','upstairs'].includes(room.kind)?INN_W:W,height:['tavern','upstairs'].includes(room.kind)?INN_H:H,furniture:[...(room.greyfordBuilding&&room.kind==='home'?greyfordHomeFurniture(room.beds):FURNITURE[room.kind]||FURNITURE.home),...(room.greyfordBuilding&&room.kind==='bakery'?[['chest',8.45,5.45,1.45,1]]:[])].map(([type,x,y,w,h])=>({type,x,y,w,h})),lights:room.kind==='tavern'?[{x:3.7,y:1.7,type:'wall-candle'},{x:9.4,y:1.7,type:'wall-candle'},{x:12.7,y:2.45,type:'hearth'}]:room.kind==='upstairs'?[{x:6.5,y:1.7,type:'wall-candle'},{x:14.5,y:1.7,type:'wall-candle'}]:[]}]));
  function get(id){return rooms[id]||null}
  function pass(room,x,y){const minY=room?.kind==='tavern'?2.25:room?.kind==='bakery'?3.05:1.2;if(!room||x<1.2||x>room.width-1.2||y<minY||y>room.height-1.05)return false;if(room.kind==='upstairs'&&((y>6.8&&y<7.45&&Math.abs(x-4.5)>.55&&Math.abs(x-11.5)>.55)||(x>7.7&&x<8.3&&y<7.4)))return false;return !room.furniture.some(f=>!['wallShelf','stairs'].includes(f.type)&&x>=f.x-.2&&x<f.x+f.w+.2&&y>=f.y-.2&&y<f.y+f.h+.2)}
- function slot(room,index){if(room.kind==='tavern'&&index===0)return {x:4.5,y:2.55};if(room.kind==='bakery'&&index===0)return {x:8.5,y:4.5};const candidates=[];for(const y of room.kind==='tavern'?[4.5,5.5,6.5,7.5,8.5,9.5]:[4.5,5.5,6.5,3.5,2.5])for(const x of room.kind==='tavern'?[3.5,5.5,7.5,9.5,11.5,13.5,4.5,6.5,8.5,10.5,12.5]:[3.5,5.5,7.5,9.5,4.5,6.5,8.5])if(pass(room,x,y)&&Math.hypot(x-room.width/2,y-room.height-1.7)>1.4)candidates.push({x,y});return candidates[(room.kind==='tavern'?index-1:index)%candidates.length]||{x:5.5,y:5.5}}
+ function slot(room,index){if(room.kind==='tavern'&&index===0)return {x:4.5,y:2.55};if(room.kind==='bakery'&&index===0)return {x:8.5,y:4.5};if(room.id==='marrow-granary'&&index===0)return {x:5.5,y:4.5};const candidates=[];for(const y of room.kind==='tavern'?[4.5,5.5,6.5,7.5,8.5,9.5]:[4.5,5.5,6.5,3.5,2.5])for(const x of room.kind==='tavern'?[3.5,5.5,7.5,9.5,11.5,13.5,4.5,6.5,8.5,10.5,12.5]:[3.5,5.5,7.5,9.5,4.5,6.5,8.5])if(pass(room,x,y)&&Math.hypot(x-room.width/2,y-room.height-1.7)>1.4)candidates.push({x,y});return candidates[(room.kind==='tavern'?index-1:index)%candidates.length]||{x:5.5,y:5.5}}
  function workSlot(room,rank,phase,from){
   const lanes=room.kind==='tavern'?[3.5,5.5,7.5,9.5,11.5,13.5]:[4.5,5.5,6.5,7.5,8.5],ys=room.kind==='tavern'?[5.5,6.5,7.5]:[4.5,5.5,6.5];
   const authored=(WORKSTATIONS[room.kind]||[]).map(([x,y])=>({x,y})).filter(p=>pass(room,p.x,p.y));
@@ -105,28 +106,28 @@ function create(buildings){
   ctx.fillStyle=wall;ctx.fillRect(0,0,rw*size,rh*size);
   ctx.fillStyle=floor;ctx.fillRect(size,size,(rw-2)*size,(rh-2)*size);
   const sprites=root.KingdomInnSprites;
-  if((['tavern','upstairs','bakery','mill','home'].includes(room.kind)||room.greyfordBuilding)&&sprites?.ready){
+  if((['tavern','upstairs','bakery','mill','home'].includes(room.kind)||room.greyfordBuilding||room.id.startsWith('marrow-'))&&sprites?.ready){
    // Complete floor and back-wall tiles. All furnishings share these source pixels.
    for(let y=1;y<rh-1;y++)for(let x=1;x<rw-1;x++)sprites.draw(ctx,(x+y)%3?'floorA':'floorB',x*size,y*size,size,size);
-   for(let x=1;x<rw-1;x++)for(let y=1;y<=(['bakery','mill','home'].includes(room.kind)||room.greyfordBuilding?2:1);y++)sprites.draw(ctx,x%3?'wallA':'wallB',x*size,y*size,size,size);
+   for(let x=1;x<rw-1;x++)for(let y=1;y<=(['bakery','mill','home'].includes(room.kind)||room.greyfordBuilding||room.id.startsWith('marrow-')?2:1);y++)sprites.draw(ctx,x%3?'wallA':'wallB',x*size,y*size,size,size);
    if(room.kind==='tavern')sprites.draw(ctx,'wallWindows',7*size,1.05*size,2.2*size,1.35*size);
    else if(room.kind==='home')sprites.draw(ctx,'guestWindow',8.2*size,1.06*size,1.05*size,.96*size);
    else if(room.kind==='bakery')sprites.draw(ctx,'bakeryWindow',5.5*size,1.22*size,1.22*size,1.16*size);
    else if(room.kind==='mill')sprites.draw(ctx,'bakeryWindow',5.5*size,1.22*size,1.22*size,1.16*size);
-   else if(room.greyfordBuilding)sprites.draw(ctx,'guestWindow',5.5*size,1.08*size,1.05*size,.96*size);
+   else if(room.greyfordBuilding||room.id.startsWith('marrow-'))sprites.draw(ctx,'guestWindow',5.5*size,1.08*size,1.05*size,.96*size);
    else{for(const x of [3.5,11.5])sprites.draw(ctx,'guestWindow',x*size,1.02*size,1.05*size,.96*size);ctx.fillStyle='#674a35';ctx.fillRect(8*size,size*.98,size*.22,6.55*size);for(let x=1;x<rw-1;x++)if(Math.abs(x-4.5)>.6&&Math.abs(x-11.5)>.6)ctx.fillRect(x*size,7*size,size,size*.42)}
   }
   for(const light of room.lights){const x=light.x*size,y=light.y*size,radius=light.type==='hearth'?size*2.6:size*1.7;const glow=ctx.createRadialGradient(x,y,0,x,y,radius);glow.addColorStop(0,'#f5ad5140');glow.addColorStop(1,'#f5ad5100');ctx.fillStyle=glow;ctx.fillRect(x-radius,y-radius,radius*2,radius*2)}
-  if(!['tavern','upstairs','bakery','mill','home'].includes(room.kind)&&!room.greyfordBuilding){ctx.fillStyle=cave?'#767b6d':'#b6956a';for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++)if((x*11+y*17)%7===0)ctx.fillRect(x*size+size*.2,y*size+size*.35,size*.22,size*.07)}
+  if(!['tavern','upstairs','bakery','mill','home'].includes(room.kind)&&!room.greyfordBuilding&&!room.id.startsWith('marrow-')){ctx.fillStyle=cave?'#767b6d':'#b6956a';for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++)if((x*11+y*17)%7===0)ctx.fillRect(x*size+size*.2,y*size+size*.35,size*.22,size*.07)}
   if(room.kind==='tavern'&&sprites?.ready)sprites.draw(ctx,'innDoor',7.1*size,10.72*size,.8*size,1.06*size);
   else if(room.kind==='upstairs'){ctx.fillStyle='#523927';ctx.fillRect(7.1*size,10.8*size,.8*size,.18*size)}
   else if(room.kind==='bakery'&&sprites?.ready)sprites.draw(ctx,'bakeryDoor',5.1*size,7.8*size,.8*size,1.05*size);
-  else if(room.greyfordBuilding&&sprites?.ready)sprites.draw(ctx,'bakeryDoor',5.1*size,7.8*size,.8*size,1.05*size);
+  else if((room.greyfordBuilding||room.id.startsWith('marrow-'))&&sprites?.ready)sprites.draw(ctx,'bakeryDoor',5.1*size,7.8*size,.8*size,1.05*size);
   else{ctx.fillStyle=cave?'#252d2c':'#34291f';ctx.fillRect(5*size,8*size,size,12)}
   ctx.fillStyle='#e6ce9f';ctx.font=`bold ${Math.round(size*.25)}px system-ui`;ctx.textAlign='center';ctx.fillText(room.name,rw*size/2,size*.6);
   for(const f of room.furniture){
    if(f.type==='wallShelf'&&sprites?.ready){sprites.draw(ctx,room.kind==='bakery'?'bakeryWallShelf':'cupboard',f.x*size,f.y*size,f.w*size,f.h*size);continue}
-   if(room.greyfordBuilding&&sprites?.ready){
+   if((room.greyfordBuilding||room.id.startsWith('marrow-'))&&sprites?.ready){
     const sprite={table:'table',bed:'guestBed',counter:'counter',bench:'bakeryBench',sacks:'bakerySackPile',rack:'cupboard',chest:'guestChest',hearth:'hearth',forge:'hearth',oven:'bakeryOvenMain'}[f.type];
     if(sprite){sprites.draw(ctx,sprite,f.x*size,f.y*size,f.w*size,f.h*size);if(f.type==='forge')sprites.draw(ctx,'fire',(f.x+.48)*size,(f.y+.78)*size,f.w*.46*size,f.h*.3*size);continue}
    }

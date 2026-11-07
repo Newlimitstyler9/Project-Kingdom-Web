@@ -104,10 +104,13 @@ function artBounds(b){return {left:b.x,right:b.x+b.w,top:b.y,bottom:b.y+b.h}}
 function at(x,y){return buildings.find(b=>{const r=artBounds(b);return x>=r.left&&x<r.right&&y>=r.top&&y<r.bottom})}
 function decorAt(x,y){return decor.find(p=>x>=p.x&&x<p.x+p.w&&y>=p.y&&y<p.y+p.h)}
 function gateAt(x,y){return GATES.find(g=>g.axis==='horizontal'?x>=g.x-1&&x<g.x+2&&y>=g.y-1&&y<g.y+1:x>=g.x-1&&x<g.x+1&&y>=g.y-1&&y<g.y+1)}
+// The west road crosses the River Grey before reaching the town wall.
+function riverAt(x,y){const center=11+1.1*Math.sin(y*.095)+.6*Math.sin(y*.31);return Math.abs(x-center)<4.1}
+function bridgeAt(x,y){return y>=33&&y<38&&x>=5&&x<20}
 function wallAt(x,y){const north=y>=12&&y<14&&x>=18&&x<=76,south=y>=57&&y<59&&x>=18&&x<=76,west=x>=18&&x<20&&y>=12&&y<=58,east=x>=75&&x<77&&y>=12&&y<=58;if(!(north||south||west||east))return false;return !GATES.some(g=>g.axis==="horizontal"?Math.abs(y-g.y)<2&&Math.abs(x-g.x)<2:Math.abs(x-g.x)<2&&y>=g.y-1&&y<g.y+1)}
 const lanes=[[[27.5,25.5],[66.5,25.5]],[[32.5,44.5],[50.5,44.5]],[[60.5,48.5],[61.5,53.5],[67.5,53.5]]];
 function segmentDistance(x,y,a,b){const dx=b[0]-a[0],dy=b[1]-a[1],t=Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy||1)));return Math.hypot(x-a[0]-t*dx,y-a[1]-t*dy)}
-function mainRoadAt(x,y){return Math.abs(x-47.5)<1.7||Math.abs(y-35)<1.5&&x>=17&&x<=87.8||Math.abs(y-48)<1.2&&x>=28&&x<=61}
+function mainRoadAt(x,y){return Math.abs(x-47.5)<1.7||Math.abs(y-35)<1.5&&x>=0&&x<=87.8||Math.abs(y-48)<1.2&&x>=28&&x<=61}
 function laneAt(x,y){return lanes.some(lane=>lane.some((point,i)=>i&&segmentDistance(x,y,lane[i-1],point)<.63))}
 function pathKey(x,y){return x+','+y}
 const footpaths=new Set();
@@ -131,7 +134,7 @@ function buildFootpaths(){
 }
 buildFootpaths();
 function wallWalkAt(x,y){return y>=12&&y<14&&x>=18&&x<=76||y>=57&&y<59&&x>=18&&x<=76||x>=18&&x<20&&y>=12&&y<=58||x>=75&&x<77&&y>=12&&y<=58}
-function pass(x,y,level=0,gatesOpen=true){if(x<0||y<0||x>=WIDTH||y>=HEIGHT)return false;if(level===1)return wallWalkAt(Math.floor(x),Math.floor(y));const northLip=y>=11&&y<12&&x>=18&&x<77&&!(x>=46&&x<49);if(northLip||wallAt(Math.floor(x),Math.floor(y))||paddockFenceAt(x,y)||root.KingdomFauna?.fenceAt(x+130,y+72)||at(x,y)||decorAt(x,y))return false;const g=gateAt(x,y);return !g||gatesOpen||g.axis==='vertical'||g.id==="south"&&y>59}
+function pass(x,y,level=0,gatesOpen=true){if(x<0||y<0||x>=WIDTH||y>=HEIGHT)return false;if(level===1)return wallWalkAt(Math.floor(x),Math.floor(y));const northLip=y>=11&&y<12&&x>=18&&x<77&&!(x>=46&&x<49);if(northLip||riverAt(x,y)&&!bridgeAt(x,y)||wallAt(Math.floor(x),Math.floor(y))||paddockFenceAt(x,y)||root.KingdomFauna?.fenceAt(x+130,y+72)||at(x,y)||decorAt(x,y))return false;const g=gateAt(x,y);return !g||gatesOpen||g.axis==='vertical'||g.id==="south"&&y>59}
 function house(id){return buildings.find(b=>b.id===id)}
 function porch(id){const b=house(id);if(!b)return {x:47.5,y:35.5};return {x:b.x+b.w/2,y:b.y+b.h+.9}}
 function seeded(n){let x=(n^0x6b884e1)>>>0;x^=x<<13;x^=x>>>17;x^=x<<5;return x>>>0}
@@ -320,5 +323,5 @@ function create(saved){
  function gatePassageAt(id){const g=GATES.find(g=>g.id===id);return !!g&&!gateOpen&&people.some(p=>{const a=agents.get(p.id);return a&&!a.inside&&!a.away&&Math.hypot(a.x-g.x,a.y-g.y)<2.1})}
  return {advance,step,snapshot,population,childRemark,introduce,knows,bond,standing,socialize,heard,hear,knownReports,reportSmithyTheft,reportPropertyTheft,schedule,peopleOnMap,insidePeople,indoorOccupants,gatePassageAt,get day(){return day},get hour(){return hour},get gateOpen(){return gateOpen},get caravan(){return caravan},get events(){return events},get grain(){return grain},get orders(){return orders}};
 }
-root.GreyfordWorld={WIDTH,HEIGHT,GATES,PADDOCK,homes,workplaces,offices,buildings,decor,people,outfit,lifeStage,lifeScale,at,decorAt,gateAt,wallAt,paddockFenceAt,inPaddock,wallWalkAt,roadAt,pass,house,porch,create};
+root.GreyfordWorld={WIDTH,HEIGHT,GATES,PADDOCK,homes,workplaces,offices,buildings,decor,people,outfit,lifeStage,lifeScale,at,decorAt,gateAt,wallAt,paddockFenceAt,inPaddock,riverAt,bridgeAt,wallWalkAt,roadAt,pass,house,porch,create};
 })(window);
