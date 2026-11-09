@@ -97,21 +97,8 @@ function brickChimney(g,x,y,size,darkRoof){
  },20,40);
  g.drawImage(art,x,y,size*.62,size*1.14);
 }
-function buildingSpriteId(b){
- if(b.kind==='tavern')return 'inn';
- if(b.kind==='bakery')return 'bakery';
- if(b.kind==='smithy')return 'forge';
- if(b.kind==='mill')return 'mill';
- if(b.kind==='healer')return 'cottage';
- if(b.id==='cottage5')return 'farmhouse';
- if(b.kind==='guard'||['cottage2','cottage4','eastern-cottage'].includes(b.id))return 'cottageLong';
- if(['home','cottage','weaver'].includes(b.kind))return 'cottageModest';
- return null;
-}
 function building(g,b,size,open=false){const x=b.x*size,y=b.y*size,w=b.w*size,h=b.h*size;
  if(root.KingdomModularBuildings?.drawWalls(g,b,size))return;
- const spriteId=buildingSpriteId(b);
- if(spriteId&&regionSite(g,spriteId,b.x+b.w/2,b.y+b.h-1,size))return;
  if(b.kind==='tavern'&&root.KingdomInnSprites?.ready){const sprites=root.KingdomInnSprites;
   gableInfill(g,x,y,w,size);
   for(let i=0;i<2;i++)sprites.draw(g,'innTimber',x+i*w/2,y+size*1.24,w/2,size*2.76);
@@ -143,8 +130,6 @@ function building(g,b,size,open=false){const x=b.x*size,y=b.y*size,w=b.w*size,h=
 }
 function roof(g,b,size){const x=b.x*size,y=b.y*size,w=b.w*size,h=(b.h-1)*size;
  if(root.KingdomModularBuildings?.drawRoof(g,b,size))return;
- const spriteId=buildingSpriteId(b);
- if(spriteId&&regionImages[spriteId]?.complete&&regionImages[spriteId].naturalWidth)return;
  const spriteBuilding=['tavern','bakery','home','cottage'].includes(b.kind)&&root.KingdomInnSprites?.ready;
  if(!spriteBuilding){
  const dark=['mill','smithy','guard'].includes(b.kind),roof=dark?'#535b5b':b.kind==='tavern'?'#75493c':'#806546',ridge=dark?'#89908b':'#b59a69';
@@ -195,7 +180,7 @@ function loadRegionImage(id,file){
  return regionImages[id];
 }
 function regionSite(g,id,x,y,size,animationMs=performance.now()){
- const config={inn:['brooklands-inn-v1.png',6.3,5.2],cottage:['brooklands-cottage-roof-v2.png',5.5,4.3],cottageModest:['brooklands-cottage-modest-v1.png',4.9,3.8],cottageLong:['brooklands-cottage-long-v1.png',5.4,3.7],farmhouse:['brooklands-farmhouse-v1.png',5.6,3.7],bakery:['brooklands-bakehouse-v1.png',6.1,4.8],forge:['brooklands-forge-v1.png',6.2,5],mill:['brooklands-watermill-base-v2.png',8.5,6.4],timber:['brooklands-timber-yard-v1.png',9.5,6.4],mine:['brooklands-mine-cliff-v2.png',22,9]};
+ const config={timber:['brooklands-timber-yard-v1.png',9.5,6.4],mine:['brooklands-mine-cliff-v2.png',22,9]};
  const entry=config[id];if(!entry)return false;
  const img=loadRegionImage(id,entry[0]);if(!img?.complete||!img.naturalWidth)return false;
  const [,w,h]=entry,left=(x-w/2)*size,top=(y+1-h)*size;

@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "status": "design targets; not yet used by the playable region renderer",
+  "coordinateSystem": "kilometres east and north of Dunmere; road distances follow terrain, not straight lines",
+  "localMetersPerTile": 1.5,
+  "overlandMetersPerTile": 6,
+  "overlandTilesPerRealSecond": 3,
+  "realMinutesPerGameDay": 90,
+  "travelKmPerGameHour": { "foot": 4, "mounted": 8, "loadedCart": 3 },
+  "settlements": [
+    { "id": "dunmere", "kind": "village", "eastKm": 0, "northKm": 0, "residents": 55, "households": 13, "coreWidthM": 160, "coreHeightM": 120 },
+    { "id": "greyford", "kind": "walled market town", "eastKm": 10, "northKm": -5, "residents": 120, "households": 30, "coreWidthM": 240, "coreHeightM": 180, "targetStatus": "provisional; residents and households require authored identities and homes" },
+    { "id": "bellmere", "kind": "ferry hamlet", "eastKm": -10, "northKm": -8, "residents": 80, "households": 18, "coreWidthM": 180, "coreHeightM": 130, "targetStatus": "provisional; named households, interiors, and ferry service are not in the playable prototype" },
+    { "id": "marrowfield", "kind": "farming village", "eastKm": 3, "northKm": -10, "residents": 95, "households": 22, "coreWidthM": 220, "coreHeightM": 170, "targetStatus": "provisional; only five named residents currently exist in the prototype" },
+    { "id": "kingsford", "kind": "bridge fort and service town", "eastKm": 28, "northKm": 7, "residents": 150, "households": 35, "coreWidthM": 260, "coreHeightM": 200 },
+    { "id": "pineharrow", "kind": "forest village", "eastKm": -1, "northKm": 5, "residents": 110, "households": 25, "coreWidthM": 200, "coreHeightM": 160 },
+    { "id": "mootwood", "kind": "assembly town", "eastKm": -6, "northKm": 21, "residents": 330, "households": 75, "coreWidthM": 330, "coreHeightM": 260 },
+    { "id": "northwatch", "kind": "pass fort and hostel", "eastKm": 13, "northKm": 27, "residents": 75, "households": 16, "coreWidthM": 160, "coreHeightM": 130 },
+    { "id": "blackpine", "kind": "timber village", "eastKm": -18, "northKm": 10, "residents": 130, "households": 30, "coreWidthM": 240, "coreHeightM": 180 },
+    { "id": "stormcross", "kind": "coastal market town", "eastKm": -32, "northKm": 1, "residents": 430, "households": 100, "coreWidthM": 360, "coreHeightM": 280 }
+  ],
+  "roads": [
+    { "from": "dunmere", "to": "greyford", "km": 16, "walkHoursBand": [3, 5], "constraint": "Vel bridge and toll" },
+    { "from": "dunmere", "to": "bellmere", "km": 14, "walkHoursBand": [2, 4], "constraint": "lower-bank road and ferry" },
+    { "from": "dunmere", "to": "marrowfield", "km": 12, "walkHoursBand": [2, 3], "constraint": "farm lane skirts planted fields" },
+    { "from": "greyford", "to": "kingsford", "km": 24, "walkHoursBand": [5, 7], "constraint": "upstream river road" },
+    { "from": "greyford", "to": "pineharrow", "km": 16, "walkHoursBand": [3, 4], "constraint": "woodland checkpoint" },
+    { "from": "pineharrow", "to": "mootwood", "km": 18, "walkHoursBand": [3, 5], "constraint": "managed forest road" },
+    { "from": "mootwood", "to": "northwatch", "km": 21, "walkHoursBand": [4, 6], "constraint": "pass approach and weather" },
+    { "from": "pineharrow", "to": "blackpine", "km": 20, "walkHoursBand": [4, 6], "constraint": "disputed cutting boundary" },
+    { "from": "blackpine", "to": "stormcross", "km": 20, "walkHoursBand": [4, 6], "constraint": "loaded timber cart road" },
+    { "from": "bellmere", "to": "stormcross", "km": 34, "walkHoursBand": [7, 10], "constraint": "ferry and exposed coastal road" },
+    { "from": "kingsford", "to": "northwatch", "km": 30, "walkHoursBand": [6, 9], "constraint": "steep eastern pass" }
+  ]
+}

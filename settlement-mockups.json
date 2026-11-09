@@ -1,0 +1,411 @@
+{
+  "version": 1,
+  "tileMeters": 1.5,
+  "status": "draft blockouts; no gameplay placement is authorized by this file",
+  "maps": [
+    {
+      "id": "dunmere",
+      "stage": "individual plots",
+      "widthTiles": 107,
+      "heightTiles": 80,
+      "intent": "A brook village around its great tree, with homes, trades, a common green, and fields outside the house lanes.",
+      "terrain": [
+        { "kind": "fields", "x": 7, "y": 53, "w": 14, "h": 11 },
+        { "kind": "fields", "x": 25, "y": 53, "w": 16, "h": 11 },
+        { "kind": "green", "x": 42, "y": 50, "w": 29, "h": 15 },
+        { "kind": "wood", "x": 93, "y": 49, "w": 13, "h": 16 }
+      ],
+      "water": [
+        { "kind": "brook", "x": 1, "y": 0, "w": 5, "h": 80 }
+      ],
+      "roads": [
+        { "x": 51, "y": 0, "w": 5, "h": 80 },
+        { "x": 7, "y": 15, "w": 94, "h": 4 },
+        { "x": 8, "y": 44, "w": 93, "h": 4 },
+        { "x": 8, "y": 65, "w": 93, "h": 4 },
+        { "x": 21, "y": 15, "w": 3, "h": 32 },
+        { "x": 81, "y": 15, "w": 3, "h": 33 },
+        { "x": 21, "y": 65, "w": 3, "h": 15 },
+        { "x": 81, "y": 65, "w": 3, "h": 15 }
+      ],
+      "buildings": [
+        { "id": "home-n1", "kind": "home", "x": 10, "y": 7, "w": 6, "h": 5, "households": 1 },
+        { "id": "home-n2", "kind": "home", "x": 27, "y": 7, "w": 6, "h": 5, "households": 1 },
+        { "id": "home-n3", "kind": "home", "x": 39, "y": 7, "w": 7, "h": 5, "households": 1 },
+        { "id": "home-n4", "kind": "home", "x": 67, "y": 7, "w": 6, "h": 5, "households": 1 },
+        { "id": "home-n5", "kind": "home", "x": 89, "y": 7, "w": 7, "h": 5, "households": 1 },
+        { "id": "home-w1", "kind": "home", "x": 10, "y": 27, "w": 7, "h": 6, "households": 1 },
+        { "id": "home-w2", "kind": "home", "x": 29, "y": 27, "w": 6, "h": 5, "households": 1 },
+        { "id": "home-e1", "kind": "home", "x": 71, "y": 27, "w": 7, "h": 5, "households": 1 },
+        { "id": "home-e2", "kind": "home", "x": 91, "y": 27, "w": 6, "h": 5, "households": 1 },
+        { "id": "home-s1", "kind": "home", "x": 11, "y": 72, "w": 7, "h": 5, "households": 1 },
+        { "id": "home-s2", "kind": "home", "x": 34, "y": 72, "w": 6, "h": 5, "households": 1 },
+        { "id": "home-s3", "kind": "home", "x": 68, "y": 72, "w": 7, "h": 5, "households": 1 },
+        { "id": "home-s4", "kind": "home", "x": 91, "y": 72, "w": 6, "h": 5, "households": 1 },
+        { "id": "brook-mill", "kind": "work", "x": 7, "y": 33, "w": 10, "h": 8 },
+        { "id": "hearth-hound", "kind": "inn", "x": 39, "y": 23, "w": 10, "h": 8 },
+        { "id": "aldric-forge", "kind": "work", "x": 59, "y": 23, "w": 9, "h": 8 },
+        { "id": "iris-bakehouse", "kind": "work", "x": 27, "y": 36, "w": 8, "h": 6 },
+        { "id": "bea-loom", "kind": "work", "x": 70, "y": 37, "w": 8, "h": 6 },
+        { "id": "edda-herbs", "kind": "work", "x": 87, "y": 37, "w": 8, "h": 6 },
+        { "id": "watch-house", "kind": "civic", "x": 71, "y": 53, "w": 9, "h": 7 }
+      ],
+      "doors": [
+        { "building": "home-n1", "x": 13, "y": 11, "side": "south", "access": { "x": 13, "y": 12, "w": 1, "h": 4 } },
+        { "building": "home-n2", "x": 30, "y": 11, "side": "south", "access": { "x": 30, "y": 12, "w": 1, "h": 4 } },
+        { "building": "home-n3", "x": 42, "y": 11, "side": "south", "access": { "x": 42, "y": 12, "w": 1, "h": 4 } },
+        { "building": "home-n4", "x": 70, "y": 11, "side": "south", "access": { "x": 70, "y": 12, "w": 1, "h": 4 } },
+        { "building": "home-n5", "x": 92, "y": 11, "side": "south", "access": { "x": 92, "y": 12, "w": 1, "h": 4 } },
+        { "building": "home-w1", "x": 16, "y": 30, "side": "east", "access": { "x": 17, "y": 30, "w": 5, "h": 1 } },
+        { "building": "home-w2", "x": 29, "y": 29, "side": "west", "access": { "x": 23, "y": 29, "w": 6, "h": 1 } },
+        { "building": "home-e1", "x": 77, "y": 29, "side": "east", "access": { "x": 78, "y": 29, "w": 4, "h": 1 } },
+        { "building": "home-e2", "x": 91, "y": 29, "side": "west", "access": { "x": 83, "y": 29, "w": 8, "h": 1 } },
+        { "building": "home-s1", "x": 14, "y": 72, "side": "north", "access": { "x": 14, "y": 68, "w": 1, "h": 4 } },
+        { "building": "home-s2", "x": 36, "y": 72, "side": "north", "access": { "x": 36, "y": 68, "w": 1, "h": 4 } },
+        { "building": "home-s3", "x": 71, "y": 72, "side": "north", "access": { "x": 71, "y": 68, "w": 1, "h": 4 } },
+        { "building": "home-s4", "x": 93, "y": 72, "side": "north", "access": { "x": 93, "y": 68, "w": 1, "h": 4 } },
+        { "building": "brook-mill", "x": 16, "y": 37, "side": "east", "access": { "x": 17, "y": 37, "w": 5, "h": 1 } },
+        { "building": "hearth-hound", "x": 48, "y": 27, "side": "east", "access": { "x": 49, "y": 27, "w": 3, "h": 1 } },
+        { "building": "aldric-forge", "x": 59, "y": 27, "side": "west", "access": { "x": 55, "y": 27, "w": 4, "h": 1 } },
+        { "building": "iris-bakehouse", "x": 31, "y": 41, "side": "south", "access": { "x": 31, "y": 42, "w": 1, "h": 3 } },
+        { "building": "bea-loom", "x": 74, "y": 42, "side": "south", "access": { "x": 74, "y": 43, "w": 1, "h": 2 } },
+        { "building": "edda-herbs", "x": 90, "y": 42, "side": "south", "access": { "x": 90, "y": 43, "w": 1, "h": 2 } },
+        { "building": "watch-house", "x": 75, "y": 59, "side": "south", "access": { "x": 75, "y": 60, "w": 1, "h": 6 } }
+      ],
+      "landmarks": [
+        { "id": "great-oak", "kind": "tree", "x": 57, "y": 50, "w": 13, "h": 13 },
+        { "id": "well", "kind": "well", "x": 45, "y": 57, "w": 3, "h": 3 },
+        { "id": "vacant-plot", "kind": "vacant", "x": 84, "y": 54, "w": 8, "h": 8 }
+      ]
+    },
+    {
+      "id": "greyford",
+      "stage": "district and street blockout",
+      "widthTiles": 160,
+      "heightTiles": 120,
+      "intent": "A modest Vel bridge town: thirty household plots support the crossing, court, market, trades, and guard.",
+      "terrain": [
+        {"kind": "fields", "x": 30, "y": 105, "w": 35, "h": 13},
+        {"kind": "green", "x": 138, "y": 81, "w": 20, "h": 20},
+        {"kind": "yard", "x": 138, "y": 24, "w": 20, "h": 21}
+      ],
+      "water": [
+        {"kind": "vel", "x": 3, "y": 0, "w": 15, "h": 120}
+      ],
+      "roads": [
+        {"x": 18, "y": 56, "w": 142, "h": 6},
+        {"x": 77, "y": 0, "w": 5, "h": 120},
+        {"x": 24, "y": 38, "w": 112, "h": 5},
+        {"x": 24, "y": 83, "w": 112, "h": 5},
+        {"x": 36, "y": 25, "w": 4, "h": 73},
+        {"x": 118, "y": 25, "w": 4, "h": 73}
+      ],
+      "bridge": {"x": 3, "y": 56, "w": 24, "h": 6},
+      "wall": { "segments": [
+          {"x": 23, "y": 25, "w": 44, "h": 2},
+          {"x": 67, "y": 21, "w": 39, "h": 2},
+          {"x": 106, "y": 25, "w": 30, "h": 2},
+          {"x": 67, "y": 21, "w": 2, "h": 6},
+          {"x": 104, "y": 21, "w": 2, "h": 6},
+          {"x": 23, "y": 25, "w": 2, "h": 75},
+          {"x": 134, "y": 25, "w": 2, "h": 75},
+          {"x": 23, "y": 98, "w": 113, "h": 2}
+        ],
+        "gates": [
+          {"side": "west", "x": 23, "y": 56, "w": 2, "h": 6},
+          {"side": "east", "x": 134, "y": 56, "w": 2, "h": 6},
+          {"side": "north", "x": 77, "y": 21, "w": 5, "h": 2},
+          {"side": "south", "x": 77, "y": 98, "w": 5, "h": 2}
+        ]
+      },
+      "districts": [
+        {"id": "northwest-frontages", "kind": "homes", "form": "attached street homes", "x": 44, "y": 46, "w": 25, "h": 8, "households": 5},
+        {"id": "northeast-frontages", "kind": "homes", "form": "shop houses", "x": 90, "y": 46, "w": 24, "h": 8, "households": 5},
+        {"id": "southwest-frontages", "kind": "homes", "form": "courtyard homes", "x": 44, "y": 64, "w": 25, "h": 16, "households": 5},
+        {"id": "southeast-frontages", "kind": "homes", "form": "attached cottages", "x": 88, "y": 64, "w": 24, "h": 16, "households": 5},
+        {"id": "north-lane-homes", "kind": "homes", "form": "larger merchant plots", "x": 44, "y": 28, "w": 26, "h": 8, "households": 4},
+        {"id": "south-lane-homes", "kind": "homes", "form": "attached cottages", "x": 44, "y": 90, "w": 27, "h": 6, "households": 4},
+        {"id": "east-lane-homes", "kind": "homes", "form": "small detached homes", "x": 124, "y": 64, "w": 8, "h": 16, "households": 2}
+      ],
+      "buildings": [
+        {"id": "march-court", "kind": "civic", "x": 89, "y": 28, "w": 14, "h": 8},
+        {"id": "bridge-inn", "kind": "inn", "x": 104, "y": 28, "w": 12, "h": 8},
+        {"id": "granary", "kind": "stock", "x": 123, "y": 28, "w": 9, "h": 8},
+        {"id": "smithy", "kind": "work", "x": 124, "y": 45, "w": 8, "h": 9},
+        {"id": "bridge-warehouse", "kind": "stock", "x": 27, "y": 65, "w": 8, "h": 9},
+        {"id": "stable", "kind": "work", "x": 139, "y": 67, "w": 14, "h": 9},
+        {"id": "guard-barracks", "kind": "civic", "x": 89, "y": 90, "w": 14, "h": 6},
+        {"id": "market-hall", "kind": "market", "x": 70, "y": 46, "w": 6, "h": 8}
+      ],
+      "doors": [
+        {"building": "march-court", "x": 96, "y": 35, "side": "south", "access": {"x": 96, "y": 36, "w": 1, "h": 3}},
+        {"building": "bridge-inn", "x": 110, "y": 35, "side": "south", "access": {"x": 110, "y": 36, "w": 1, "h": 3}},
+        {"building": "granary", "x": 127, "y": 35, "side": "south", "access": {"x": 127, "y": 36, "w": 1, "h": 3}},
+        {"building": "smithy", "x": 124, "y": 49, "side": "west", "access": {"x": 121, "y": 49, "w": 3, "h": 1}},
+        {"building": "bridge-warehouse", "x": 34, "y": 69, "side": "east", "access": {"x": 35, "y": 69, "w": 2, "h": 1}},
+        {"building": "stable", "x": 146, "y": 67, "side": "north", "access": {"x": 146, "y": 61, "w": 1, "h": 6}},
+        {"building": "guard-barracks", "x": 96, "y": 90, "side": "north", "access": {"x": 96, "y": 87, "w": 1, "h": 3}},
+        {"building": "market-hall", "x": 75, "y": 50, "side": "east", "access": {"x": 76, "y": 50, "w": 2, "h": 1}}
+      ],
+      "landmarks": [
+        {"id": "market-square", "kind": "square", "x": 69, "y": 44, "w": 21, "h": 16},
+        {"id": "market-well", "kind": "well", "x": 72, "y": 54, "w": 2, "h": 2},
+        {"id": "cart-yard", "kind": "yard", "x": 139, "y": 26, "w": 18, "h": 18},
+        {"id": "paddock", "kind": "paddock", "x": 139, "y": 82, "w": 18, "h": 18}
+      ],
+      "market": {
+        "squareId": "market-square",
+        "regularStallIds": ["grain-stall", "cloth-stall"],
+        "stalls": [
+          {"id": "grain-stall", "goods": "grain and flour", "sprite": "marketStallGold", "x": 83, "y": 45, "w": 2, "h": 3, "customerTile": [83, 48]},
+          {"id": "cloth-stall", "goods": "cloth and thread", "sprite": "marketStallBlue", "x": 87, "y": 45, "w": 2, "h": 3, "customerTile": [87, 48]},
+          {"id": "produce-stall", "goods": "garden produce", "sprite": "marketStallGold", "x": 83, "y": 52, "w": 2, "h": 3, "customerTile": [83, 55]},
+          {"id": "visiting-stall", "goods": "visiting merchant stock", "sprite": "marketStallBlue", "x": 87, "y": 52, "w": 2, "h": 3, "customerTile": [87, 55]}
+        ],
+        "cartBays": [
+          {"id": "west-unload", "x": 69, "y": 62, "w": 5, "h": 3},
+          {"id": "east-unload", "x": 83, "y": 62, "w": 5, "h": 3}
+        ],
+        "designCapacity": {"regularVendors": 2, "marketDayVendors": 4, "peopleOnSquare": 14, "carts": 2, "marketDayEveryDays": 5},
+        "intent": "Bridge traffic passes through; only purposeful traders, buyers, carriers, and guards stop here. Stalls use real merchant stock."
+      }
+    },
+    {
+      "id": "marrowfield",
+      "stage": "individual house and farm-lane draft",
+      "widthTiles": 147,
+      "heightTiles": 114,
+      "intent": "An older spring hamlet meets later estate crofts. The cart lane bends around the common, reaches threshing and stores, and skirts outfields; pond water joins the Vel.",
+      "terrain": [
+        {"kind": "fields", "x": 2, "y": 43, "w": 15, "h": 26},
+        {"kind": "fields", "x": 4, "y": 88, "w": 61, "h": 24},
+        {"kind": "fields", "x": 81, "y": 95, "w": 64, "h": 17},
+        {"kind": "fields", "x": 132, "y": 26, "w": 13, "h": 33},
+        {"kind": "green", "x": 53, "y": 50, "w": 15, "h": 6}
+      ],
+      "water": [
+        {"kind": "pond", "x": 5, "y": 7, "w": 20, "h": 14},
+        {"kind": "brook", "x": 24, "y": 18, "w": 31, "h": 3},
+        {"kind": "brook", "x": 55, "y": 19, "w": 36, "h": 3},
+        {"kind": "brook", "x": 91, "y": 17, "w": 34, "h": 3},
+        {"kind": "brook", "x": 125, "y": 18, "w": 22, "h": 3}
+      ],
+      "roads": [
+        {"x": 70, "y": 0, "w": 4, "h": 44},
+        {"x": 70, "y": 42, "w": 11, "h": 4},
+        {"x": 77, "y": 42, "w": 4, "h": 72},
+        {"x": 17, "y": 35, "w": 56, "h": 3},
+        {"x": 72, "y": 37, "w": 58, "h": 3},
+        {"x": 18, "y": 56, "w": 62, "h": 3},
+        {"x": 79, "y": 57, "w": 51, "h": 3},
+        {"x": 12, "y": 72, "w": 68, "h": 4},
+        {"x": 79, "y": 74, "w": 68, "h": 4}
+      ],
+      "bridge": {"x": 70, "y": 19, "w": 4, "h": 3},
+      "buildings": [
+        {"id": "marrow-house-nw1", "kind": "home", "x": 18, "y": 25, "w": 7, "h": 6, "households": 1},
+        {"id": "marrow-house-nw2", "kind": "home", "x": 31, "y": 27, "w": 7, "h": 6, "households": 1},
+        {"id": "marrow-house-nw3", "kind": "home", "x": 45, "y": 24, "w": 7, "h": 6, "households": 1},
+        {"id": "marrow-house-ne1", "kind": "home", "x": 82, "y": 25, "w": 7, "h": 6, "households": 1},
+        {"id": "marrow-house-ne2", "kind": "home", "x": 93, "y": 26, "w": 8, "h": 6, "households": 1},
+        {"id": "marrow-house-ne3", "kind": "home", "x": 105, "y": 25, "w": 7, "h": 6, "households": 1},
+        {"id": "marrow-house-ne4", "kind": "home", "x": 117, "y": 26, "w": 7, "h": 6, "households": 1},
+        {"id": "marrow-house-w1", "kind": "home", "x": 18, "y": 44, "w": 7, "h": 6, "households": 1},
+        {"id": "marrow-house-w2", "kind": "home", "x": 31, "y": 42, "w": 8, "h": 7, "households": 1},
+        {"id": "marrow-house-w3", "kind": "home", "x": 44, "y": 45, "w": 7, "h": 6, "households": 1},
+        {"id": "marrow-house-e1", "kind": "home", "x": 95, "y": 43, "w": 7, "h": 6, "households": 1},
+        {"id": "marrow-house-e2", "kind": "home", "x": 106, "y": 42, "w": 8, "h": 7, "households": 1},
+        {"id": "marrow-house-e3", "kind": "home", "x": 119, "y": 43, "w": 7, "h": 6, "households": 1},
+        {"id": "marrow-house-lw1", "kind": "home", "x": 17, "y": 63, "w": 7, "h": 6, "households": 1},
+        {"id": "marrow-house-lw2", "kind": "home", "x": 30, "y": 61, "w": 8, "h": 7, "households": 1},
+        {"id": "marrow-house-lw3", "kind": "home", "x": 42, "y": 63, "w": 7, "h": 6, "households": 1},
+        {"id": "marrow-house-le1", "kind": "home", "x": 97, "y": 61, "w": 7, "h": 6, "households": 1},
+        {"id": "marrow-croft", "kind": "home", "x": 18, "y": 81, "w": 8, "h": 6, "households": 1},
+        {"id": "marrow-house-sw2", "kind": "home", "x": 31, "y": 80, "w": 8, "h": 6, "households": 0, "status": "vacant"},
+        {"id": "marrow-house-se1", "kind": "home", "x": 83, "y": 84, "w": 8, "h": 6, "households": 1},
+        {"id": "marrow-house-se2", "kind": "home", "x": 96, "y": 81, "w": 8, "h": 7, "households": 1},
+        {"id": "marrow-house-se3", "kind": "home", "x": 108, "y": 84, "w": 8, "h": 6, "households": 0, "status": "vacant"},
+        {"id": "marrow-inn", "kind": "inn", "x": 54, "y": 25, "w": 11, "h": 8, "households": 1},
+        {"id": "marrow-hall", "kind": "civic", "x": 54, "y": 42, "w": 11, "h": 8, "households": 1},
+        {"id": "marrow-bakehouse", "kind": "work", "x": 82, "y": 42, "w": 9, "h": 8},
+        {"id": "marrow-granary", "kind": "stock", "x": 82, "y": 61, "w": 12, "h": 9},
+        {"id": "marrow-cartwright", "kind": "work", "x": 109, "y": 61, "w": 9, "h": 8},
+        {"id": "marrow-stable", "kind": "work", "x": 121, "y": 61, "w": 13, "h": 8},
+        {"id": "marrow-barn", "kind": "work", "x": 42, "y": 79, "w": 12, "h": 8},
+        {"id": "marrow-seed-store", "kind": "stock", "x": 56, "y": 79, "w": 8, "h": 7}
+      ],
+      "doors": [
+        {"building": "marrow-house-nw1", "x": 21, "y": 30, "side": "south", "access": {"x": 21, "y": 31, "w": 1, "h": 5}},
+        {"building": "marrow-house-nw2", "x": 34, "y": 32, "side": "south", "access": {"x": 34, "y": 33, "w": 1, "h": 3}},
+        {"building": "marrow-house-nw3", "x": 48, "y": 29, "side": "south", "access": {"x": 48, "y": 30, "w": 1, "h": 6}},
+        {"building": "marrow-house-ne1", "x": 85, "y": 30, "side": "south", "access": {"x": 85, "y": 31, "w": 1, "h": 7}},
+        {"building": "marrow-house-ne2", "x": 97, "y": 31, "side": "south", "access": {"x": 97, "y": 32, "w": 1, "h": 6}},
+        {"building": "marrow-house-ne3", "x": 108, "y": 30, "side": "south", "access": {"x": 108, "y": 31, "w": 1, "h": 7}},
+        {"building": "marrow-house-ne4", "x": 120, "y": 31, "side": "south", "access": {"x": 120, "y": 32, "w": 1, "h": 6}},
+        {"building": "marrow-house-w1", "x": 21, "y": 44, "side": "north", "access": {"x": 21, "y": 37, "w": 1, "h": 7}},
+        {"building": "marrow-house-w2", "x": 35, "y": 42, "side": "north", "access": {"x": 35, "y": 37, "w": 1, "h": 5}},
+        {"building": "marrow-house-w3", "x": 47, "y": 45, "side": "north", "access": {"x": 47, "y": 37, "w": 1, "h": 8}},
+        {"building": "marrow-house-e1", "x": 98, "y": 43, "side": "north", "access": {"x": 98, "y": 39, "w": 1, "h": 4}},
+        {"building": "marrow-house-e2", "x": 110, "y": 42, "side": "north", "access": {"x": 110, "y": 39, "w": 1, "h": 3}},
+        {"building": "marrow-house-e3", "x": 122, "y": 43, "side": "north", "access": {"x": 122, "y": 39, "w": 1, "h": 4}},
+        {"building": "marrow-house-lw1", "x": 20, "y": 63, "side": "north", "access": {"x": 20, "y": 58, "w": 1, "h": 5}},
+        {"building": "marrow-house-lw2", "x": 34, "y": 61, "side": "north", "access": {"x": 34, "y": 58, "w": 1, "h": 3}},
+        {"building": "marrow-house-lw3", "x": 45, "y": 63, "side": "north", "access": {"x": 45, "y": 58, "w": 1, "h": 5}},
+        {"building": "marrow-house-le1", "x": 100, "y": 61, "side": "north", "access": {"x": 100, "y": 59, "w": 1, "h": 2}},
+        {"building": "marrow-croft", "x": 22, "y": 81, "side": "north", "access": {"x": 22, "y": 75, "w": 1, "h": 6}},
+        {"building": "marrow-house-sw2", "x": 35, "y": 80, "side": "north", "access": {"x": 35, "y": 75, "w": 1, "h": 5}},
+        {"building": "marrow-house-se1", "x": 87, "y": 84, "side": "north", "access": {"x": 87, "y": 77, "w": 1, "h": 7}},
+        {"building": "marrow-house-se2", "x": 100, "y": 81, "side": "north", "access": {"x": 100, "y": 77, "w": 1, "h": 4}},
+        {"building": "marrow-house-se3", "x": 112, "y": 84, "side": "north", "access": {"x": 112, "y": 77, "w": 1, "h": 7}},
+        {"building": "marrow-inn", "x": 59, "y": 32, "side": "south", "access": {"x": 59, "y": 33, "w": 1, "h": 3}},
+        {"building": "marrow-hall", "x": 59, "y": 42, "side": "north", "access": {"x": 59, "y": 37, "w": 1, "h": 5}},
+        {"building": "marrow-bakehouse", "x": 86, "y": 42, "side": "north", "access": {"x": 86, "y": 39, "w": 1, "h": 3}},
+        {"building": "marrow-granary", "x": 88, "y": 69, "side": "south", "access": {"x": 88, "y": 70, "w": 1, "h": 5}},
+        {"building": "marrow-cartwright", "x": 113, "y": 68, "side": "south", "access": {"x": 113, "y": 69, "w": 1, "h": 6}},
+        {"building": "marrow-stable", "x": 127, "y": 68, "side": "south", "access": {"x": 127, "y": 69, "w": 1, "h": 6}},
+        {"building": "marrow-barn", "x": 48, "y": 79, "side": "north", "access": {"x": 48, "y": 75, "w": 1, "h": 4}},
+        {"building": "marrow-seed-store", "x": 60, "y": 79, "side": "north", "access": {"x": 60, "y": 75, "w": 1, "h": 4}}
+      ],
+      "crofts": [
+        {"house": "marrow-house-nw1", "purpose": "wet-bank garden", "x": 18, "y": 22, "w": 7, "h": 3},
+        {"house": "marrow-house-nw2", "purpose": "wet-bank garden", "x": 31, "y": 23, "w": 7, "h": 4},
+        {"house": "marrow-house-nw3", "purpose": "wet-bank garden", "x": 45, "y": 22, "w": 7, "h": 2},
+        {"house": "marrow-house-ne1", "purpose": "croft garden", "x": 82, "y": 22, "w": 7, "h": 3},
+        {"house": "marrow-house-ne2", "purpose": "croft garden", "x": 93, "y": 22, "w": 8, "h": 4},
+        {"house": "marrow-house-ne3", "purpose": "croft garden", "x": 105, "y": 22, "w": 7, "h": 3},
+        {"house": "marrow-house-ne4", "purpose": "croft garden", "x": 117, "y": 22, "w": 7, "h": 4},
+        {"house": "marrow-house-w1", "purpose": "kitchen garden", "x": 18, "y": 50, "w": 7, "h": 6},
+        {"house": "marrow-house-w2", "purpose": "kitchen garden", "x": 31, "y": 49, "w": 8, "h": 7},
+        {"house": "marrow-house-w3", "purpose": "kitchen garden", "x": 44, "y": 51, "w": 7, "h": 5},
+        {"house": "marrow-house-e1", "purpose": "kitchen garden", "x": 95, "y": 49, "w": 7, "h": 8},
+        {"house": "marrow-house-e2", "purpose": "kitchen garden", "x": 106, "y": 49, "w": 8, "h": 8},
+        {"house": "marrow-house-e3", "purpose": "kitchen garden", "x": 119, "y": 49, "w": 7, "h": 8},
+        {"house": "marrow-house-lw1", "purpose": "kitchen garden", "x": 17, "y": 69, "w": 7, "h": 3},
+        {"house": "marrow-house-lw2", "purpose": "kitchen garden", "x": 30, "y": 68, "w": 8, "h": 4},
+        {"house": "marrow-house-lw3", "purpose": "kitchen garden", "x": 42, "y": 69, "w": 7, "h": 3},
+        {"house": "marrow-house-le1", "purpose": "kitchen garden", "x": 97, "y": 67, "w": 7, "h": 7},
+        {"house": "marrow-house-se1", "purpose": "kitchen garden", "x": 83, "y": 90, "w": 8, "h": 5},
+        {"house": "marrow-house-se2", "purpose": "kitchen garden", "x": 96, "y": 88, "w": 8, "h": 7},
+        {"house": "marrow-house-se3", "purpose": "kitchen garden", "x": 108, "y": 90, "w": 8, "h": 5}
+      ],
+      "workAccess": [
+        {"id": "threshing-north", "to": "threshing-yard", "x": 57, "y": 58, "w": 4, "h": 4},
+        {"id": "threshing-south", "to": "threshing-yard", "x": 57, "y": 68, "w": 4, "h": 5},
+        {"id": "paddock-gate", "to": "horse-paddock", "x": 126, "y": 77, "w": 3, "h": 3}
+      ],
+      "landmarks": [
+        {"id": "threshing-yard", "kind": "yard", "x": 50, "y": 61, "w": 18, "h": 8},
+        {"id": "horse-paddock", "kind": "paddock", "x": 119, "y": 79, "w": 25, "h": 15},
+        {"id": "spring-green-well", "kind": "well", "x": 63, "y": 52, "w": 2, "h": 2},
+        {"id": "common-ash", "kind": "tree", "x": 65, "y": 50, "w": 6, "h": 6},
+        {"id": "pond-willow", "kind": "tree", "x": 8, "y": 23, "w": 6, "h": 6}
+      ]
+    },
+    {
+      "id": "bellmere",
+      "stage": "ferry banks and household draft",
+      "widthTiles": 120,
+      "heightTiles": 87,
+      "intent": "A lower Vel hamlet. Dry-bank homes and stores feed a staffed ferry; the wet shore holds working landings, reeds, nets, and flood traces.",
+      "terrain": [
+        {"kind": "wetland", "x": 15, "y": 0, "w": 6, "h": 87},
+        {"kind": "wetland", "x": 45, "y": 0, "w": 13, "h": 60},
+        {"kind": "wetland", "x": 47, "y": 60, "w": 12, "h": 27},
+        {"kind": "green", "x": 70, "y": 80, "w": 47, "h": 7}
+      ],
+      "water": [
+        {"kind": "vel", "x": 20, "y": 0, "w": 23, "h": 12},
+        {"kind": "vel", "x": 21, "y": 12, "w": 23, "h": 13},
+        {"kind": "vel", "x": 22, "y": 25, "w": 23, "h": 13},
+        {"kind": "vel", "x": 23, "y": 38, "w": 22, "h": 12},
+        {"kind": "vel", "x": 24, "y": 50, "w": 22, "h": 13},
+        {"kind": "vel", "x": 25, "y": 63, "w": 22, "h": 12},
+        {"kind": "vel", "x": 26, "y": 75, "w": 22, "h": 12}
+      ],
+      "roads": [
+        {"x": 0, "y": 43, "w": 20, "h": 5},
+        {"x": 54, "y": 43, "w": 66, "h": 5},
+        {"x": 60, "y": 23, "w": 60, "h": 4},
+        {"x": 107, "y": 23, "w": 3, "h": 45},
+        {"x": 60, "y": 64, "w": 60, "h": 4}
+      ],
+      "ferry": {"westLanding": {"x": 16, "y": 42, "w": 9, "h": 7}, "eastLanding": {"x": 44, "y": 42, "w": 12, "h": 7}, "crossing": {"x": 23, "y": 43, "w": 22, "h": 5}, "craft": [{"id": "bellmere-skiff", "role": "passengers and hand goods", "passengers": 4, "carts": 0}, {"id": "bellmere-freight-ferry", "role": "small carts and larger parties", "passengers": 8, "carts": 1, "horseTeams": 1}], "service": {"daylightHours": [6, 18], "freightDepartures": [8, 12, 16], "crewRequired": 2, "closedAtHighWater": true}},
+      "buildings": [
+        {"id": "bell-home-n1", "kind": "home", "x": 71, "y": 9, "w": 7, "h": 6, "households": 1},
+        {"id": "bell-home-n2", "kind": "home", "x": 81, "y": 10, "w": 7, "h": 6, "households": 1},
+        {"id": "bell-home-n3", "kind": "home", "x": 91, "y": 8, "w": 8, "h": 7, "households": 1},
+        {"id": "bell-home-n4", "kind": "home", "x": 102, "y": 10, "w": 7, "h": 6, "households": 1},
+        {"id": "bell-home-n5", "kind": "home", "x": 112, "y": 9, "w": 7, "h": 6, "households": 0, "status": "vacant"},
+        {"id": "bell-home-m1", "kind": "home", "x": 71, "y": 32, "w": 7, "h": 6, "households": 1},
+        {"id": "bell-home-m2", "kind": "home", "x": 98, "y": 33, "w": 7, "h": 6, "households": 1},
+        {"id": "bell-home-m3", "kind": "home", "x": 112, "y": 31, "w": 7, "h": 6, "households": 1},
+        {"id": "bell-home-s1", "kind": "home", "x": 70, "y": 54, "w": 7, "h": 6, "households": 1},
+        {"id": "bell-home-s2", "kind": "home", "x": 80, "y": 55, "w": 7, "h": 6, "households": 1},
+        {"id": "bell-home-s3", "kind": "home", "x": 90, "y": 54, "w": 7, "h": 6, "households": 1},
+        {"id": "bell-home-s4", "kind": "home", "x": 99, "y": 55, "w": 7, "h": 6, "households": 1},
+        {"id": "bell-home-s5", "kind": "home", "x": 112, "y": 54, "w": 7, "h": 6, "households": 1},
+        {"id": "bell-home-l1", "kind": "home", "x": 72, "y": 70, "w": 7, "h": 6, "households": 1},
+        {"id": "bell-home-l2", "kind": "home", "x": 82, "y": 69, "w": 7, "h": 6, "households": 1},
+        {"id": "bell-home-l3", "kind": "home", "x": 92, "y": 70, "w": 7, "h": 6, "households": 1},
+        {"id": "bell-home-l4", "kind": "home", "x": 101, "y": 69, "w": 7, "h": 6, "households": 1},
+        {"id": "bell-home-l5", "kind": "home", "x": 112, "y": 70, "w": 7, "h": 6, "households": 0, "status": "vacant"},
+        {"id": "bellmere-high-store", "kind": "stock", "x": 59, "y": 9, "w": 9, "h": 8},
+        {"id": "bellmere-ferry-house", "kind": "home", "x": 59, "y": 31, "w": 9, "h": 8, "households": 1},
+        {"id": "bellmere-inn", "kind": "inn", "x": 84, "y": 31, "w": 10, "h": 8, "households": 1},
+        {"id": "bellmere-net-shed", "kind": "work", "x": 59, "y": 54, "w": 8, "h": 7},
+        {"id": "bellmere-boatwright", "kind": "work", "x": 60, "y": 72, "w": 9, "h": 8},
+        {"id": "bellmere-west-shelter", "kind": "work", "x": 5, "y": 31, "w": 9, "h": 8}
+      ],
+      "crofts": [
+        {"house": "bell-home-n1", "purpose": "greens and herbs", "x": 71, "y": 6, "w": 6, "h": 3},
+        {"house": "bell-home-n2", "purpose": "drying herbs and household greens", "x": 81, "y": 7, "w": 6, "h": 3},
+        {"house": "bell-home-n4", "purpose": "vegetable beds", "x": 102, "y": 7, "w": 6, "h": 3},
+        {"house": "bell-home-l1", "purpose": "kitchen greens", "x": 72, "y": 76, "w": 6, "h": 4},
+        {"house": "bell-home-l2", "purpose": "roots and onions", "x": 82, "y": 75, "w": 6, "h": 4},
+        {"house": "bell-home-l3", "purpose": "vegetable beds", "x": 92, "y": 76, "w": 6, "h": 4},
+        {"house": "bell-home-l4", "purpose": "household greens", "x": 101, "y": 75, "w": 6, "h": 4}
+      ],
+      "doors": [
+        {"building": "bell-home-n1", "x": 74, "y": 14, "side": "south", "access": {"x": 74, "y": 15, "w": 1, "h": 9}},
+        {"building": "bell-home-n2", "x": 84, "y": 15, "side": "south", "access": {"x": 84, "y": 16, "w": 1, "h": 8}},
+        {"building": "bell-home-n3", "x": 95, "y": 14, "side": "south", "access": {"x": 95, "y": 15, "w": 1, "h": 9}},
+        {"building": "bell-home-n4", "x": 105, "y": 15, "side": "south", "access": {"x": 105, "y": 16, "w": 1, "h": 8}},
+        {"building": "bell-home-n5", "x": 115, "y": 14, "side": "south", "access": {"x": 115, "y": 15, "w": 1, "h": 9}},
+        {"building": "bell-home-m1", "x": 74, "y": 37, "side": "south", "access": {"x": 74, "y": 38, "w": 1, "h": 6}},
+        {"building": "bell-home-m2", "x": 101, "y": 38, "side": "south", "access": {"x": 101, "y": 39, "w": 1, "h": 5}},
+        {"building": "bell-home-m3", "x": 115, "y": 36, "side": "south", "access": {"x": 115, "y": 37, "w": 1, "h": 7}},
+        {"building": "bell-home-s1", "x": 73, "y": 54, "side": "north", "access": {"x": 73, "y": 47, "w": 1, "h": 7}},
+        {"building": "bell-home-s2", "x": 83, "y": 55, "side": "north", "access": {"x": 83, "y": 47, "w": 1, "h": 8}},
+        {"building": "bell-home-s3", "x": 93, "y": 54, "side": "north", "access": {"x": 93, "y": 47, "w": 1, "h": 7}},
+        {"building": "bell-home-s4", "x": 102, "y": 55, "side": "north", "access": {"x": 102, "y": 47, "w": 1, "h": 8}},
+        {"building": "bell-home-s5", "x": 115, "y": 54, "side": "north", "access": {"x": 115, "y": 47, "w": 1, "h": 7}},
+        {"building": "bell-home-l1", "x": 75, "y": 70, "side": "north", "access": {"x": 75, "y": 67, "w": 1, "h": 3}},
+        {"building": "bell-home-l2", "x": 85, "y": 69, "side": "north", "access": {"x": 85, "y": 67, "w": 1, "h": 2}},
+        {"building": "bell-home-l3", "x": 95, "y": 70, "side": "north", "access": {"x": 95, "y": 67, "w": 1, "h": 3}},
+        {"building": "bell-home-l4", "x": 104, "y": 69, "side": "north", "access": {"x": 104, "y": 67, "w": 1, "h": 2}},
+        {"building": "bell-home-l5", "x": 115, "y": 70, "side": "north", "access": {"x": 115, "y": 67, "w": 1, "h": 3}},
+        {"building": "bellmere-high-store", "x": 63, "y": 16, "side": "south", "access": {"x": 63, "y": 17, "w": 1, "h": 7}},
+        {"building": "bellmere-ferry-house", "x": 63, "y": 38, "side": "south", "access": {"x": 63, "y": 39, "w": 1, "h": 5}},
+        {"building": "bellmere-inn", "x": 89, "y": 38, "side": "south", "access": {"x": 89, "y": 39, "w": 1, "h": 5}},
+        {"building": "bellmere-net-shed", "x": 63, "y": 54, "side": "north", "access": {"x": 63, "y": 47, "w": 1, "h": 7}},
+        {"building": "bellmere-boatwright", "x": 64, "y": 72, "side": "north", "access": {"x": 64, "y": 67, "w": 1, "h": 5}},
+        {"building": "bellmere-west-shelter", "x": 9, "y": 38, "side": "south", "access": {"x": 9, "y": 39, "w": 1, "h": 5}}
+      ],
+      "workAccess": [
+        {"id": "west-waiting-access", "to": "west-waiting-yard", "x": 8, "y": 47, "w": 3, "h": 3},
+        {"id": "east-landing-access", "to": "east-landing-yard", "x": 60, "y": 47, "w": 3, "h": 3},
+        {"id": "fish-drying-access", "to": "fish-drying-yard", "x": 61, "y": 63, "w": 3, "h": 2}
+      ],
+      "landmarks": [
+        {"id": "west-waiting-yard", "kind": "yard", "x": 3, "y": 49, "w": 11, "h": 10},
+        {"id": "east-landing-yard", "kind": "yard", "x": 55, "y": 49, "w": 12, "h": 5},
+        {"id": "fish-drying-yard", "kind": "yard", "x": 59, "y": 61, "w": 8, "h": 3},
+        {"id": "high-bank-well", "kind": "well", "x": 76, "y": 18, "w": 2, "h": 2},
+        {"id": "flood-marker", "kind": "marker", "x": 53, "y": 39, "w": 2, "h": 3},
+        {"id": "old-landing-posts", "kind": "marker", "x": 48, "y": 65, "w": 2, "h": 3},
+        {"id": "reed-bed", "kind": "reeds", "x": 49, "y": 72, "w": 7, "h": 10},
+        {"id": "high-bank-willow", "kind": "tree", "x": 51, "y": 28, "w": 5, "h": 5}
+      ]
+    }
+  ]
+}

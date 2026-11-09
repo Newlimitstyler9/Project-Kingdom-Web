@@ -13,86 +13,6 @@
       "sourceRecord": "bakery-containers-CREDITS.txt"
     },
     {
-      "path": "brooklands-bakehouse-v1.png",
-      "category": "Buildings and world structures",
-      "size": [
-        1374,
-        1145
-      ],
-      "referenced": true,
-      "sourceRecord": null
-    },
-    {
-      "path": "brooklands-cottage-long-v1.png",
-      "category": "Buildings and world structures",
-      "size": [
-        1541,
-        1021
-      ],
-      "referenced": true,
-      "sourceRecord": null
-    },
-    {
-      "path": "brooklands-cottage-modest-v1.png",
-      "category": "Buildings and world structures",
-      "size": [
-        925,
-        891
-      ],
-      "referenced": true,
-      "sourceRecord": null
-    },
-    {
-      "path": "brooklands-cottage-roof-v2.png",
-      "category": "Buildings and world structures",
-      "size": [
-        1402,
-        1122
-      ],
-      "referenced": true,
-      "sourceRecord": null
-    },
-    {
-      "path": "brooklands-cottage-v1.png",
-      "category": "Buildings and world structures",
-      "size": [
-        1322,
-        1190
-      ],
-      "referenced": false,
-      "sourceRecord": null
-    },
-    {
-      "path": "brooklands-farmhouse-v1.png",
-      "category": "Buildings and world structures",
-      "size": [
-        1716,
-        771
-      ],
-      "referenced": true,
-      "sourceRecord": null
-    },
-    {
-      "path": "brooklands-forge-v1.png",
-      "category": "Buildings and world structures",
-      "size": [
-        1374,
-        1145
-      ],
-      "referenced": true,
-      "sourceRecord": null
-    },
-    {
-      "path": "brooklands-inn-v1.png",
-      "category": "Buildings and world structures",
-      "size": [
-        1354,
-        1161
-      ],
-      "referenced": true,
-      "sourceRecord": null
-    },
-    {
       "path": "brooklands-mine-cliff-v2.png",
       "category": "Buildings and world structures",
       "size": [
@@ -123,26 +43,6 @@
       "sourceRecord": null
     },
     {
-      "path": "brooklands-watermill-base-v2.png",
-      "category": "Buildings and world structures",
-      "size": [
-        1448,
-        1086
-      ],
-      "referenced": true,
-      "sourceRecord": null
-    },
-    {
-      "path": "brooklands-watermill-v1.png",
-      "category": "Buildings and world structures",
-      "size": [
-        1448,
-        1086
-      ],
-      "referenced": false,
-      "sourceRecord": null
-    },
-    {
       "path": "brooklands-waterwheel-v2.png",
       "category": "Buildings and world structures",
       "size": [
@@ -150,16 +50,6 @@
         1086
       ],
       "referenced": false,
-      "sourceRecord": null
-    },
-    {
-      "path": "dunmere-current-layout.png",
-      "category": "Map references",
-      "size": [
-        1768,
-        1415
-      ],
-      "referenced": true,
       "sourceRecord": null
     },
     {
